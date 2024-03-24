@@ -269,6 +269,10 @@ with lib; {
       routes = helpers.defaultNullOpts.mkNullable (types.listOf (types.attrsOf types.anything)) "[]" "";
       status = helpers.defaultNullOpts.mkNullable (types.attrsOf types.anything) "{}" "";
       format = helpers.defaultNullOpts.mkNullable (types.attrsOf types.anything) "{}" "";
+
+      enableTelescope = mkEnableOption ''
+        When set to true, enabled noice telescope integration.
+      '';
     };
 
   config = let
@@ -345,5 +349,7 @@ with lib; {
       extraConfigLua = ''
         require("noice").setup(${helpers.toLuaObject setupOptions})
       '';
+
+      plugins.telescope.enabledExtensions = mkIf cfg.enableTelescope ["noice"];
     };
 }
