@@ -15,7 +15,7 @@ in
 
     package = helpers.mkPluginPackageOption "lsp-format.nvim" pkgs.vimPlugins.lsp-format-nvim;
 
-    setup = mkOption {
+    setup = lib.mkOption {
       type =
         with types;
         attrsOf (submodule {
@@ -58,7 +58,7 @@ in
       default = { };
     };
 
-    lspServersToEnable = mkOption {
+    lspServersToEnable = lib.mkOption {
       type =
         with types;
         either (enum [

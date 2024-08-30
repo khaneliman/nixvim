@@ -11,27 +11,27 @@ in
 {
   options.plugins.lsp.servers.rust-analyzer = {
     # https://github.com/nix-community/nixvim/issues/674
-    installCargo = mkOption {
+    installCargo = lib.mkOption {
       type = with types; nullOr bool;
       default = null;
       example = true;
       description = "Whether to install `cargo`.";
     };
 
-    cargoPackage = mkOption {
+    cargoPackage = lib.mkOption {
       type = types.package;
       default = pkgs.cargo;
       description = "Which package to use for `cargo`.";
     };
 
-    installRustc = mkOption {
+    installRustc = lib.mkOption {
       type = with types; nullOr bool;
       default = null;
       example = true;
       description = "Whether to install `rustc`.";
     };
 
-    rustcPackage = mkOption {
+    rustcPackage = lib.mkOption {
       type = types.package;
       default = pkgs.rustc;
       description = "Which package to use for `rustc`.";

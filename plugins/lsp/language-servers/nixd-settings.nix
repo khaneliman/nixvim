@@ -31,7 +31,7 @@ with lib;
     let
       provider = types.submodule {
         options = {
-          expr = mkOption {
+          expr = lib.mkOption {
             type = types.str;
             description = "Expression to eval. Select this attrset as eval .options";
           };
@@ -47,7 +47,7 @@ with lib;
     let
       provider = types.submodule {
         options = {
-          expr = mkOption {
+          expr = lib.mkOption {
             type = types.str;
             description = "Expression to eval. Treat it as `import <nixpkgs> { }`";
           };

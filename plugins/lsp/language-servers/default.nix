@@ -609,7 +609,7 @@ let
       # nixpkgs.
       package = null;
       extraOptions = {
-        autoSetFiletype = mkOption {
+        autoSetFiletype = lib.mkOption {
           type = types.bool;
           description = ''
             Files with the `.v` extension are not automatically detected as vlang files.

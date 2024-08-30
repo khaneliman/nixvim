@@ -17,13 +17,13 @@ in
       enable = mkEnableOption "neovim's built-in LSP";
 
       keymaps = {
-        silent = mkOption {
+        silent = lib.mkOption {
           type = types.bool;
           description = "Whether nvim-lsp keymaps should be silent";
           default = false;
         };
 
-        diagnostic = mkOption {
+        diagnostic = lib.mkOption {
           type = with types; attrsOf (either str attrs);
           description = "Mappings for `vim.diagnostic.<action>` functions to be added when an LSP is attached.";
           example = {
@@ -33,7 +33,7 @@ in
           default = { };
         };
 
-        lspBuf = mkOption {
+        lspBuf = lib.mkOption {
           type = with types; attrsOf (either str attrs);
           description = "Mappings for `vim.lsp.buf.<action>` functions to be added when an LSP it attached.";
           example = {
@@ -46,7 +46,7 @@ in
           default = { };
         };
 
-        extra = mkOption {
+        extra = lib.mkOption {
           type = with types; listOf helpers.keymaps.deprecatedMapOptionSubmodule;
           apply = map helpers.keymaps.removeDeprecatedMapAttrs;
           description = ''
@@ -79,19 +79,19 @@ in
         };
       };
 
-      enabledServers = mkOption {
+      enabledServers = lib.mkOption {
         type =
           with types;
           listOf (oneOf [
             str
             (submodule {
               options = {
-                name = mkOption {
+                name = lib.mkOption {
                   type = str;
                   description = "The server's name";
                 };
 
-                capabilities = mkOption {
+                capabilities = lib.mkOption {
                   type = types.nullOr (types.attrsOf types.bool);
                   description = "Control resolved capabilities for the language server.";
                   default = null;
@@ -100,7 +100,7 @@ in
                   };
                 };
 
-                extraOptions = mkOption {
+                extraOptions = lib.mkOption {
                   type = attrs;
                   description = "Extra options for the server";
                 };
@@ -113,7 +113,7 @@ in
         visible = false;
       };
 
-      inlayHints = mkOption {
+      inlayHints = lib.mkOption {
         description = ''
           Whether to enable LSP inlay-hints.
           Only affects language servers with inlay-hints support.
@@ -125,31 +125,31 @@ in
         example = true;
       };
 
-      onAttach = mkOption {
+      onAttach = lib.mkOption {
         type = types.lines;
         description = "A lua function to be run when a new LSP buffer is attached. The argument `client` and `bufnr` is provided.";
         default = "";
       };
 
-      capabilities = mkOption {
+      capabilities = lib.mkOption {
         type = types.lines;
         description = "Lua code that modifies inplace the `capabilities` table.";
         default = "";
       };
 
-      setupWrappers = mkOption {
+      setupWrappers = lib.mkOption {
         type = with types; listOf (functionTo str);
         description = "Code to be run to wrap the setup args. Takes in an argument containing the previous results, and returns a new string of code.";
         default = [ ];
       };
 
-      preConfig = mkOption {
+      preConfig = lib.mkOption {
         type = types.lines;
         description = "Code to be run before loading the LSP. Useful for requiring plugins";
         default = "";
       };
 
-      postConfig = mkOption {
+      postConfig = lib.mkOption {
         type = types.lines;
         description = "Code to be run after loading the LSP. This is an internal option";
         default = "";

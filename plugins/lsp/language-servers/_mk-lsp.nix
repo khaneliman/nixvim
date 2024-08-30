@@ -46,13 +46,13 @@ in
     plugins.lsp.servers.${name} = {
       enable = mkEnableOption description;
 
-      package = mkOption {
+      package = lib.mkOption {
         default = package;
         type = types.nullOr types.package;
         description = "Which package to use for ${name}.";
       };
 
-      cmd = mkOption {
+      cmd = lib.mkOption {
         type = with types; nullOr (listOf str);
         default = if (cfg.package or null) != null then cmd cfg else null;
         description = ''
@@ -82,13 +82,13 @@ in
       '';
 
       onAttach = helpers.mkCompositeOption "Server specific on_attach behavior." {
-        override = mkOption {
+        override = lib.mkOption {
           type = types.bool;
           default = false;
           description = "Override the global `plugins.lsp.onAttach` function.";
         };
 
-        function = mkOption {
+        function = lib.mkOption {
           type = types.lines;
           description = ''
             Body of the on_attach function.
@@ -102,7 +102,7 @@ in
         options = settingsOptions;
       };
 
-      extraOptions = mkOption {
+      extraOptions = lib.mkOption {
         default = { };
         type = types.attrsOf types.anything;
         description = "Extra options for the ${name} language server.";

@@ -11,7 +11,7 @@ let
 in
 {
   options.plugins.lsp.servers.pylsp = {
-    pythonPackage = mkOption {
+    pythonPackage = lib.mkOption {
       type = lib.types.package;
       description = "Python package to use for lsp.";
       default = pkgs.python3;
@@ -20,7 +20,7 @@ in
     # All settings are documented here:
     # https://github.com/python-lsp/python-lsp-server/blob/develop/CONFIGURATION.md
     settings = {
-      configurationSources = mkOption {
+      configurationSources = lib.mkOption {
         type = lib.types.nullOr (
           types.enum [
             "pycodestyle"

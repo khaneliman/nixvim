@@ -5,13 +5,12 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "trouble";
   originalName = "trouble-nvim";
   defaultPackage = pkgs.vimPlugins.trouble-nvim;
 
-  maintainers = [ maintainers.loicreynier ];
+  maintainers = [ lib.maintainers.loicreynier ];
 
   # TODO introduced 2024-03-15: remove 2024-05-15
   optionsRenamedToSettings = [
@@ -157,11 +156,11 @@ helpers.neovim-plugin.mkNeovimPlugin config {
     cycle_results = helpers.defaultNullOpts.mkBool true "Whether to cycle item list when reaching beginning or end of list";
 
     action_keys =
-      mapAttrs
+      lib.mapAttrs
         (
           action: config:
           helpers.defaultNullOpts.mkNullable (
-            with types; either str (listOf str)
+            with lib.types; either str (listOf str)
           ) config.default config.description
         )
         {
@@ -251,7 +250,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       Add an indent guide below the fold icons.
     '';
 
-    win_config = helpers.defaultNullOpts.mkAttrsOf types.anything {
+    win_config = helpers.defaultNullOpts.mkAttrsOf lib.types.anything {
       border = "single";
     } "Configuration for floating windows. See `|nvim_open_win()|`.";
 
@@ -272,18 +271,18 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       Automatically fold a file trouble list at creation.
     '';
 
-    auto_jump = helpers.defaultNullOpts.mkListOf types.str [ "lsp_definitions" ] ''
+    auto_jump = helpers.defaultNullOpts.mkListOf lib.types.str [ "lsp_definitions" ] ''
       For the given modes, automatically jump if there is only a single result.
     '';
 
-    include_declaration = helpers.defaultNullOpts.mkListOf types.str [
+    include_declaration = helpers.defaultNullOpts.mkListOf lib.types.str [
       "lsp_references"
       "lsp_implementations"
       "lsp_definitions"
     ] "For the given modes, include the declaration of the current symbol in the results.";
 
     signs =
-      mapAttrs
+      lib.mapAttrs
         (
           diagnostic: default:
           helpers.defaultNullOpts.mkStr default "Icon/text for ${diagnostic} diagnostics."
@@ -309,6 +308,6 @@ helpers.neovim-plugin.mkNeovimPlugin config {
   };
 
   extraConfig = cfg: {
-    extraPlugins = mkIf (cfg.iconsPackage != null) [ cfg.iconsPackage ];
+    extraPlugins = lib.mkIf (cfg.iconsPackage != null) [ cfg.iconsPackage ];
   };
 }

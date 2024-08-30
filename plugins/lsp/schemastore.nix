@@ -18,7 +18,7 @@ helpers.vim-plugin.mkVimPlugin config {
       schemaEntry = types.submodule {
         freeformType = with types; attrsOf anything;
         options = {
-          name = mkOption {
+          name = lib.mkOption {
             type = with helpers.nixvimTypes; maybeRaw str;
             description = "The name of the schema.";
           };
@@ -31,7 +31,7 @@ helpers.vim-plugin.mkVimPlugin config {
                 Which filename to match against for this schema.
               '';
 
-          url = mkOption {
+          url = lib.mkOption {
             type = with helpers.nixvimTypes; maybeRaw str;
             description = "The URL of this schema.";
           };
@@ -69,7 +69,7 @@ helpers.vim-plugin.mkVimPlugin config {
     in
     {
       json = {
-        enable = mkOption {
+        enable = lib.mkOption {
           type = types.bool;
           default = true;
           example = false;
@@ -108,7 +108,7 @@ helpers.vim-plugin.mkVimPlugin config {
       };
 
       yaml = {
-        enable = mkOption {
+        enable = lib.mkOption {
           type = types.bool;
           default = true;
           example = false;
