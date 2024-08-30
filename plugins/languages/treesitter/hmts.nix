@@ -5,21 +5,20 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.hmts;
 in
 {
-  meta.maintainers = [ maintainers.GaetanLepage ];
+  meta.maintainers = [ lib.maintainers.GaetanLepage ];
 
   options.plugins.hmts = {
-    enable = mkEnableOption "hmts.nvim";
+    enable = lib.mkEnableOption "hmts.nvim";
 
     package = helpers.mkPluginPackageOption "hmts.nvim" pkgs.vimPlugins.hmts-nvim;
   };
 
-  config = mkIf cfg.enable {
-    warnings = optional (!config.plugins.treesitter.enable) [
+  config = lib.mkIf cfg.enable {
+    warnings = lib.optional (!config.plugins.treesitter.enable) [
       "Nixvim: hmts needs treesitter to function as intended"
     ];
 

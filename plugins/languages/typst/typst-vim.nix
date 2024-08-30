@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.vim-plugin.mkVimPlugin config {
   name = "typst-vim";
   originalName = "typst.vim";
@@ -15,7 +14,7 @@ helpers.vim-plugin.mkVimPlugin config {
   # Add the typst compiler to nixvim packages
   extraPackages = [ pkgs.typst ];
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO introduced 2024-02-20: remove 2024-04-20
   deprecateExtraConfig = true;
@@ -28,13 +27,13 @@ helpers.vim-plugin.mkVimPlugin config {
 
   extraOptions = {
     keymaps = {
-      silent = mkOption {
-        type = types.bool;
+      silent = lib.mkOption {
+        type = lib.types.bool;
         description = "Whether typst-vim keymaps should be silent.";
         default = false;
       };
 
-      watch = helpers.mkNullOrOption types.str "Keymap to preview the document and recompile on change.";
+      watch = helpers.mkNullOrOption lib.types.str "Keymap to preview the document and recompile on change.";
     };
   };
 
@@ -47,7 +46,7 @@ helpers.vim-plugin.mkVimPlugin config {
           options.silent = silent;
         }
         (
-          optional (watch != null) {
+          lib.optional (watch != null) {
             # mode = "n";
             key = watch;
             action = ":TypstWatch<CR>";
@@ -60,7 +59,7 @@ helpers.vim-plugin.mkVimPlugin config {
       Specifies the location of the Typst executable.
     '';
 
-    pdf_viewer = helpers.mkNullOrOption types.str ''
+    pdf_viewer = helpers.mkNullOrOption lib.types.str ''
       Specifies pdf viewer that `typst watch --open` will use.
     '';
 

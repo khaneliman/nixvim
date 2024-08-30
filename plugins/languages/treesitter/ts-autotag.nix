@@ -5,14 +5,13 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "ts-autotag";
   originalName = "nvim-ts-autotag";
   luaName = "nvim-ts-autotag";
   defaultPackage = pkgs.vimPlugins.nvim-ts-autotag;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO introduced 2024-06-17: remove 2024-08-17
   deprecateExtraOptions = true;
@@ -20,7 +19,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
     map
       (
         optionName:
-        mkRemovedOptionModule
+        lib.mkRemovedOptionModule
           [
             "plugins"
             "ts-autotag"
@@ -38,7 +37,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       ];
 
   extraConfig = cfg: {
-    warnings = mkIf (!config.plugins.treesitter.enable) [
+    warnings = lib.mkIf (!config.plugins.treesitter.enable) [
       "Nixvim: ts-autotag needs treesitter to function as intended"
     ];
   };
@@ -62,7 +61,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
     {
       inherit opts;
 
-      aliases = helpers.defaultNullOpts.mkAttrsOf types.str {
+      aliases = helpers.defaultNullOpts.mkAttrsOf lib.types.str {
         "astro" = "html";
         "eruby" = "html";
         "vue" = "html";
@@ -82,8 +81,8 @@ helpers.neovim-plugin.mkNeovimPlugin config {
         "rust" = "rust";
       } "Filetype aliases.";
 
-      per_filetype = helpers.defaultNullOpts.mkAttrsOf (types.submodule {
-        freeformType = with types; attrsOf anything;
+      per_filetype = helpers.defaultNullOpts.mkAttrsOf (lib.types.submodule {
+        freeformType = with lib.types; attrsOf anything;
         options = opts;
       }) { } "Per filetype config overrides.";
     };

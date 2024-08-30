@@ -5,7 +5,9 @@
   pkgs,
   ...
 }:
-with lib;
+let
+  inherit (lib) types literalExpression;
+in
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "treesitter";
   originalName = "nvim-treesitter";
@@ -177,9 +179,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
     highlight = {
       additional_vim_regex_highlighting =
-        helpers.defaultNullOpts.mkNullableWithRaw
-          (with helpers.nixvimTypes; either bool (listOf (maybeRaw str)))
-          false
+        helpers.defaultNullOpts.mkNullableWithRaw (with types; either bool (listOf (maybeRaw str))) false
           ''
             Setting this to true will run `syntax` and tree-sitter at the same time. \
             Set this to `true` if you depend on 'syntax' being enabled (e.g. for indentation). \
@@ -193,12 +193,10 @@ helpers.neovim-plugin.mkNeovimPlugin config {
         Whether to enable treesitter highlighting.
       '';
 
-      disable =
-        helpers.defaultNullOpts.mkStrLuaFnOr (with helpers.nixvimTypes; listOf (maybeRaw str)) null
-          ''
-            Can either be a list of the names of parsers you wish to disable or
-            a lua function that returns a boolean indicating the parser should be disabled.
-          '';
+      disable = helpers.defaultNullOpts.mkStrLuaFnOr (with types; listOf (maybeRaw str)) null ''
+        Can either be a list of the names of parsers you wish to disable or
+        a lua function that returns a boolean indicating the parser should be disabled.
+      '';
 
       custom_captures = helpers.defaultNullOpts.mkAttrsOf types.str { } ''
         Custom capture group highlighting.
@@ -234,7 +232,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
     ensure_installed = helpers.defaultNullOpts.mkNullable' {
       type =
-        with helpers.nixvimTypes;
+        with types;
         oneOf [
           (enum [ "all" ])
           (listOf (maybeRaw str))
@@ -251,7 +249,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
     '';
 
     parser_install_dir = helpers.mkNullOrOption' {
-      type = with helpers.nixvimTypes; maybeRaw str;
+      type = with types; maybeRaw str;
       # Backport the default from nvim-treesitter 1.0
       # The current default doesn't work on nix, as it is readonly
       default.__raw = "vim.fs.joinpath(vim.fn.stdpath('data'), 'site')";
@@ -301,7 +299,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
   };
 
   extraOptions = {
-    folding = mkEnableOption "tree-sitter based folding";
+    folding = lib.mkEnableOption "tree-sitter based folding";
 
     gccPackage = helpers.mkPackageOption {
       name = "gcc";
@@ -316,7 +314,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       '';
     };
 
-    grammarPackages = mkOption {
+    grammarPackages = lib.mkOption {
       type = with types; listOf package;
       default = config.plugins.treesitter.package.passthru.allGrammars;
       example = literalExpression "pkgs.vimPlugins.nvim-treesitter.passthru.allGrammars";
@@ -330,8 +328,8 @@ helpers.neovim-plugin.mkNeovimPlugin config {
     };
 
     # TODO: Implement rawLua support to be passed into extraConfigLua.
-    languageRegister = mkOption {
-      type = with types; attrsOf (coercedTo str toList (listOf str));
+    languageRegister = lib.mkOption {
+      type = with types; attrsOf (coercedTo str lib.toList (listOf str));
       default = { };
       example = {
         cpp = "onelab";
@@ -349,14 +347,14 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       '';
     };
 
-    nixGrammars = mkOption {
+    nixGrammars = lib.mkOption {
       type = types.bool;
       default = true;
       example = false;
       description = "Whether to install grammars defined in `grammarPackages`.";
     };
 
-    nixvimInjections = mkOption {
+    nixvimInjections = lib.mkOption {
       type = types.bool;
       default = true;
       example = false;
@@ -398,13 +396,13 @@ helpers.neovim-plugin.mkNeovimPlugin config {
     extraConfigLua =
       # NOTE: Upstream state that the parser MUST be at the beginning of runtimepath.
       # Otherwise the parsers from Neovim takes precedent, which may be incompatible with some queries.
-      (optionalString (cfg.settings.parser_install_dir != null) ''
+      (lib.optionalString (cfg.settings.parser_install_dir != null) ''
         vim.opt.runtimepath:prepend(${helpers.toLuaObject cfg.settings.parser_install_dir})
       '')
       + ''
         require('nvim-treesitter.configs').setup(${helpers.toLuaObject cfg.settings})
       ''
-      + (optionalString (cfg.languageRegister != { }) ''
+      + (lib.optionalString (cfg.languageRegister != { }) ''
         do
           local __parserFiletypeMappings = ${helpers.toLuaObject cfg.languageRegister}
 
@@ -414,7 +412,9 @@ helpers.neovim-plugin.mkNeovimPlugin config {
         end
       '');
 
-    extraFiles = mkIf cfg.nixvimInjections { "queries/nix/injections.scm".source = ./injections.scm; };
+    extraFiles = lib.mkIf cfg.nixvimInjections {
+      "queries/nix/injections.scm".source = ./injections.scm;
+    };
 
     extraPlugins =
       lib.optional (cfg.iconsPackage != null) cfg.iconsPackage
@@ -428,9 +428,9 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       cfg.treesitterPackage
     ];
 
-    opts = mkIf cfg.folding {
-      foldmethod = mkDefault "expr";
-      foldexpr = mkDefault "nvim_treesitter#foldexpr()";
+    opts = lib.mkIf cfg.folding {
+      foldmethod = lib.mkDefault "expr";
+      foldexpr = lib.mkDefault "nvim_treesitter#foldexpr()";
     };
 
     # Since https://github.com/NixOS/nixpkgs/pull/321550 upstream queries are added

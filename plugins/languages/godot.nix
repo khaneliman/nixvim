@@ -5,14 +5,13 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.vim-plugin.mkVimPlugin config {
   name = "godot";
   originalName = "vim-godot";
   defaultPackage = pkgs.vimPlugins.vim-godot;
   globalPrefix = "godot_";
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   extraOptions = {
     godotPackage = helpers.mkPackageOption {

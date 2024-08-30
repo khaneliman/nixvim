@@ -12,12 +12,12 @@ with lib;
 
     package = helpers.mkPluginPackageOption "plantuml-syntax" pkgs.vimPlugins.plantuml-syntax;
 
-    setMakeprg = mkOption {
+    setMakeprg = lib.mkOption {
       type = types.bool;
       default = true;
       description = "Set the makeprg to 'plantuml'";
     };
-    executableScript = mkOption {
+    executableScript = lib.mkOption {
       type = types.nullOr types.str;
       default = null;
       description = "Set the script to be called with makeprg, default to 'plantuml' in PATH";

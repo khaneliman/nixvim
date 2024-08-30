@@ -36,14 +36,13 @@ let
     };
   };
 in
-with lib;
 helpers.vim-plugin.mkVimPlugin config {
   name = "julia-cell";
   originalName = "vim-julia-cell";
   defaultPackage = pkgs.vimPlugins.vim-julia-cell;
   globalPrefix = "julia_cell_";
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO introduced 2024-02-19: remove 2024-04-19
   deprecateExtraConfig = true;
@@ -69,23 +68,25 @@ helpers.vim-plugin.mkVimPlugin config {
   extraOptions = {
     keymaps =
       {
-        silent = mkOption {
-          type = types.bool;
+        silent = lib.mkOption {
+          type = lib.types.bool;
           description = "Whether julia-cell keymaps should be silent";
           default = false;
         };
       }
-      // (mapAttrs (name: value: helpers.mkNullOrOption types.str "Keymap for ${value.desc}.") mappings);
+      // (lib.mapAttrs (
+        name: value: helpers.mkNullOrOption lib.types.str "Keymap for ${value.desc}."
+      ) mappings);
   };
 
   extraConfig = cfg: {
-    keymaps = flatten (
-      mapAttrsToList (
+    keymaps = lib.flatten (
+      lib.mapAttrsToList (
         name: value:
         let
           key = cfg.keymaps.${name};
         in
-        optional (key != null) {
+        lib.optional (key != null) {
           mode = "n";
           inherit key;
           action = ":JuliaCell${value.cmd}<CR>";

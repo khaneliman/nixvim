@@ -5,15 +5,14 @@
   pkgs,
   ...
 }:
-with lib;
 {
   options.plugins.ts-context-commentstring = helpers.neovim-plugin.extraOptionsOptions // {
-    enable = mkEnableOption "nvim-ts-context-commentstring";
+    enable = lib.mkEnableOption "nvim-ts-context-commentstring";
 
     package = helpers.mkPluginPackageOption "ts-context-commentstring" pkgs.vimPlugins.nvim-ts-context-commentstring;
 
-    skipTsContextCommentStringModule = mkOption {
-      type = types.bool;
+    skipTsContextCommentStringModule = lib.mkOption {
+      type = lib.types.bool;
       default = true;
       description = ''
         Whether to skip backwards compatibility routines and speed up loading.
@@ -25,7 +24,7 @@ with lib;
       Whether to disable auto-initialization.
     '';
 
-    languages = helpers.mkNullOrOption (with types; attrsOf (either str (attrsOf str))) ''
+    languages = helpers.mkNullOrOption (with lib.types; attrsOf (either str (attrsOf str))) ''
       Allows you to add support for more languages.
 
       See `:h ts-context-commentstring-commentstring-configuration` for more information.
@@ -36,8 +35,8 @@ with lib;
     let
       cfg = config.plugins.ts-context-commentstring;
     in
-    mkIf cfg.enable {
-      warnings = mkIf (!config.plugins.treesitter.enable) [
+    lib.mkIf cfg.enable {
+      warnings = lib.mkIf (!config.plugins.treesitter.enable) [
         "Nixvim: ts-context-commentstring needs treesitter to function as intended"
       ];
 

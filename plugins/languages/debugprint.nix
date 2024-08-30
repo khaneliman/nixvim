@@ -114,22 +114,22 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           with types;
           attrsOf (submodule {
             options = {
-              left = mkOption {
+              left = lib.mkOption {
                 type = str;
                 description = "Left part of snippet to insert.";
               };
 
-              right = mkOption {
+              right = lib.mkOption {
                 type = str;
                 description = "Right part of snippet to insert (plain debug line mode).";
               };
 
-              mid_var = mkOption {
+              mid_var = lib.mkOption {
                 type = str;
                 description = "Middle part of snippet to insert (variable debug line mode).";
               };
 
-              right_var = mkOption {
+              right_var = lib.mkOption {
                 type = str;
                 description = "Right part of snippet to insert (variable debug line mode).";
               };

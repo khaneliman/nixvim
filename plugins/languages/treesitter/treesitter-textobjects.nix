@@ -5,21 +5,20 @@
   pkgs,
   ...
 }:
-with lib;
 {
   options.plugins.treesitter-textobjects =
     let
-      disable = helpers.defaultNullOpts.mkListOf types.str [ ] ''
+      disable = helpers.defaultNullOpts.mkListOf lib.types.str [ ] ''
         List of languages to disable this module for.
       '';
 
       mkKeymapsOption =
         desc:
         helpers.defaultNullOpts.mkAttrsOf (
-          with types;
+          with lib.types;
           either str (submodule {
             options = {
-              query = mkOption {
+              query = lib.mkOption {
                 type = str;
                 description = "";
                 example = "@class.inner";
@@ -39,7 +38,7 @@ with lib;
     in
     helpers.neovim-plugin.extraOptionsOptions
     // {
-      enable = mkEnableOption "treesitter-textobjects (requires plugins.treesitter.enable to be true)";
+      enable = lib.mkEnableOption "treesitter-textobjects (requires plugins.treesitter.enable to be true)";
 
       package = helpers.mkPluginPackageOption "treesitter-textobjects" pkgs.vimPlugins.nvim-treesitter-textobjects;
 
@@ -65,7 +64,7 @@ with lib;
         selectionModes =
           helpers.defaultNullOpts.mkAttrsOf
             (
-              with types;
+              with lib.types;
               enum [
                 "v"
                 "V"
@@ -78,7 +77,7 @@ with lib;
               selection mode per capture, default is `v`(charwise).
             '';
 
-        includeSurroundingWhitespace = helpers.defaultNullOpts.mkStrLuaFnOr types.bool false ''
+        includeSurroundingWhitespace = helpers.defaultNullOpts.mkStrLuaFnOr lib.types.bool false ''
           `true` or `false`, when `true` textobjects are extended to include preceding or
           succeeding whitespace.
 
@@ -175,7 +174,7 @@ with lib;
           (when https://github.com/neovim/neovim/pull/12720 or its successor is merged).
         '';
 
-        floatingPreviewOpts = helpers.defaultNullOpts.mkAttrsOf types.anything { } ''
+        floatingPreviewOpts = helpers.defaultNullOpts.mkAttrsOf lib.types.anything { } ''
           Options to pass to `vim.lsp.util.open_floating_preview`.
           For example, `maximum_height`.
         '';
@@ -186,8 +185,8 @@ with lib;
     let
       cfg = config.plugins.treesitter-textobjects;
     in
-    mkIf cfg.enable {
-      warnings = mkIf (!config.plugins.treesitter.enable) [
+    lib.mkIf cfg.enable {
+      warnings = lib.mkIf (!config.plugins.treesitter.enable) [
         "Nixvim: treesitter-textobjects needs treesitter to function as intended"
       ];
 
@@ -199,9 +198,9 @@ with lib;
           processKeymapsOpt =
             keymapsOptionValue:
             helpers.ifNonNull' keymapsOptionValue (
-              mapAttrs (
+              lib.mapAttrs (
                 key: mapping:
-                if isString mapping then
+                if lib.isString mapping then
                   mapping
                 else
                   {

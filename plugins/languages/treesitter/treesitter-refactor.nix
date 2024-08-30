@@ -5,11 +5,13 @@
   pkgs,
   ...
 }:
-with lib;
+let
+  inherit (lib) mkEnableOption types;
+in
 {
   options.plugins.treesitter-refactor =
     let
-      disable = mkOption {
+      disable = lib.mkOption {
         type = types.listOf types.str;
         default = [ ];
         description = "List of languages to disable the module on";
@@ -23,7 +25,7 @@ with lib;
       highlightDefinitions = {
         inherit disable;
         enable = mkEnableOption "Highlights definition and usages of the current symbol under the cursor.";
-        clearOnCursorMove = mkOption {
+        clearOnCursorMove = lib.mkOption {
           type = types.bool;
           default = true;
           description = ''
@@ -40,7 +42,7 @@ with lib;
         inherit disable;
         enable = mkEnableOption "Renames the symbol under the cursor within the current scope (and current file).";
         keymaps = {
-          smartRename = mkOption {
+          smartRename = lib.mkOption {
             type = types.nullOr types.str;
             default = "grr";
             description = "rename symbol under the cursor";
@@ -55,12 +57,12 @@ with lib;
         '';
 
         keymaps = {
-          gotoDefinition = mkOption {
+          gotoDefinition = lib.mkOption {
             type = types.nullOr types.str;
             default = "gnd";
             description = "go to the definition of the symbol under the cursor";
           };
-          gotoDefinitionLspFallback = mkOption {
+          gotoDefinitionLspFallback = lib.mkOption {
             type = types.nullOr types.str;
             default = null;
             description = ''
@@ -69,12 +71,12 @@ with lib;
               mapping for `lua require'nvim-treesitter.refactor.navigation(nil, fallback_function)<cr>`.
             '';
           };
-          listDefinitions = mkOption {
+          listDefinitions = lib.mkOption {
             type = types.nullOr types.str;
             default = "gnD";
             description = "list all definitions from the current file";
           };
-          listDefinitionsToc = mkOption {
+          listDefinitionsToc = lib.mkOption {
             type = types.nullOr types.str;
             default = "gO";
             description = ''
@@ -82,12 +84,12 @@ with lib;
               you see when pressing |gO| in help files).
             '';
           };
-          gotoNextUsage = mkOption {
+          gotoNextUsage = lib.mkOption {
             type = types.nullOr types.str;
             default = "<a-*>";
             description = "go to next usage of identifier under the cursor";
           };
-          gotoPreviousUsage = mkOption {
+          gotoPreviousUsage = lib.mkOption {
             type = types.nullOr types.str;
             default = "<a-#>";
             description = "go to previous usage of identifier";
@@ -98,7 +100,7 @@ with lib;
 
   imports = [
     # Added 2024-02-07
-    (mkRenamedOptionModule
+    (lib.mkRenamedOptionModule
       [
         "plugins"
         "treesitter-refactor"
@@ -115,7 +117,7 @@ with lib;
       ]
     )
     # Added 2024-02-07
-    (mkRenamedOptionModule
+    (lib.mkRenamedOptionModule
       [
         "plugins"
         "treesitter-refactor"
@@ -137,8 +139,8 @@ with lib;
     let
       cfg = config.plugins.treesitter-refactor;
     in
-    mkIf cfg.enable {
-      warnings = mkIf (!config.plugins.treesitter.enable) [
+    lib.mkIf cfg.enable {
+      warnings = lib.mkIf (!config.plugins.treesitter.enable) [
         "Nixvim: treesitter-refactor needs treesitter to function as intended"
       ];
 

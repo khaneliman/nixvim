@@ -5,13 +5,12 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.vim-plugin.mkVimPlugin config {
   name = "vimtex";
   defaultPackage = pkgs.vimPlugins.vimtex;
   globalPrefix = "vimtex_";
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   extraPackages = [ pkgs.pstree ];
 
@@ -26,17 +25,17 @@ helpers.vim-plugin.mkVimPlugin config {
       ];
     in
     [
-      (mkRemovedOptionModule (
+      (lib.mkRemovedOptionModule (
         basePluginPath ++ [ "installTexLive" ]
       ) "If you don't want `texlive` to be installed, set `plugins.vimtex.texlivePackage` to `null`.")
-      (mkRenamedOptionModule (basePluginPath ++ [ "texLivePackage" ]) (
+      (lib.mkRenamedOptionModule (basePluginPath ++ [ "texLivePackage" ]) (
         basePluginPath ++ [ "texlivePackage" ]
       ))
     ];
 
   settingsOptions = {
-    view_method = mkOption {
-      type = types.str;
+    view_method = lib.mkOption {
+      type = lib.types.str;
       default = "general";
       example = "zathura";
       description = ''
@@ -71,7 +70,7 @@ helpers.vim-plugin.mkVimPlugin config {
     extraPackages =
       let
         # xdotool does not exist on darwin
-        xdotool = optional pkgs.stdenv.isLinux pkgs.xdotool;
+        xdotool = lib.optional pkgs.stdenv.isLinux pkgs.xdotool;
         viewerPackages =
           {
             general = xdotool;

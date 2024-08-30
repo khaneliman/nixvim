@@ -15,7 +15,7 @@ in
     package = helpers.mkPluginPackageOption "typescript-tools" pkgs.vimPlugins.typescript-tools-nvim;
 
     onAttach = helpers.defaultNullOpts.mkLuaFn "__lspOnAttach" "Lua code to run when tsserver attaches to a buffer.";
-    handlers = mkOption {
+    handlers = lib.mkOption {
       type = with helpers.nixvimTypes; nullOr (attrsOf strLuaFn);
       apply = v: helpers.ifNonNull' v (mapAttrs (_: helpers.mkRaw) v);
       default = null;
@@ -44,7 +44,7 @@ in
             Either "change" or "insert_leave". Determines when the client asks the server about diagnostics
           '';
 
-      exposeAsCodeAction = mkOption {
+      exposeAsCodeAction = lib.mkOption {
         type =
           with types;
           either (enum [ "all" ]) (
@@ -80,7 +80,7 @@ in
             Memory limit in megabytes or "auto"(basically no limit)
           '';
 
-      tsserverFormatOptions = mkOption {
+      tsserverFormatOptions = lib.mkOption {
         type = with types; nullOr (attrsOf anything);
         default = null;
         description = "Configuration options that well be passed to the tsserver instance. Find available options [here](https://github.com/microsoft/TypeScript/blob/v5.0.4/src/server/protocol.ts#L3418)";
@@ -96,7 +96,7 @@ in
         };
       };
 
-      tsserverFilePreferences = mkOption {
+      tsserverFilePreferences = lib.mkOption {
         type = with types; nullOr (attrsOf anything);
         default = null;
         description = "Configuration options that well be passed to the tsserver instance. Find available options [here](https://github.com/microsoft/TypeScript/blob/v5.0.4/src/server/protocol.ts#L3439)";

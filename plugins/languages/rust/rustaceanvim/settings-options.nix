@@ -302,7 +302,7 @@ with lib;
           freeformType = with types; attrsOf anything;
           options = {
             # Common options
-            type = mkOption {
+            type = lib.mkOption {
               type = types.enum [
                 "executable"
                 "server"

@@ -5,15 +5,13 @@
   pkgs,
   ...
 }:
-with lib;
-with helpers.vim-plugin;
-mkVimPlugin config {
+lib.nixvim.vim-plugin.mkVimPlugin config {
   name = "ledger";
   originalName = "vim-ledger";
   defaultPackage = pkgs.vimPlugins.vim-ledger;
   globalPrefix = "ledger_";
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO introduced 2024-03-02: remove 2024-05-02
   deprecateExtraConfig = true;
@@ -29,14 +27,14 @@ mkVimPlugin config {
       ];
     in
     [
-      (mkRenamedOptionModule (basePluginPath ++ [ "maxWidth" ]) (
+      (lib.mkRenamedOptionModule (basePluginPath ++ [ "maxWidth" ]) (
         basePluginPath
         ++ [
           "settings"
           "maxwidth"
         ]
       ))
-      (mkRenamedOptionModule (basePluginPath ++ [ "fillString" ]) (
+      (lib.mkRenamedOptionModule (basePluginPath ++ [ "fillString" ]) (
         basePluginPath
         ++ [
           "settings"
@@ -59,7 +57,7 @@ mkVimPlugin config {
       Path to the `ledger` executable.
     '';
 
-    is_hledger = helpers.mkNullOrOption types.bool ''
+    is_hledger = helpers.mkNullOrOption lib.types.bool ''
       Whether to use ledger or hledger specific features.
       Setting this value is optional and in most coses will be guessed correctly based on `bin`,
       but in the event it isn't guessed correctly or you want to use different syntax features

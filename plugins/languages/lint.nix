@@ -111,7 +111,7 @@ let
             type,
             description,
           }:
-          mkOption (
+          lib.mkOption (
             {
               inherit apply description example;
             }
@@ -139,7 +139,7 @@ in
 
     package = helpers.mkPluginPackageOption "nvim-lint" pkgs.vimPlugins.nvim-lint;
 
-    lintersByFt = mkOption {
+    lintersByFt = lib.mkOption {
       type = with types; attrsOf (listOf str);
       default = { };
       description = ''
@@ -159,7 +159,7 @@ in
       };
     };
 
-    linters = mkOption {
+    linters = lib.mkOption {
       type = with types; attrsOf (mkLinterOpts false);
       default = { };
       description = ''
@@ -174,7 +174,7 @@ in
       };
     };
 
-    customLinters = mkOption {
+    customLinters = lib.mkOption {
       type = with types; attrsOf (either str (mkLinterOpts true));
       default = { };
       description = ''
@@ -194,18 +194,18 @@ in
           end
         '';
       in
-      mkOption {
+      lib.mkOption {
         type =
           with types;
           nullOr (submodule {
             options = helpers.autocmd.autoCmdOptions // {
-              event = mkOption {
+              event = lib.mkOption {
                 type = with types; nullOr (either str (listOf str));
                 default = defaultEvent;
                 description = "The event or events that should trigger linting.";
               };
 
-              callback = mkOption {
+              callback = lib.mkOption {
                 type = with types; nullOr (either str helpers.nixvimTypes.rawLua);
                 default = defaultCallback;
                 description = "What action to perform for linting";

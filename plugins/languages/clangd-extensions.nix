@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.clangd-extensions;
 
@@ -21,11 +20,11 @@ in
   # TODO: Remove them in ~2 months (Oct. 2023).
   imports =
     [
-      (mkRemovedOptionModule (basePluginPath ++ [ "server" ]) ''
+      (lib.mkRemovedOptionModule (basePluginPath ++ [ "server" ]) ''
         To configure the `clangd` language server options, please use
         `plugins.lsp.servers.clangd.extraSettings`.
       '')
-      (mkRemovedOptionModule (
+      (lib.mkRemovedOptionModule (
         basePluginPath
         ++ [
           "extensions"
@@ -36,7 +35,7 @@ in
     ++ (map
       (
         optionPath:
-        mkRenamedOptionModule (basePluginPath ++ [ "extensions" ] ++ optionPath) (
+        lib.mkRenamedOptionModule (basePluginPath ++ [ "extensions" ] ++ optionPath) (
           basePluginPath ++ optionPath
         )
       )
@@ -96,11 +95,11 @@ in
     );
 
   options.plugins.clangd-extensions = helpers.neovim-plugin.extraOptionsOptions // {
-    enable = mkEnableOption "clangd_extensions, plugins implementing clangd LSP extensions";
+    enable = lib.mkEnableOption "clangd_extensions, plugins implementing clangd LSP extensions";
 
     package = helpers.mkPluginPackageOption "clangd_extensions.nvim" pkgs.vimPlugins.clangd_extensions-nvim;
 
-    enableOffsetEncodingWorkaround = mkEnableOption ''
+    enableOffsetEncodingWorkaround = lib.mkEnableOption ''
       utf-16 offset encoding. This is used to work around the warning:
       "multiple different client offset_encodings detected for buffer, this is not supported yet"
     '';
@@ -149,7 +148,7 @@ in
     };
 
     ast = {
-      roleIcons = mapAttrs (name: default: helpers.defaultNullOpts.mkStr default "") {
+      roleIcons = lib.mapAttrs (name: default: helpers.defaultNullOpts.mkStr default "") {
         type = "🄣";
         declaration = "🄓";
         expression = "🄔";
@@ -158,7 +157,7 @@ in
         templateArgument = "🆃";
       };
 
-      kindIcons = mapAttrs (name: default: helpers.defaultNullOpts.mkStr default "") {
+      kindIcons = lib.mapAttrs (name: default: helpers.defaultNullOpts.mkStr default "") {
         compound = "🄲";
         recovery = "🅁";
         translationUnit = "🅄";
@@ -233,8 +232,8 @@ in
         }
         // cfg.extraOptions;
     in
-    mkIf cfg.enable {
-      warnings = optional (!config.plugins.lsp.enable) ''
+    lib.mkIf cfg.enable {
+      warnings = lib.optional (!config.plugins.lsp.enable) ''
         You have enabled `clangd-extensions` but not the lsp (`plugins.lsp`).
         You should set `plugins.lsp.enable = true` to make use of the clangd-extensions' features.
       '';
@@ -244,14 +243,14 @@ in
           # Enable the clangd language server
           enable = true;
 
-          extraOptions = mkIf cfg.enableOffsetEncodingWorkaround {
+          extraOptions = lib.mkIf cfg.enableOffsetEncodingWorkaround {
             capabilities = {
               __raw = "__clangdCaps";
             };
           };
         };
 
-        preConfig = optionalString cfg.enableOffsetEncodingWorkaround ''
+        preConfig = lib.optionalString cfg.enableOffsetEncodingWorkaround ''
           local __clangdCaps = vim.lsp.protocol.make_client_capabilities()
           __clangdCaps.offsetEncoding = { "utf-16" }
         '';

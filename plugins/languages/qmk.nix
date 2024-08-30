@@ -14,7 +14,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
   maintainers = [ maintainers.GaetanLepage ];
 
   settingsOptions = {
-    name = mkOption {
+    name = lib.mkOption {
       type = types.str;
       example = "LAYOUT_preonic_grid";
       description = ''
@@ -23,7 +23,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       '';
     };
 
-    layout = mkOption {
+    layout = lib.mkOption {
       type = with types; listOf str;
       example = [
         "x x"

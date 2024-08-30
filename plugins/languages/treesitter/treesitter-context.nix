@@ -5,13 +5,12 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "treesitter-context";
   originalName = "nvim-treesitter-context";
   defaultPackage = pkgs.vimPlugins.nvim-treesitter-context;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO introduced 2024-04-22: remove 2024-06-22
   deprecateExtraOptions = true;
@@ -68,7 +67,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           Line used to calculate context.
         '';
 
-    separator = helpers.mkNullOrOption types.str ''
+    separator = helpers.mkNullOrOption lib.types.str ''
       Separator between context and content.
       Should be a single character string, like "-".
       When separator is set, the context will only show up when there are at least 2 lines above
@@ -98,7 +97,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
   };
 
   extraConfig = cfg: {
-    warnings = mkIf (!config.plugins.treesitter.enable) [
+    warnings = lib.mkIf (!config.plugins.treesitter.enable) [
       "Nixvim: treesitter-context needs treesitter to function as intended"
     ];
   };

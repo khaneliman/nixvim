@@ -5,12 +5,11 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "rustaceanvim";
   defaultPackage = pkgs.vimPlugins.rustaceanvim;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO: introduced 2024-05-17, remove on 2024-02-17
   deprecateExtraOptions = true;
@@ -52,7 +51,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
   callSetup = false;
   extraConfig =
     cfg:
-    mkMerge [
+    lib.mkMerge [
       {
         extraPackages = [ cfg.rustAnalyzerPackage ];
 
@@ -60,8 +59,8 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
         # TODO: remove after 24.11
         warnings =
-          optional
-            (hasAttrByPath [
+          lib.optional
+            (lib.hasAttrByPath [
               "settings"
               "server"
               "settings"
@@ -74,9 +73,9 @@ helpers.neovim-plugin.mkNeovimPlugin config {
             '';
       }
       # If nvim-lspconfig is enabled:
-      (mkIf config.plugins.lsp.enable {
+      (lib.mkIf config.plugins.lsp.enable {
         # Use the same `on_attach` callback as for the other LSP servers
-        plugins.rustaceanvim.settings.server.on_attach = mkDefault ''
+        plugins.rustaceanvim.settings.server.on_attach = lib.mkDefault ''
           function(client, bufnr)
             return _M.lspOnAttach(client, bufnr)
           end
