@@ -5,14 +5,14 @@
   pkgs,
   ...
 }:
-with lib;
+
 let
   cfg = config.plugins.chadtree;
-  mkListStr = helpers.defaultNullOpts.mkNullable (types.listOf types.str);
+  mkListStr = helpers.defaultNullOpts.mkNullable (lib.types.listOf lib.types.str);
 in
 {
   options.plugins.chadtree = helpers.neovim-plugin.extraOptionsOptions // {
-    enable = mkEnableOption "chadtree";
+    enable = lib.mkEnableOption "chadtree";
 
     package = helpers.mkPluginPackageOption "chadtree" pkgs.vimPlugins.chadtree;
 
@@ -26,7 +26,7 @@ in
         CHADTree will highlight currently open file, and open all its parents.
       '';
 
-      lang = helpers.mkNullOrOption types.str ''
+      lang = helpers.mkNullOrOption lib.types.str ''
         CHADTree will guess your locale from unix environmental variables.
         Set to `c` to disable emojis.
       '';
@@ -496,10 +496,10 @@ in
           };
       };
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins =
         [ cfg.package ]
-        ++ (optional (
+        ++ (lib.optional (
           cfg.iconsPackage != null && (cfg.theme == null || cfg.theme.iconGlyphSet == "devicons")
         ) cfg.iconsPackage);
 

@@ -5,8 +5,8 @@
   pkgs,
   ...
 }:
-with lib;
 let
+  inherit (lib) types;
   cfg = config.plugins.neo-tree;
   basePluginPath = [
     "plugins"
@@ -15,27 +15,27 @@ let
 in
 {
   imports = [
-    (mkRemovedOptionModule (
+    (lib.mkRemovedOptionModule (
       basePluginPath
       ++ [
         "sourceSelector"
         "tabLabels"
       ]
     ) "Use `plugins.neo-tree.sourceSelector.sources` to achieve the same functionality.")
-    (mkRemovedOptionModule (
+    (lib.mkRemovedOptionModule (
       basePluginPath ++ [ "closeFloatsOnEscapeKey" ]
     ) "This option has been removed from upstream.")
   ];
   options.plugins.neo-tree =
     let
-      listOfRendererComponents = with types; listOf (either str attrs);
+      listOfRendererComponents = with lib.types; listOf (either str attrs);
 
       mkRendererComponentListOption = helpers.defaultNullOpts.mkNullable listOfRendererComponents;
 
       mkMappingsOption =
         defaults:
         helpers.defaultNullOpts.mkNullable (
-          with types; attrsOf (either str attrs)
+          with lib.types; attrsOf (either str attrs)
         ) defaults "Mapping options";
 
       mkWindowMappingsOption = defaults: { mappings = mkMappingsOption defaults; };
@@ -53,7 +53,7 @@ in
     in
     helpers.neovim-plugin.extraOptionsOptions
     // {
-      enable = mkEnableOption "neo-tree";
+      enable = lib.mkEnableOption "neo-tree";
 
       package = helpers.mkPluginPackageOption "neo-tree" pkgs.vimPlugins.neo-tree-nvim;
 
@@ -181,7 +181,7 @@ in
           with types;
           listOf (submodule {
             options = {
-              source = mkOption {
+              source = lib.mkOption {
                 type = str;
                 description = "Name of the source to add to the bar.";
               };
@@ -420,7 +420,7 @@ in
         };
 
         gitStatus = {
-          symbols = mapAttrs (optionName: default: helpers.defaultNullOpts.mkStr default optionName) {
+          symbols = lib.mapAttrs (optionName: default: helpers.defaultNullOpts.mkStr default optionName) {
             added = "✚";
             deleted = "✖";
             modified = "";
@@ -585,77 +585,81 @@ in
           nowait = helpers.defaultNullOpts.mkBool true "nowait";
         };
 
-        mappings = mkMappingsOption (literalMD ''
-          ```nix
-            {
-              "<space>" = {
-                command = "toggle_node";
-                # disable `nowait` if you have existing combos starting with this char that you want to use
-                nowait = false;
-              };
-              "<2-LeftMouse>" = "open";
-              "<cr>" = "open";
-              "<esc>" = "revert_preview";
-              P = {
-                command = "toggle_preview";
-                config = { use_float = true; };
-              };
-              l = "focus_preview";
-              S = "open_split";
-              # S = "split_with_window_picker";
-              s = "open_vsplit";
-              # s = "vsplit_with_window_picker";
-              t = "open_tabnew";
-              # "<cr>" = "open_drop";
-              # t = "open_tab_drop";
-              w = "open_with_window_picker";
-              C = "close_node";
-              z = "close_all_nodes";
-              # Z = "expand_all_nodes";
-              R = "refresh";
-              a = {
-                command = "add";
-                # some commands may take optional config options, see `:h neo-tree-mappings` for details
-                config = {
-                  show_path = "none"; # "none", "relative", "absolute"
+        mappings = mkMappingsOption (
+          lib.literalMD ''
+            ```nix
+              {
+                "<space>" = {
+                  command = "toggle_node";
+                  # disable `nowait` if you have existing combos starting with this char that you want to use
+                  nowait = false;
                 };
-              };
-              A = "add_directory"; # also accepts the config.show_path and config.insert_as options.
-              d = "delete";
-              r = "rename";
-              y = "copy_to_clipboard";
-              x = "cut_to_clipboard";
-              p = "paste_from_clipboard";
-              c = "copy"; # takes text input for destination, also accepts the config.show_path and config.insert_as options
-              m = "move"; # takes text input for destination, also accepts the config.show_path and config.insert_as options
-              e = "toggle_auto_expand_width";
-              q = "close_window";
-              "?" = "show_help";
-              "<" = "prev_source";
-              ">" = "next_source";
-            }
-          ```
-        '');
+                "<2-LeftMouse>" = "open";
+                "<cr>" = "open";
+                "<esc>" = "revert_preview";
+                P = {
+                  command = "toggle_preview";
+                  config = { use_float = true; };
+                };
+                l = "focus_preview";
+                S = "open_split";
+                # S = "split_with_window_picker";
+                s = "open_vsplit";
+                # s = "vsplit_with_window_picker";
+                t = "open_tabnew";
+                # "<cr>" = "open_drop";
+                # t = "open_tab_drop";
+                w = "open_with_window_picker";
+                C = "close_node";
+                z = "close_all_nodes";
+                # Z = "expand_all_nodes";
+                R = "refresh";
+                a = {
+                  command = "add";
+                  # some commands may take optional config options, see `:h neo-tree-mappings` for details
+                  config = {
+                    show_path = "none"; # "none", "relative", "absolute"
+                  };
+                };
+                A = "add_directory"; # also accepts the config.show_path and config.insert_as options.
+                d = "delete";
+                r = "rename";
+                y = "copy_to_clipboard";
+                x = "cut_to_clipboard";
+                p = "paste_from_clipboard";
+                c = "copy"; # takes text input for destination, also accepts the config.show_path and config.insert_as options
+                m = "move"; # takes text input for destination, also accepts the config.show_path and config.insert_as options
+                e = "toggle_auto_expand_width";
+                q = "close_window";
+                "?" = "show_help";
+                "<" = "prev_source";
+                ">" = "next_source";
+              }
+            ```
+          ''
+        );
       };
       filesystem = {
-        window = mkWindowMappingsOption (literalMD ''
-          ```nix
-            {
-              H = "toggle_hidden";
-              "/" = "fuzzy_finder";
-              D = "fuzzy_finder_directory";
-              # "/" = "filter_as_you_type"; # this was the default until v1.28
-              "#" = "fuzzy_sorter"; # fuzzy sorting using the fzy algorithm
-              # D = "fuzzy_sorter_directory";
-              f = "filter_on_submit";
-              "<C-x>" = "clear_filter";
-              "<bs>" = "navigate_up";
-              "." = "set_root";
-              "[g" = "prev_git_modified";
-              "]g" = "next_git_modified";
-            }
-          ```
-        '');
+        window = mkWindowMappingsOption (
+          lib.literalMD ''
+            ```nix
+              {
+                H = "toggle_hidden";
+                "/" = "fuzzy_finder";
+                D = "fuzzy_finder_directory";
+                # "/" = "filter_as_you_type"; # this was the default until v1.28
+                "#" = "fuzzy_sorter"; # fuzzy sorting using the fzy algorithm
+                # D = "fuzzy_sorter_directory";
+                f = "filter_on_submit";
+                "<C-x>" = "clear_filter";
+                "<bs>" = "navigate_up";
+                "." = "set_root";
+                "[g" = "prev_git_modified";
+                "]g" = "next_git_modified";
+              }
+            ```
+          ''
+        );
         asyncDirectoryScan =
           helpers.defaultNullOpts.mkEnumFirstDefault
             [
@@ -888,12 +892,12 @@ in
               with types;
               attrsOf (submodule {
                 options = {
-                  icon = mkOption {
+                  icon = lib.mkOption {
                     description = "Icon for this LSP kind.";
                     type = types.str;
                     example = "";
                   };
-                  hl = mkOption {
+                  hl = lib.mkOption {
                     description = "Highlight group for this LSP kind.";
                     type = types.str;
                     example = "Include";
@@ -907,7 +911,7 @@ in
               `Class = { icon = ""; hl = "Include"; }`
             '';
 
-        customKinds = mkOption {
+        customKinds = lib.mkOption {
           type = with types; attrsOf str;
           default = { };
           example = {
@@ -927,16 +931,16 @@ in
 
   config =
     let
-      inherit (helpers) ifNonNull' mkRaw;
+      inherit (helpers) ifNonNull';
 
       processRendererComponent =
         component:
-        if isString component then
+        if lib.isString component then
           [ component ]
         else
-          (mapAttrs' (name: value: {
+          (lib.mapAttrs' (name: value: {
             name = if name == "name" then "__unkeyed" else name;
-            value = if isList value then processRendererComponentList value else value;
+            value = if lib.isList value then processRendererComponentList value else value;
           }) component);
 
       processRendererComponentList =
@@ -944,15 +948,15 @@ in
 
       processMapping =
         key: action:
-        if isString action then
+        if lib.isString action then
           action
         else
-          mapAttrs' (k: v: {
+          lib.mapAttrs' (k: v: {
             name = if k == "command" then "__unkeyed" else k;
             value = v;
           }) action;
 
-      processMappings = mappings: ifNonNull' mappings (mapAttrs processMapping mappings);
+      processMappings = mappings: ifNonNull' mappings (lib.mapAttrs processMapping mappings);
 
       processWindowMappings = window: { mappings = processMappings window.mappings; };
 
@@ -1125,7 +1129,7 @@ in
         }
         // cfg.extraOptions;
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [
         cfg.package
       ] ++ lib.optional (cfg.iconsPackage != null) cfg.iconsPackage;

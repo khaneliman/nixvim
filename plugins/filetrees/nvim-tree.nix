@@ -5,10 +5,10 @@
   config,
   ...
 }:
-with lib;
 let
+  inherit (lib) types;
+
   cfg = config.plugins.nvim-tree;
-  inherit (helpers) ifNonNull';
 
   openWinConfigOption =
     helpers.defaultNullOpts.mkAttributeSet
@@ -29,7 +29,7 @@ let
 in
 {
   imports = [
-    (mkRemovedOptionModule [
+    (lib.mkRemovedOptionModule [
       "plugins"
       "nvim-tree"
       "view"
@@ -37,7 +37,7 @@ in
     ] "Set `plugins.nvim-tree.renderer.rootFolderLabel` to `false` to hide the root folder.")
   ];
   options.plugins.nvim-tree = helpers.neovim-plugin.extraOptionsOptions // {
-    enable = mkEnableOption "nvim-tree";
+    enable = lib.mkEnableOption "nvim-tree";
 
     package = helpers.mkPluginPackageOption "nvim-tree" pkgs.vimPlugins.nvim-tree-lua;
 
@@ -55,7 +55,7 @@ in
 
     hijackNetrw = helpers.defaultNullOpts.mkBool true "Hijack netrw";
 
-    openOnSetup = mkOption {
+    openOnSetup = lib.mkOption {
       type = types.bool;
       default = false;
       description = ''
@@ -64,7 +64,7 @@ in
       '';
     };
 
-    openOnSetupFile = mkOption {
+    openOnSetupFile = lib.mkOption {
       type = types.bool;
       default = false;
       description = ''
@@ -74,7 +74,7 @@ in
       '';
     };
 
-    ignoreBufferOnSetup = mkOption {
+    ignoreBufferOnSetup = lib.mkOption {
       type = types.bool;
       default = false;
       description = ''
@@ -82,7 +82,7 @@ in
       '';
     };
 
-    ignoreFtOnSetup = mkOption {
+    ignoreFtOnSetup = lib.mkOption {
       type = types.listOf types.str;
       default = [ ];
       description = ''
@@ -92,7 +92,7 @@ in
       '';
     };
 
-    autoClose = mkOption {
+    autoClose = lib.mkOption {
       type = types.bool;
       default = false;
       description = "Automatically close";
@@ -1163,24 +1163,24 @@ in
         end
       '';
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [
         cfg.package
       ] ++ lib.optional (cfg.iconsPackage != null) cfg.iconsPackage;
 
       autoCmd =
-        (optional autoOpenEnabled {
+        (lib.optional autoOpenEnabled {
           event = "VimEnter";
           callback = helpers.mkRaw "open_nvim_tree";
         })
-        ++ (optional cfg.autoClose {
+        ++ (lib.optional cfg.autoClose {
           event = "BufEnter";
           command = "if winnr('$') == 1 && bufname() == 'NvimTree_' . tabpagenr() | quit | endif";
           nested = true;
         });
 
       extraConfigLua =
-        (optionalString autoOpenEnabled openNvimTreeFunction)
+        (lib.optionalString autoOpenEnabled openNvimTreeFunction)
         + ''
 
           require('nvim-tree').setup(${helpers.toLuaObject options})
