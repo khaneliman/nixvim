@@ -5,13 +5,12 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "chatgpt";
   originalName = "ChatGPT.nvim";
   defaultPackage = pkgs.vimPlugins.ChatGPT-nvim;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   extraOptions = {
     curlPackage = helpers.mkPackageOption {
@@ -32,7 +31,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
     '';
 
     extra_curl_params = helpers.defaultNullOpts.mkListOf' {
-      type = types.str;
+      type = lib.types.str;
       pluginDefault = null;
       description = ''
         Custom cURL parameters can be passed using this option.

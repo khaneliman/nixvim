@@ -5,14 +5,13 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "copilot-chat";
   originalName = "CopilotChat.nvim";
   luaName = "CopilotChat";
   defaultPackage = pkgs.vimPlugins.CopilotChat-nvim;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   settingsOptions = {
     debug = helpers.defaultNullOpts.mkBool false ''
@@ -35,7 +34,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       GPT model to use, 'gpt-3.5-turbo' or 'gpt-4'.
     '';
 
-    temperature = helpers.defaultNullOpts.mkNullableWithRaw (types.numbers.between 0.0 1.0) 0.1 ''
+    temperature = helpers.defaultNullOpts.mkNullableWithRaw (lib.types.numbers.between 0.0 1.0) 0.1 ''
       GPT temperature.
     '';
 
@@ -115,8 +114,8 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
     prompts =
       let
-        promptType = types.submodule {
-          freeformType = with types; attrsOf anything;
+        promptType = lib.types.submodule {
+          freeformType = with lib.types; attrsOf anything;
           options = {
             prompt = helpers.mkNullOrStr "Prompt text.";
 
@@ -172,7 +171,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           };
         };
       in
-      helpers.defaultNullOpts.mkAttrsOf (with types; either str promptType) default ''
+      helpers.defaultNullOpts.mkAttrsOf (with lib.types; either str promptType) default ''
         Default prompts.
       '';
 
@@ -191,7 +190,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
       width =
         helpers.defaultNullOpts.mkNullableWithRaw
-          (with types; either (numbers.between 0.0 1.0) ints.positive)
+          (with lib.types; either (numbers.between 0.0 1.0) ints.positive)
           0.5
           ''
             Fractional width of parent, or absolute width in columns when > 1.
@@ -199,7 +198,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
       height =
         helpers.defaultNullOpts.mkNullableWithRaw
-          (with types; either (numbers.between 0.0 1.0) ints.positive)
+          (with lib.types; either (numbers.between 0.0 1.0) ints.positive)
           0.5
           ''
             Fractional height of parent, or absolute height in rows when > 1.
@@ -259,7 +258,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
     mappings =
       helpers.defaultNullOpts.mkAttrsOf
-        (types.submodule {
+        (lib.types.submodule {
           options = {
             normal = helpers.mkNullOrStr "Key for normal mode.";
 
