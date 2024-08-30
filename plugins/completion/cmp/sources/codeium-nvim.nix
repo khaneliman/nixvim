@@ -5,12 +5,12 @@
   pkgs,
   ...
 }:
-with lib;
 let
+  inherit (lib) types;
   cfg = config.plugins.codeium-nvim;
 in
 {
-  meta.maintainers = [ maintainers.GaetanLepage ];
+  meta.maintainers = [ lib.maintainers.GaetanLepage ];
 
   options.plugins.codeium-nvim = helpers.neovim-plugin.extraOptionsOptions // {
     configPath = helpers.defaultNullOpts.mkStr {
@@ -53,7 +53,7 @@ in
     '';
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     extraConfigLua =
       let
         setupOptions =

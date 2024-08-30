@@ -5,13 +5,14 @@
   pkgs,
   ...
 }:
-with lib;
 let
+  inherit (lib) types;
+
   cfg = config.plugins.lspkind;
 in
 {
   options.plugins.lspkind = helpers.neovim-plugin.extraOptionsOptions // {
-    enable = mkEnableOption "lspkind.nvim";
+    enable = lib.mkEnableOption "lspkind.nvim";
 
     package = helpers.mkPluginPackageOption "lspkind" pkgs.vimPlugins.lspkind-nvim;
 
@@ -30,7 +31,7 @@ in
     symbolMap = helpers.mkNullOrOption (types.attrsOf types.str) "Override preset symbols";
 
     cmp = {
-      enable = mkOption {
+      enable = lib.mkOption {
         type = types.bool;
         default = true;
         description = "Integrate with nvim-cmp";
@@ -66,10 +67,10 @@ in
         )
         // cfg.extraOptions;
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [ cfg.package ];
 
-      extraConfigLua = optionalString (!doCmp) ''
+      extraConfigLua = lib.optionalString (!doCmp) ''
         require('lspkind').init(${helpers.toLuaObject options})
       '';
 

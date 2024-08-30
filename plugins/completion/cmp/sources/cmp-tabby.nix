@@ -4,12 +4,11 @@
   config,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.cmp-tabby;
 in
 {
-  meta.maintainers = [ maintainers.GaetanLepage ];
+  meta.maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO: introduced 24-06-18, remove after 24.11
   imports =
@@ -21,13 +20,13 @@ in
       settingsPath = basePluginPath ++ [ "settings" ];
     in
     [
-      (mkRenamedOptionModule (basePluginPath ++ [ "extraOptions" ]) settingsPath)
-      (mkRenamedOptionModule (basePluginPath ++ [ "host" ]) (settingsPath ++ [ "host" ]))
-      (mkRenamedOptionModule (basePluginPath ++ [ "maxLines" ]) (settingsPath ++ [ "max_lines" ]))
-      (mkRenamedOptionModule (basePluginPath ++ [ "runOnEveryKeyStroke" ]) (
+      (lib.mkRenamedOptionModule (basePluginPath ++ [ "extraOptions" ]) settingsPath)
+      (lib.mkRenamedOptionModule (basePluginPath ++ [ "host" ]) (settingsPath ++ [ "host" ]))
+      (lib.mkRenamedOptionModule (basePluginPath ++ [ "maxLines" ]) (settingsPath ++ [ "max_lines" ]))
+      (lib.mkRenamedOptionModule (basePluginPath ++ [ "runOnEveryKeyStroke" ]) (
         settingsPath ++ [ "run_on_every_keystroke" ]
       ))
-      (mkRenamedOptionModule (basePluginPath ++ [ "stop" ]) (settingsPath ++ [ "stop" ]))
+      (lib.mkRenamedOptionModule (basePluginPath ++ [ "stop" ]) (settingsPath ++ [ "stop" ]))
     ];
 
   options.plugins.cmp-tabby = {
@@ -47,7 +46,7 @@ in
           Whether to run the completion on every keystroke.
         '';
 
-        stop = helpers.defaultNullOpts.mkListOf types.str [ "\n" ] ''
+        stop = helpers.defaultNullOpts.mkListOf lib.types.str [ "\n" ] ''
           Stop character.
         '';
       };
@@ -61,7 +60,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     extraConfigLua = ''
       require('cmp_tabby.config'):setup(${helpers.toLuaObject cfg.settings})
     '';

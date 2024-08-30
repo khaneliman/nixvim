@@ -4,35 +4,34 @@
   config,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.cmp;
 
-  extractSources = { sources, ... }: if isList sources then sources else [ ];
+  extractSources = { sources, ... }: if lib.isList sources then sources else [ ];
 
   # Collect the names of the sources provided by the user
   # ["foo" "bar"]
   enabledSources =
-    pipe
+    lib.pipe
       [
         # cfg.setup.sources
         (extractSources cfg.settings)
         # cfg.filetype.<name>.sources
-        (mapAttrsToList (_: extractSources) cfg.filetype)
+        (lib.mapAttrsToList (_: extractSources) cfg.filetype)
         # cfg.cmdline.<name>.sources
-        (mapAttrsToList (_: extractSources) cfg.cmdline)
+        (lib.mapAttrsToList (_: extractSources) cfg.cmdline)
       ]
       [
-        flatten
-        (map (getAttr "name"))
-        unique
+        lib.flatten
+        (map (lib.getAttr "name"))
+        lib.unique
       ];
 in
 {
   options = {
     # Note: this option must be outside of `plugins` to avoid infinite recursion
-    cmpSourcePlugins = mkOption {
-      type = with types; attrsOf str;
+    cmpSourcePlugins = lib.mkOption {
+      type = with lib.types; attrsOf str;
       default = { };
       description = ''
         Internal option used to associate nvim-cmp source names with nixvim plugin module names.
@@ -47,8 +46,8 @@ in
       visible = false;
     };
 
-    plugins.cmp.autoEnableSources = mkOption {
-      type = types.bool;
+    plugins.cmp.autoEnableSources = lib.mkOption {
+      type = lib.types.bool;
       default = true;
       example = false;
       description = ''
@@ -57,34 +56,36 @@ in
     };
   };
 
-  config = mkIf (cfg.enable && cfg.autoEnableSources) (mkMerge [
-    {
-      warnings =
-        # TODO: expand this warning to ft & cmd sources lists and `showDefs` the offending definitions
-        optional (helpers.nixvimTypes.isRawType cfg.settings.sources) ''
-          Nixvim (plugins.cmp): You have enabled `autoEnableSources` that tells Nixvim to automatically
-          enable the source plugins with respect to the list of sources provided in `settings.sources`.
-          However, the latter is proveded as a raw lua string which is not parseable by Nixvim.
+  config = lib.mkIf (cfg.enable && cfg.autoEnableSources) (
+    lib.mkMerge [
+      {
+        warnings =
+          # TODO: expand this warning to ft & cmd sources lists and `showDefs` the offending definitions
+          lib.optional (helpers.nixvimTypes.isRawType cfg.settings.sources) ''
+            Nixvim (plugins.cmp): You have enabled `autoEnableSources` that tells Nixvim to automatically
+            enable the source plugins with respect to the list of sources provided in `settings.sources`.
+            However, the latter is proveded as a raw lua string which is not parseable by Nixvim.
 
-          If you want to keep using raw lua for defining your sources:
-          - Ensure you enable the relevant plugins manually in your configuration;
-          - Dismiss this warning by explicitly setting `autoEnableSources` to `false`;
+            If you want to keep using raw lua for defining your sources:
+            - Ensure you enable the relevant plugins manually in your configuration;
+            - Dismiss this warning by explicitly setting `autoEnableSources` to `false`;
+          '';
+
+        # If the user has enabled the `foo` and `bar` sources, then `plugins` will look like:
+        # {
+        #   cmp-foo.enable = true;
+        #   cmp-bar.enable = true;
+        # }
+        plugins = lib.mapAttrs' (source: name: {
+          inherit name;
+          value.enable = lib.mkIf (lib.elem source enabledSources) true;
+        }) config.cmpSourcePlugins;
+      }
+      {
+        plugins.lsp.capabilities = lib.mkIf (lib.elem "nvim_lsp" enabledSources) ''
+          capabilities = vim.tbl_deep_extend("force", capabilities, require('cmp_nvim_lsp').default_capabilities())
         '';
-
-      # If the user has enabled the `foo` and `bar` sources, then `plugins` will look like:
-      # {
-      #   cmp-foo.enable = true;
-      #   cmp-bar.enable = true;
-      # }
-      plugins = mapAttrs' (source: name: {
-        inherit name;
-        value.enable = mkIf (elem source enabledSources) true;
-      }) config.cmpSourcePlugins;
-    }
-    {
-      plugins.lsp.capabilities = mkIf (elem "nvim_lsp" enabledSources) ''
-        capabilities = vim.tbl_deep_extend("force", capabilities, require('cmp_nvim_lsp').default_capabilities())
-      '';
-    }
-  ]);
+      }
+    ]
+  );
 }

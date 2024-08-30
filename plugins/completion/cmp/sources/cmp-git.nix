@@ -4,14 +4,16 @@
   config,
   ...
 }:
-with lib;
+
 let
+  inherit (lib) types;
   cfg = config.plugins.cmp-git;
 
   mkAction =
     action: target:
     helpers.defaultNullOpts.mkLuaFn "require('cmp_git.${action}').git.${target}" ''
-      Function used to ${action} the ${replaceStrings [ "_" ] [ " " ] target}.
+
+      Function used to ${action} the ${lib.replaceStrings [ "_" ] [ " " ] target}.
     '';
 in
 {
@@ -151,7 +153,7 @@ in
             options = {
               debug_name = helpers.mkNullOrStr "Debug name.";
 
-              trigger_character = mkOption {
+              trigger_character = lib.mkOption {
                 type = types.str;
                 example = ":";
                 description = ''
@@ -160,7 +162,7 @@ in
                 '';
               };
 
-              action = mkOption {
+              action = lib.mkOption {
                 type = helpers.nixvimTypes.strLuaFn;
                 apply = helpers.mkRaw;
                 description = ''
@@ -290,7 +292,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     extraConfigLua = ''
       require('cmp_git').setup(${helpers.toLuaObject cfg.settings})
     '';

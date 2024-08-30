@@ -5,21 +5,20 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "coq-nvim";
   originalName = "coq_nvim";
   defaultPackage = pkgs.vimPlugins.coq_nvim;
 
   maintainers = [
-    maintainers.traxys
+    lib.maintainers.traxys
     helpers.maintainers.Kareem-Medhat
   ];
 
   extraOptions = {
-    installArtifacts = mkEnableOption "and install coq-artifacts";
-    artifactsPackage = mkOption {
-      type = types.package;
+    installArtifacts = lib.mkEnableOption "and install coq-artifacts";
+    artifactsPackage = lib.mkOption {
+      type = lib.types.package;
       description = "Package to use for coq-artifacts (when enabled with installArtifacts)";
       default = pkgs.vimPlugins.coq-artifacts;
     };
@@ -39,7 +38,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       settingsPath = basePath ++ [ "settings" ];
     in
     [
-      (mkRenamedOptionModule (basePath ++ [ "recommendedKeymaps" ]) (
+      (lib.mkRenamedOptionModule (basePath ++ [ "recommendedKeymaps" ]) (
         settingsPath
         ++ [
           "keymap"
@@ -47,7 +46,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
         ]
       ))
 
-      (mkRenamedOptionModule (basePath ++ [ "alwaysComplete" ]) (
+      (lib.mkRenamedOptionModule (basePath ++ [ "alwaysComplete" ]) (
         settingsPath
         ++ [
           "completion"
@@ -62,8 +61,8 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       with helpers.nixvimTypes; maybeRaw (either bool (enum [ "shut-up" ]))
     ) "Auto-start or shut up";
 
-    xdg = mkOption {
-      type = types.bool;
+    xdg = lib.mkOption {
+      type = lib.types.bool;
       default = true;
       description = "Use XDG paths. May be required when installing coq with Nix.";
     };
@@ -74,7 +73,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
   };
 
   extraConfig = cfg: {
-    extraPlugins = mkIf cfg.installArtifacts [ cfg.artifactsPackage ];
+    extraPlugins = lib.mkIf cfg.installArtifacts [ cfg.artifactsPackage ];
 
     globals = {
       coq_settings = cfg.settings;

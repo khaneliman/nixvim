@@ -5,15 +5,13 @@
   pkgs,
   ...
 }:
-with lib;
-with helpers.vim-plugin;
 helpers.vim-plugin.mkVimPlugin config {
   name = "copilot-vim";
   originalName = "copilot.vim";
   defaultPackage = pkgs.vimPlugins.copilot-vim;
   globalPrefix = "copilot_";
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO introduced 2024-03-02: remove 2024-05-02
   deprecateExtraConfig = true;
@@ -24,14 +22,14 @@ helpers.vim-plugin.mkVimPlugin config {
   ];
 
   settingsOptions = {
-    node_command = mkOption {
-      type = with types; nullOr str;
+    node_command = lib.mkOption {
+      type = with lib.types; nullOr str;
       default = "${pkgs.nodejs-18_x}/bin/node";
       description = "Tell Copilot what `node` binary to use.";
     };
 
-    filetypes = mkOption {
-      type = with types; nullOr (attrsOf bool);
+    filetypes = lib.mkOption {
+      type = with lib.types; nullOr (attrsOf bool);
       default = null;
       description = "A dictionary mapping file types to their enabled status.";
       example = {
@@ -40,8 +38,8 @@ helpers.vim-plugin.mkVimPlugin config {
       };
     };
 
-    proxy = mkOption {
-      type = with types; nullOr str;
+    proxy = lib.mkOption {
+      type = with lib.types; nullOr str;
       default = null;
       description = ''
         Tell Copilot what proxy server to use.
@@ -52,7 +50,7 @@ helpers.vim-plugin.mkVimPlugin config {
       example = "localhost:3128";
     };
 
-    proxy_strict_ssl = helpers.mkNullOrOption types.bool ''
+    proxy_strict_ssl = helpers.mkNullOrOption lib.types.bool ''
       Corporate proxies sometimes use a man-in-the-middle SSL certificate which is incompatible
       with GitHub Copilot.
       To work around this, SSL certificate verification can be disabled by setting this option to
@@ -62,7 +60,7 @@ helpers.vim-plugin.mkVimPlugin config {
       `$NODE_TLS_REJECT_UNAUTHORIZED` environment variable to `"0"`.
     '';
 
-    workspace_folders = helpers.mkNullOrOption (with types; listOf str) ''
+    workspace_folders = helpers.mkNullOrOption (with lib.types; listOf str) ''
       A list of "workspace folders" or project roots that Copilot may use to improve to improve
       the quality of suggestions.
 

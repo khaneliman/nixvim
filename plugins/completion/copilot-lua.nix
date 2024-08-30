@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.copilot-lua;
 in
@@ -13,11 +12,11 @@ in
   options = {
     plugins.copilot-lua =
       let
-        keymapOption = helpers.defaultNullOpts.mkNullable (with types; either (enum [ false ]) str);
+        keymapOption = helpers.defaultNullOpts.mkNullable (with lib.types; either (enum [ false ]) str);
       in
       helpers.neovim-plugin.extraOptionsOptions
       // {
-        enable = mkEnableOption "copilot.lua";
+        enable = lib.mkEnableOption "copilot.lua";
 
         package = helpers.mkPluginPackageOption "copilot.lua" pkgs.vimPlugins.copilot-lua;
 
@@ -51,7 +50,7 @@ in
                   The panel position.
                 '';
 
-            ratio = helpers.defaultNullOpts.mkNullable (types.numbers.between 0.0 1.0) 0.4 ''
+            ratio = helpers.defaultNullOpts.mkNullable (lib.types.numbers.between 0.0 1.0) 0.4 ''
               The panel ratio.
             '';
           };
@@ -80,7 +79,7 @@ in
         };
 
         filetypes =
-          helpers.defaultNullOpts.mkAttrsOf types.bool
+          helpers.defaultNullOpts.mkAttrsOf lib.types.bool
             {
               yaml = false;
               markdown = false;
@@ -124,8 +123,8 @@ in
               ```
             '';
 
-        copilotNodeCommand = mkOption {
-          type = types.str;
+        copilotNodeCommand = lib.mkOption {
+          type = lib.types.str;
           default = "${pkgs.nodejs-18_x}/bin/node";
           description = ''
             Use this field to provide the path to a specific node version such as one installed by
@@ -135,7 +134,7 @@ in
         };
 
         serverOptsOverrides = helpers.defaultNullOpts.mkAttrsOf' {
-          type = types.anything;
+          type = lib.types.anything;
           pluginDefault = { };
           description = ''
             Override copilot lsp client `settings`.
@@ -161,7 +160,7 @@ in
       };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     assertions = [
       {
         assertion = !config.plugins.copilot-vim.enable;

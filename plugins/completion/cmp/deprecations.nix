@@ -1,5 +1,4 @@
 { lib, ... }:
-with lib;
 let
   oldPluginBasePath = [
     "plugins"
@@ -306,23 +305,25 @@ let
 
   renameWarnings = map (
     rename:
-    mkRenamedOptionModule (oldPluginBasePath ++ rename.old) (settingsPath ++ (rename.new or rename.old))
+    lib.mkRenamedOptionModule (oldPluginBasePath ++ rename.old) (
+      settingsPath ++ (rename.new or rename.old)
+    )
   ) renamedOptions;
 in
 {
   imports = renameWarnings ++ [
-    (mkRenamedOptionModule (oldPluginBasePath ++ [ "enable" ]) (newPluginBasePath ++ [ "enable" ]))
-    (mkRenamedOptionModule (oldPluginBasePath ++ [ "autoEnableSources" ]) (
+    (lib.mkRenamedOptionModule (oldPluginBasePath ++ [ "enable" ]) (newPluginBasePath ++ [ "enable" ]))
+    (lib.mkRenamedOptionModule (oldPluginBasePath ++ [ "autoEnableSources" ]) (
       newPluginBasePath ++ [ "autoEnableSources" ]
     ))
-    (mkRemovedOptionModule (oldPluginBasePath ++ [ "preselect" ]) ''
+    (lib.mkRemovedOptionModule (oldPluginBasePath ++ [ "preselect" ]) ''
       Use `plugins.cmp.settings.preselect` option. But watch out, you now have to explicitly write `cmp.PreselectMode.<mode>`.
       See the option documentation for more details.
     '')
-    (mkRemovedOptionModule (oldPluginBasePath ++ [ "mappingPresets" ])
+    (lib.mkRemovedOptionModule (oldPluginBasePath ++ [ "mappingPresets" ])
       "If you want to have a complex mapping logic, express it in raw lua within the `plugins.cmp.settings.mapping` option."
     )
-    (mkRemovedOptionModule
+    (lib.mkRemovedOptionModule
       (
         oldPluginBasePath
         ++ [
@@ -338,7 +339,7 @@ in
         ```
       ''
     )
-    (mkRemovedOptionModule
+    (lib.mkRemovedOptionModule
       (
         oldPluginBasePath
         ++ [
@@ -351,7 +352,7 @@ in
         See the option documentation for more details.
       ''
     )
-    (mkRemovedOptionModule (oldPluginBasePath ++ [ "sources" ]) ''
+    (lib.mkRemovedOptionModule (oldPluginBasePath ++ [ "sources" ]) ''
       Use `plugins.cmp.settings.sources` option. But watch out, you can no longer provide a list of lists of sources.
       For this type of use, directly write lua.
       See the option documentation for more details.

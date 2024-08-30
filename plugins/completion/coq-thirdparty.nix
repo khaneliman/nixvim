@@ -5,28 +5,28 @@
   pkgs,
   ...
 }:
-with lib;
 let
+  inherit (lib) types;
   cfg = config.plugins.coq-thirdparty;
 in
 {
   options.plugins.coq-thirdparty = {
-    enable = mkEnableOption "coq-thirdparty";
+    enable = lib.mkEnableOption "coq-thirdparty";
 
     package = helpers.mkPluginPackageOption "coq-thirdparty" pkgs.vimPlugins.coq-thirdparty;
 
-    sources = mkOption {
+    sources = lib.mkOption {
       type = types.listOf (
         types.submodule {
           freeformType = types.attrs;
 
           options = {
-            src = mkOption {
+            src = lib.mkOption {
               type = types.str;
               description = "The name of the source";
             };
 
-            short_name = mkOption {
+            short_name = lib.mkOption {
               type = types.nullOr types.str;
               description = ''
                 A short name for the source.
@@ -62,7 +62,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     extraPlugins = [ cfg.package ];
 
     extraConfigLua = ''

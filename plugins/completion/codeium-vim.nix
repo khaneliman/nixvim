@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-with lib;
 let
   keymapsDefinitions = {
     clear = {
@@ -41,7 +40,7 @@ helpers.vim-plugin.mkVimPlugin config {
   defaultPackage = pkgs.vimPlugins.codeium-vim;
   globalPrefix = "codeium_";
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO introduced 2024-02-19: remove 2024-03-19
   deprecateExtraConfig = true;
@@ -57,14 +56,14 @@ helpers.vim-plugin.mkVimPlugin config {
   ];
 
   settingsOptions = {
-    bin = mkOption {
-      type = with types; nullOr str;
+    bin = lib.mkOption {
+      type = with lib.types; nullOr str;
       default = "${pkgs.codeium}/bin/codeium_language_server";
       description = "The path to the codeium language server executable.";
     };
 
     filetypes =
-      helpers.defaultNullOpts.mkAttrsOf types.bool
+      helpers.defaultNullOpts.mkAttrsOf lib.types.bool
         {
           help = false;
           gitcommit = false;
@@ -93,7 +92,7 @@ helpers.vim-plugin.mkVimPlugin config {
       A global boolean flag that controls whether codeium renders are enabled or disabled.
     '';
 
-    tab_fallback = helpers.mkNullOrOption types.str ''
+    tab_fallback = helpers.mkNullOrOption lib.types.str ''
       The fallback key when there is no suggestion display in `codeium#Accept()`.
 
       Default: "\<C-N>" when a popup menu is visible, else "\t".
@@ -105,7 +104,7 @@ helpers.vim-plugin.mkVimPlugin config {
   };
 
   extraOptions = {
-    keymaps = mapAttrs (
+    keymaps = lib.mapAttrs (
       optionName: v:
       helpers.defaultNullOpts.mkStr v.default ''
         ${v.description}
@@ -121,7 +120,7 @@ helpers.vim-plugin.mkVimPlugin config {
       let
         processKeymap =
           optionName: v:
-          optional (v != null) {
+          lib.optional (v != null) {
             key = v;
             action =
               let
@@ -130,7 +129,7 @@ helpers.vim-plugin.mkVimPlugin config {
               helpers.mkRaw "function() ${command} end";
           };
 
-        keymapsList = flatten (mapAttrsToList processKeymap cfg.keymaps);
+        keymapsList = lib.flatten (lib.mapAttrsToList processKeymap cfg.keymaps);
 
         defaults = {
           mode = "i";

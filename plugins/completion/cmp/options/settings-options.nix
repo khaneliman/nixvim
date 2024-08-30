@@ -1,5 +1,7 @@
 { lib, helpers }:
-with lib;
+let
+  inherit (lib) types;
+in
 {
   performance = {
     debounce = helpers.defaultNullOpts.mkUnsignedInt 60 ''
@@ -36,7 +38,7 @@ with lib;
     - "cmp.PreselectMode.None": nvim-cmp will not preselect any items.
   '';
 
-  mapping = mkOption {
+  mapping = lib.mkOption {
     default = { };
     type = with helpers.nixvimTypes; maybeRaw (attrsOf strLua);
     description = ''
@@ -50,7 +52,7 @@ with lib;
         v
       # When v is an attrs **but not {__raw = ...}**
       else
-        mapAttrs (_: helpers.mkRaw) v;
+        lib.mapAttrs (_: helpers.mkRaw) v;
     example = {
       "<C-d>" = "cmp.mapping.scroll_docs(-4)";
       "<C-f>" = "cmp.mapping.scroll_docs(4)";
@@ -63,7 +65,7 @@ with lib;
   };
 
   snippet = {
-    expand = mkOption {
+    expand = lib.mkOption {
       type = with helpers.nixvimTypes; nullOr strLuaFn;
       default = null;
       description = ''
@@ -209,7 +211,7 @@ with lib;
       `final_score = orig_score + ((#sources - (source_index - 1)) * sorting.priority_weight)`
     '';
 
-    comparators = mkOption {
+    comparators = lib.mkOption {
       type = with helpers.nixvimTypes; nullOr (listOf strLuaFn);
       apply = v: helpers.ifNonNull' v (map helpers.mkRaw v);
       default = null;
@@ -272,7 +274,9 @@ with lib;
     in
     {
       completion = {
-        border = helpers.defaultNullOpts.mkBorder (genList (_: "") 8) "nvim-cmp completion popup menu" "";
+        border = helpers.defaultNullOpts.mkBorder (lib.genList (
+          _: ""
+        ) 8) "nvim-cmp completion popup menu" "";
 
         winhighlight = mkWinhighlightOption "Normal:Pmenu,FloatBorder:Pmenu,CursorLine:PmenuSel,Search:None";
 
@@ -297,7 +301,7 @@ with lib;
       };
 
       documentation = {
-        border = helpers.defaultNullOpts.mkBorder (genList (
+        border = helpers.defaultNullOpts.mkBorder (lib.genList (
           _: ""
         ) 8) "nvim-cmp documentation popup menu" "";
 
