@@ -5,7 +5,7 @@
   pkgs,
   ...
 }:
-with lib;
+
 let
   pluginName = "spider";
   cfg = config.plugins.${pluginName};

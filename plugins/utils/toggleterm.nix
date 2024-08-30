@@ -5,7 +5,7 @@
   pkgs,
   ...
 }:
-with lib;
+ 
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "toggleterm";
   originalName = "toggleterm.nvim";

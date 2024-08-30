@@ -5,7 +5,7 @@
   config,
   ...
 }:
-with lib;
+ 
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "indent-o-matic";
   defaultPackage = pkgs.vimPlugins.indent-o-matic;

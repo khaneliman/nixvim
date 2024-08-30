@@ -5,7 +5,7 @@
   pkgs,
   ...
 }:
-with lib;
+ 
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "auto-save";
   originalName = "auto-save.nvim";

@@ -5,7 +5,7 @@
   pkgs,
   ...
 }:
-with lib;
+ 
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "dashboard";
   originalName = "dashboard-nvim";

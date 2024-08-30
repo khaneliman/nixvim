@@ -4,7 +4,7 @@
   pkgs,
   ...
 }:
-with lib;
+
 let
   inherit (lib.nixvim) defaultNullOpts mkNullOrOption;
   telescopeHelpers = import ./_helpers.nix { inherit lib config pkgs; };

@@ -5,7 +5,7 @@
   pkgs,
   ...
 }:
-with lib;
+ 
 let
   cfg = config.plugins.project-nvim;
 in

@@ -4,7 +4,7 @@
   pkgs,
   ...
 }:
-with lib;
+ 
 let
   inherit (lib.nixvim) keymaps mkNullOrOption toLuaObject;
 in

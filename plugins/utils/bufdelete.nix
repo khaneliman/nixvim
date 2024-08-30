@@ -5,7 +5,7 @@
   lib,
   ...
 }:
-with lib;
+
 helpers.vim-plugin.mkVimPlugin config {
   name = "bufdelete";
   originalName = "bufdelete.nvim";

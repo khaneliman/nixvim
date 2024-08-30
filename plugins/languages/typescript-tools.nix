@@ -5,7 +5,7 @@
   config,
   ...
 }:
-with lib;
+
 let
   cfg = config.plugins.typescript-tools;
 in

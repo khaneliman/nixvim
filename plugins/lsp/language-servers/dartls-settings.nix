@@ -1,5 +1,5 @@
 { lib, helpers }:
-with lib;
+
 {
   analysisExcludedFolders = helpers.mkNullOrOption (with types; listOf str) ''
     An array of paths (absolute or relative to each workspace folder) that should be excluded from

@@ -3,7 +3,7 @@
 #  - https://github.com/grafana/jsonnet-language-server/tree/main/editor/vim
 #  - https://github.com/grafana/jsonnet-language-server/blob/main/pkg/server/configuration.go
 #  - https://github.com/google/go-jsonnet/blob/master/internal/formatter/jsonnetfmt.go#L55
-with lib;
+ 
 {
   ext_vars = helpers.defaultNullOpts.mkAttrsOf types.str { } ''
     External variables.

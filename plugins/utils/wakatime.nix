@@ -5,7 +5,7 @@
   pkgs,
   ...
 }:
-with lib;
+ 
 helpers.vim-plugin.mkVimPlugin config {
   name = "wakatime";
   originalName = "vim-wakatime";

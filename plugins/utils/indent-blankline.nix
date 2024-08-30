@@ -5,7 +5,7 @@
   pkgs,
   ...
 }:
-with lib;
+
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "indent-blankline";
   originalName = "indent-blankline.nvim";

@@ -6,7 +6,7 @@
   ...
 }:
 with helpers.vim-plugin;
-with lib;
+ 
 mkVimPlugin config {
   name = "goyo";
   originalName = "goyo.vim";

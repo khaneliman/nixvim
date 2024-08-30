@@ -5,7 +5,7 @@
   config,
   ...
 }:
-with lib;
+ 
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "virt-column";
   originalName = "virt-column.nvim";

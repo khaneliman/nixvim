@@ -5,7 +5,7 @@
   pkgs,
   ...
 }:
-with lib;
+ 
 with helpers.vim-plugin;
 mkVimPlugin config {
   name = "markdown-preview";

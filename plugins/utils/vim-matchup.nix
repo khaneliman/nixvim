@@ -5,7 +5,7 @@
   config,
   ...
 }:
-with lib;
+ 
 {
   options.plugins.vim-matchup = {
     enable = mkEnableOption "vim-matchup";

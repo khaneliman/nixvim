@@ -8,7 +8,7 @@
 let
   cfg = config.plugins.neorg;
 in
-with lib;
+ 
 {
   options.plugins.neorg = helpers.neovim-plugin.extraOptionsOptions // {
     enable = mkEnableOption "neorg";

@@ -5,7 +5,7 @@
   pkgs,
   ...
 }:
-with lib;
+ 
 {
   options.plugins.plantuml-syntax = {
     enable = mkEnableOption "plantuml syntax support";

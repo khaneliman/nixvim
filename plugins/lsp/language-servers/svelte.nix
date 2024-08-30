@@ -4,7 +4,7 @@
   config,
   ...
 }:
-with lib;
+ 
 let
   cfg = config.plugins.lsp.servers.svelte;
 in

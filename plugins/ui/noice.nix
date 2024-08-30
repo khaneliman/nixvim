@@ -8,7 +8,7 @@
 # TODO: This uses a lot of types.anything because noice.nvim types are quite complex.
 # It should be possible to map them to nix, but they would not map really well through
 # toLuaObject, we would maybe need some ad-hoc pre-processing functions.
-with lib;
+ 
 {
   options.plugins.noice = helpers.neovim-plugin.extraOptionsOptions // {
     enable = mkEnableOption ''

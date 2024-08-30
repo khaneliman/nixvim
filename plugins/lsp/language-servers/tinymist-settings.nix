@@ -1,5 +1,5 @@
 { lib, helpers }:
-with lib;
+
 # https://github.com/Myriad-Dreamin/tinymist/blob/main/editors/neovim/Configuration.md
 {
   outputPath = helpers.defaultNullOpts.mkStr "$dir/$name" ''

@@ -8,7 +8,7 @@
   options,
   ...
 }:
-with lib;
+ 
 {
   options.plugins.nvim-osc52 = {
     enable = lib.mkOption {

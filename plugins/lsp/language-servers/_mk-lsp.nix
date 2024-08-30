@@ -26,7 +26,7 @@
   lib,
   ...
 }:
-with lib;
+ 
 let
   cfg = config.plugins.lsp.servers.${name};
 in

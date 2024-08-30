@@ -2,7 +2,7 @@
 # Options:
 #  - https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md
 #  - https://github.com/nix-community/nixd/blob/main/nixd/include/nixd/Controller/Configuration.h
-with lib;
+ 
 {
   diagnostic = {
     suppress = helpers.defaultNullOpts.mkListOf' {

@@ -8,7 +8,7 @@
 let
   cfg = config.plugins.lastplace;
 in
-with lib;
+ 
 {
   options.plugins.lastplace = helpers.neovim-plugin.extraOptionsOptions // {
     enable = mkEnableOption "lastplace";

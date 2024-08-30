@@ -1,5 +1,5 @@
 { lib, helpers }:
-with lib;
+ 
 {
   # https://github.com/epwalsh/obsidian.nvim/blob/main/lua/obsidian/config.lua
 

@@ -5,7 +5,7 @@
   pkgs,
   ...
 }:
-with lib;
+
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "zen-mode";
   originalName = "zen-mode.nvim";

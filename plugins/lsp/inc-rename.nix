@@ -5,7 +5,7 @@
   pkgs,
   ...
 }:
-with lib;
+ 
 {
   options.plugins.inc-rename = {
     enable = mkEnableOption "inc-rename, a plugin previewing LSP renaming";

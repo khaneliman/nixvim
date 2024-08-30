@@ -5,7 +5,7 @@
   pkgs,
   ...
 }:
-with lib;
+ 
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "nvim-autopairs";
   defaultPackage = pkgs.vimPlugins.nvim-autopairs;

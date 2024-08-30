@@ -1,7 +1,7 @@
 # All available settings are documented here:
 # https://luals.github.io/wiki/settings/
 { lib, helpers }:
-with lib;
+ 
 {
   addonManager = {
     enable = helpers.defaultNullOpts.mkBool true ''

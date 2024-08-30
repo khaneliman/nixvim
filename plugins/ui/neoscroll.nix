@@ -5,7 +5,7 @@
   helpers,
   ...
 }:
-with lib;
+ 
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "neoscroll";
   originalName = "neoscroll.nvim";
