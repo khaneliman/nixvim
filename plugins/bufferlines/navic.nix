@@ -5,17 +5,16 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.navic;
 in
 {
   options.plugins.navic = helpers.neovim-plugin.extraOptionsOptions // {
-    enable = mkEnableOption "nvim-navic";
+    enable = lib.mkEnableOption "nvim-navic";
 
     package = helpers.mkPluginPackageOption "nvim-navic" pkgs.vimPlugins.nvim-navic;
 
-    icons = mapAttrs (name: default: helpers.defaultNullOpts.mkStr default "icon for ${name}.") {
+    icons = lib.mapAttrs (name: default: helpers.defaultNullOpts.mkStr default "icon for ${name}.") {
       File = "󰈙 ";
       Module = " ";
       Namespace = "󰌗 ";
@@ -50,7 +49,7 @@ in
       '';
 
       preference = helpers.defaultNullOpts.mkListOf' {
-        type = types.str;
+        type = lib.types.str;
         pluginDefault = [ ];
         example = [
           "clangd"
@@ -112,7 +111,7 @@ in
         }
         // cfg.extraOptions;
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [ cfg.package ];
 
       extraConfigLua = ''

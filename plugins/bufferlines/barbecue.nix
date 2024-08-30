@@ -5,14 +5,15 @@
   pkgs,
   ...
 }:
-with lib;
+
 let
+  inherit (lib) types;
   cfg = config.plugins.barbecue;
   mkListStr = helpers.defaultNullOpts.mkNullable (types.listOf types.str);
 in
 {
   options.plugins.barbecue = helpers.neovim-plugin.extraOptionsOptions // {
-    enable = mkEnableOption "barbecue-nvim";
+    enable = lib.mkEnableOption "barbecue-nvim";
 
     package = helpers.mkPluginPackageOption "barbecue-nvim" pkgs.vimPlugins.barbecue-nvim;
 
@@ -126,7 +127,7 @@ in
       '';
     };
 
-    kinds = mapAttrs (name: default: helpers.defaultNullOpts.mkStr default "icon for ${name}.") {
+    kinds = lib.mapAttrs (name: default: helpers.defaultNullOpts.mkStr default "icon for ${name}.") {
       File = "";
       Module = "";
       Namespace = "";
@@ -184,7 +185,7 @@ in
         }
         // cfg.extraOptions;
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [ cfg.package ];
 
       extraConfigLua = ''

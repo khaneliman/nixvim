@@ -4,8 +4,9 @@
   pkgs,
   ...
 }:
-with lib;
+
 let
+  inherit (lib) types;
   inherit (lib.nixvim)
     defaultNullOpts
     keymaps
@@ -56,7 +57,7 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
   originalName = "barbar.nvim";
   defaultPackage = pkgs.vimPlugins.barbar-nvim;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO: introduced 2024-05-30, remove on 2024-07-30
   deprecateExtraOptions = true;
@@ -135,27 +136,27 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
       settingsPath = basePluginPath ++ [ "settings" ];
     in
     [
-      (mkRemovedOptionModule (
+      (lib.mkRemovedOptionModule (
         basePluginPath
         ++ [
           "keymaps"
           "silent"
         ]
       ) "Keymaps will be silent anyways. This option has always been useless.")
-      (mkRenamedOptionModule (basePluginPath ++ [ "excludeFileTypes" ]) (
+      (lib.mkRenamedOptionModule (basePluginPath ++ [ "excludeFileTypes" ]) (
         settingsPath ++ [ "exclude_ft" ]
       ))
-      (mkRenamedOptionModule (basePluginPath ++ [ "excludeFileNames" ]) (
+      (lib.mkRenamedOptionModule (basePluginPath ++ [ "excludeFileNames" ]) (
         settingsPath ++ [ "exclude_name" ]
       ))
-      (mkRemovedOptionModule (
+      (lib.mkRemovedOptionModule (
         basePluginPath
         ++ [
           "icons"
           "diagnostics"
         ]
       ) "Use `settings.icons.diagnostics` instead, but pay attention as the keys have changed.")
-      (mkRenamedOptionModule
+      (lib.mkRenamedOptionModule
         (
           basePluginPath
           ++ [
@@ -177,7 +178,7 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
     ++ (map
       (
         name:
-        mkRemovedOptionModule (
+        lib.mkRemovedOptionModule (
           basePluginPath
           ++ [
             "icons"
@@ -201,7 +202,7 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
       default = pkgs.vimPlugins.nvim-web-devicons;
     };
 
-    keymaps = mapAttrs (
+    keymaps = lib.mapAttrs (
       optionName: funcName:
       mkNullOrOption' {
         type = keymaps.mkMapOptionSubmodule {
@@ -218,11 +219,11 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
   };
 
   extraConfig = cfg: {
-    extraPlugins = mkIf (cfg.iconsPackage != null) [ cfg.iconsPackage ];
+    extraPlugins = lib.mkIf (cfg.iconsPackage != null) [ cfg.iconsPackage ];
 
-    keymaps = filter (keymap: keymap != null) (
+    keymaps = lib.filter (keymap: keymap != null) (
       # TODO: switch to `attrValues cfg.keymaps` when removing the deprecation warnings above:
-      attrValues (filterAttrs (n: v: n != "silent") cfg.keymaps)
+      lib.attrValues (lib.filterAttrs (n: v: n != "silent") cfg.keymaps)
     );
   };
 
@@ -329,7 +330,7 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
         Use `false` to disable it.
       '';
 
-      diagnostics = mkOption rec {
+      diagnostics = lib.mkOption rec {
         type = types.submodule {
           freeformType = with types; attrsOf anything;
           options =
