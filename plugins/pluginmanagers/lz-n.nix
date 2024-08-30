@@ -5,14 +5,14 @@
   pkgs,
   ...
 }:
-with lib;
 let
-  inherit (lib.nixvim) defaultNullOpts;
+  inherit (lib) types;
+  inherit (lib.nixvim) defaultNullOpts mkNullOrOption' mkNullOrLuaFn;
 in
-nixvim.neovim-plugin.mkNeovimPlugin config {
+lib.nixvim.neovim-plugin.mkNeovimPlugin config {
   name = "lz-n";
   originalName = "lz.n";
-  maintainers = [ maintainers.psfloyd ];
+  maintainers = [ lib.maintainers.psfloyd ];
   defaultPackage = pkgs.vimPlugins.lz-n;
 
   settingsDescription = ''
@@ -34,7 +34,7 @@ nixvim.neovim-plugin.mkNeovimPlugin config {
       lzPluginType = types.submodule {
         freeformType = types.attrsOf types.anything;
         options = {
-          __unkeyed-1 = mkOption {
+          __unkeyed-1 = lib.mkOption {
             type = types.str;
             description = ''
               The "unkeyed" attribute is the plugin's name.
@@ -45,32 +45,32 @@ nixvim.neovim-plugin.mkNeovimPlugin config {
             '';
           };
 
-          enabled = nixvim.defaultNullOpts.mkStrLuaFnOr types.bool true ''
+          enabled = defaultNullOpts.mkStrLuaFnOr types.bool true ''
             When false, or if the function returns false, then this plugin will not be included in the spec.
             This option corresponds to the `enabled` property of lz.n.
           '';
 
-          beforeAll = nixvim.mkNullOrLuaFn ''
+          beforeAll = mkNullOrLuaFn ''
             Always executed before any plugins are loaded.
           '';
 
-          before = nixvim.mkNullOrLuaFn ''
+          before = mkNullOrLuaFn ''
             Executed before this plugin is loaded.
           '';
 
-          after = nixvim.mkNullOrLuaFn ''
+          after = mkNullOrLuaFn ''
             Executed after this plugin is loaded.
           '';
 
-          load = nixvim.mkNullOrLuaFn ''
+          load = mkNullOrLuaFn ''
             Can be used to override the `vim.g.lz_n.load()` function for this plugin.
           '';
 
-          priority = nixvim.defaultNullOpts.mkUnsignedInt (literalMD "`50` (or `1000` if `colorscheme` is set)") ''
-            Only useful for start plugins (not lazy-loaded) to force loading certain plugins first. 
+          priority = defaultNullOpts.mkUnsignedInt (lib.literalMD "`50` (or `1000` if `colorscheme` is set)") ''
+            Only useful for start plugins (not lazy-loaded) to force loading certain plugins first.
           '';
 
-          event = nixvim.mkNullOrOption' {
+          event = mkNullOrOption' {
             type = types.anything;
             description = ''
               Lazy-load on event. Events can be specified as BufEnter or with a pattern like BufEnter *.lua
@@ -81,7 +81,7 @@ nixvim.neovim-plugin.mkNeovimPlugin config {
             ];
           };
 
-          cmd = nixvim.mkNullOrOption' {
+          cmd = mkNullOrOption' {
             type = types.anything;
             description = ''
               Lazy-load on command.
@@ -92,7 +92,7 @@ nixvim.neovim-plugin.mkNeovimPlugin config {
             ];
           };
 
-          ft = nixvim.mkNullOrOption' {
+          ft = mkNullOrOption' {
             type = types.anything;
             description = ''
               Lazy-load on filetype.
@@ -100,7 +100,7 @@ nixvim.neovim-plugin.mkNeovimPlugin config {
             example = [ "tex" ];
           };
 
-          colorscheme = nixvim.mkNullOrOption' {
+          colorscheme = mkNullOrOption' {
             type = types.anything;
             description = ''
               Lazy-load on colorscheme.
@@ -108,7 +108,7 @@ nixvim.neovim-plugin.mkNeovimPlugin config {
             example = "onedarker";
           };
 
-          keys = nixvim.mkNullOrOption' {
+          keys = mkNullOrOption' {
             type = types.listOf types.anything;
             description = ''
               Lazy-load on key mapping. Mode is `n` by default.
@@ -131,10 +131,10 @@ nixvim.neovim-plugin.mkNeovimPlugin config {
       };
     in
     {
-      plugins = mkOption {
+      plugins = lib.mkOption {
         description = ''
           List of plugin specs provided to the `require('lz.n').load` function.
-          Plugin specs can be ${nixvim.nixvimTypes.rawLua.description}.
+          Plugin specs can be ${types.rawLua.description}.
         '';
         default = [ ];
         type = types.listOf lzPluginType;
@@ -192,9 +192,9 @@ nixvim.neovim-plugin.mkNeovimPlugin config {
     };
 
   extraConfig = cfg: {
-    globals.lz_n = modules.mkAliasAndWrapDefsWithPriority id options.plugins.lz-n.settings;
-    extraConfigLua = mkIf (cfg.plugins != [ ]) ''
-      require('lz.n').load( ${nixvim.toLuaObject cfg.plugins})
+    globals.lz_n = lib.modules.mkAliasAndWrapDefsWithPriority lib.id options.plugins.lz-n.settings;
+    extraConfigLua = lib.mkIf (cfg.plugins != [ ]) ''
+      require('lz.n').load( ${lib.nixvim.toLuaObject cfg.plugins})
     '';
   };
 }

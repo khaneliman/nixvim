@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.lazy;
   lazyPlugins = cfg.plugins;
@@ -39,7 +38,7 @@ in
 {
   options = {
     plugins.lazy = {
-      enable = mkEnableOption "lazy.nvim";
+      enable = lib.mkEnableOption "lazy.nvim";
 
       gitPackage = helpers.mkPackageOption {
         name = "git";
@@ -47,13 +46,13 @@ in
       };
 
       plugins =
-        with types;
+        with lib.types;
         let
           pluginType = either package (submodule {
             options = {
               dir = helpers.mkNullOrOption str "A directory pointing to a local plugin";
 
-              pkg = mkOption {
+              pkg = lib.mkOption {
                 type = package;
                 description = "Vim plugin to install";
               };
@@ -147,7 +146,7 @@ in
 
           listOfPlugins = types.listOf pluginType;
         in
-        mkOption {
+        lib.mkOption {
           type = listOfPlugins;
           default = [ ];
           description = "List of plugins";
@@ -155,7 +154,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     extraPlugins = [ pkgs.vimPlugins.lazy-nvim ];
 
     extraPackages = [ cfg.gitPackage ];
@@ -167,7 +166,7 @@ in
           let
             keyExists = keyToCheck: attrSet: lib.elem keyToCheck (lib.attrNames attrSet);
           in
-          if isDerivation plugin then
+          if lib.isDerivation plugin then
             { dir = "${lazyPath}/${lib.getName plugin}"; }
           else
             {
@@ -194,7 +193,10 @@ in
                 ;
 
               dependencies = helpers.ifNonNull' plugin.dependencies (
-                if isList plugin.dependencies then (pluginListToLua plugin.dependencies) else plugin.dependencies
+                if lib.isList plugin.dependencies then
+                  (pluginListToLua plugin.dependencies)
+                else
+                  plugin.dependencies
               );
 
               dir =
@@ -205,9 +207,9 @@ in
 
         plugins = pluginListToLua cfg.plugins;
 
-        packedPlugins = if length plugins == 1 then head plugins else plugins;
+        packedPlugins = if lib.length plugins == 1 then lib.head plugins else plugins;
       in
-      mkIf (cfg.plugins != [ ]) ''
+      lib.mkIf (cfg.plugins != [ ]) ''
         require('lazy').setup(
           {
             dev = {

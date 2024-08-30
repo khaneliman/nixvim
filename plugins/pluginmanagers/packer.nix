@@ -5,14 +5,13 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.packer;
 in
 {
   options = {
     plugins.packer = {
-      enable = mkEnableOption "packer.nvim";
+      enable = lib.mkEnableOption "packer.nvim";
 
       gitPackage = helpers.mkPackageOption {
         name = "git";
@@ -20,11 +19,11 @@ in
       };
 
       plugins =
-        with types;
+        with lib.types;
         let
           pluginType = either str (submodule {
             options = {
-              name = mkOption {
+              name = lib.mkOption {
                 type = str;
                 description = "Name of the plugin to install";
               };
@@ -87,14 +86,14 @@ in
 
           listOfPlugins = types.listOf pluginType;
         in
-        mkOption {
+        lib.mkOption {
           type = listOfPlugins;
           default = [ ];
           description = "List of plugins";
         };
 
-      rockPlugins = mkOption {
-        type = with types; listOf (either str attrs);
+      rockPlugins = lib.mkOption {
+        type = with lib.types; listOf (either str attrs);
         description = "List of lua rock plugins";
         default = [ ];
         example = ''
@@ -108,7 +107,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     extraPlugins = [
       (pkgs.vimPlugins.packer-nvim.overrideAttrs (_: {
         pname = "packer.nvim";
@@ -121,8 +120,8 @@ in
       let
         luaRockPluginToLua =
           luaRockPlugin:
-          if isAttrs luaRockPlugin then
-            mapAttrs' (k: v: {
+          if lib.isAttrs luaRockPlugin then
+            lib.mapAttrs' (k: v: {
               name = if k == "name" then "__unkeyed" else k;
               value = v;
             }) luaRockPlugin
@@ -132,7 +131,7 @@ in
 
         pluginToLua =
           plugin:
-          if isAttrs plugin then
+          if lib.isAttrs plugin then
             {
               "__unkeyed" = plugin.name;
 
@@ -152,11 +151,11 @@ in
                 ;
 
               requires = helpers.ifNonNull' plugin.requires (
-                if isList plugin.requires then (pluginListToLua plugin.requires) else plugin.requires
+                if lib.isList plugin.requires then (pluginListToLua plugin.requires) else plugin.requires
               );
 
               rocks = helpers.ifNonNull' plugin.rocks (
-                if isList plugin.rocks then luaRockListToLua plugin.rocks else plugin.rocks
+                if lib.isList plugin.rocks then luaRockListToLua plugin.rocks else plugin.rocks
               );
 
               inherit (plugin)
@@ -178,14 +177,14 @@ in
 
         plugins = pluginListToLua cfg.plugins;
 
-        packedPlugins = if length plugins == 1 then head plugins else plugins;
+        packedPlugins = if lib.length plugins == 1 then lib.head plugins else plugins;
 
         luaRockPlugins = luaRockListToLua cfg.rockPlugins;
-        luaRocksString = optionalString (
+        luaRocksString = lib.optionalString (
           cfg.rockPlugins != [ ]
         ) "use_rocks ${helpers.toLuaObject luaRockPlugins}";
       in
-      mkIf (cfg.plugins != [ ]) ''
+      lib.mkIf (cfg.plugins != [ ]) ''
         require('packer').startup(function()
           use ${helpers.toLuaObject packedPlugins}
           ${luaRocksString}
