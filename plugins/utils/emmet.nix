@@ -5,21 +5,19 @@
   pkgs,
   ...
 }:
-with lib;
-with helpers.vim-plugin;
-mkVimPlugin config {
+lib.nixvim.vim-plugin.mkVimPlugin config {
   name = "emmet";
   originalName = "emmet-vim";
   defaultPackage = pkgs.vimPlugins.emmet-vim;
   globalPrefix = "user_emmet_";
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO introduced 2024-03-01: remove 2024-05-01
   deprecateExtraConfig = true;
   optionsRenamedToSettings = [ "mode" ];
   imports = [
-    (mkRenamedOptionModule
+    (lib.mkRenamedOptionModule
       [
         "plugins"
         "emmet"
@@ -52,7 +50,7 @@ mkVimPlugin config {
       Leading keys to run Emmet functions.
     '';
 
-    settings = helpers.mkNullOrOption (with types; attrsOf anything) ''
+    settings = helpers.mkNullOrOption (with lib.types; attrsOf anything) ''
       Emmet settings.
 
       Defaults: see https://github.com/mattn/emmet-vim/blob/master/autoload/emmet.vim

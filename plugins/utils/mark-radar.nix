@@ -5,13 +5,12 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.mark-radar;
 in
 {
   options.plugins.mark-radar = helpers.neovim-plugin.extraOptionsOptions // {
-    enable = mkEnableOption "mark-radar";
+    enable = lib.mkEnableOption "mark-radar";
 
     package = helpers.mkPluginPackageOption "mark-radar" pkgs.vimPlugins.mark-radar-nvim;
 
@@ -33,7 +32,7 @@ in
         background_highlight_group = cfg.backgroundHighlightGroup;
       } // cfg.extraOptions;
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [ cfg.package ];
 
       extraConfigLua = ''

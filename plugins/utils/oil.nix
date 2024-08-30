@@ -210,7 +210,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
         Set to false if you still want to use netrw.
       '';
 
-      columns = mkOption {
+      columns = lib.mkOption {
         type =
           with helpers.nixvimTypes;
           listOf (oneOf [

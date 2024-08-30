@@ -214,12 +214,12 @@ helpers.neovim-plugin.mkNeovimPlugin config {
             listOf (
               types.submodule {
                 options = {
-                  name = mkOption {
+                  name = lib.mkOption {
                     type = with helpers.nixvimTypes; maybeRaw str;
                     description = "The name for this workspace";
                   };
 
-                  path = mkOption {
+                  path = lib.mkOption {
                     type = with helpers.nixvimTypes; maybeRaw str;
                     description = "The of the workspace.";
                   };

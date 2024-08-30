@@ -19,13 +19,13 @@ in
     skipInsignificantPunctuation = helpers.defaultNullOpts.mkBool true "Whether to skip insignificant punctuation.";
 
     keymaps = {
-      silent = mkOption {
+      silent = lib.mkOption {
         type = types.bool;
         description = "Whether ${pluginName} keymaps should be silent.";
         default = false;
       };
 
-      motions = mkOption {
+      motions = lib.mkOption {
         type = types.attrsOf types.str;
         description = ''
           Mappings for spider motions.

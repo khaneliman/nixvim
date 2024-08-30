@@ -90,7 +90,7 @@ in
 
     package = helpers.mkPluginPackageOption "clipboard-image.nvim" pkgs.vimPlugins.clipboard-image-nvim;
 
-    clipboardPackage = mkOption {
+    clipboardPackage = lib.mkOption {
       type = with types; nullOr package;
       description = ''
         Which clipboard provider to use.
@@ -105,7 +105,7 @@ in
 
     default = pluginOptions;
 
-    filetypes = mkOption {
+    filetypes = lib.mkOption {
       type =
         with types;
         attrsOf (submodule {

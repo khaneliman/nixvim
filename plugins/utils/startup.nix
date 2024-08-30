@@ -112,7 +112,7 @@ in
             };
           };
       in
-      mkOption {
+      lib.mkOption {
         type = with types; attrsOf sectionType;
         default = { };
         description = '''';
@@ -235,7 +235,7 @@ in
       '';
     };
 
-    parts = mkOption {
+    parts = lib.mkOption {
       type = with types; listOf str;
       default = [ ];
       description = "List all sections in order.";
@@ -245,7 +245,7 @@ in
       ];
     };
 
-    userMappings = mkOption {
+    userMappings = lib.mkOption {
       type = with types; attrsOf str;
       description = "Add your own mappings as key-command pairs.";
       default = { };

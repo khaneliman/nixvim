@@ -6,7 +6,6 @@
   pkgs,
   ...
 }:
-with lib;
 let
   settingsOptions = {
     fzf_bin = helpers.mkNullOrStr ''
@@ -37,7 +36,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
   extraPackages = [ pkgs.fzf ];
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   inherit settingsOptions settingsExample;
 
@@ -49,8 +48,8 @@ helpers.neovim-plugin.mkNeovimPlugin config {
     };
 
     # TODO: deprecated 2024-08-29 remove after 24.11
-    iconsEnabled = mkOption {
-      type = types.bool;
+    iconsEnabled = lib.mkOption {
+      type = lib.types.bool;
       description = "Toggle icon support. Installs nvim-web-devicons.";
       visible = false;
     };
@@ -70,13 +69,13 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       "skim"
     ] "Preconfigured profile to use";
 
-    keymaps = mkOption {
+    keymaps = lib.mkOption {
       type =
-        with types;
+        with lib.types;
         attrsOf (
           either str (submodule {
             options = {
-              action = mkOption {
+              action = lib.mkOption {
                 type = types.str;
                 description = "The `fzf-lua` action to run";
                 example = "git_files";
@@ -120,7 +119,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       warnings = lib.mkIf opt.iconsEnabled.isDefined [
         ''
           nixvim (plugins.fzf-lua):
-          The option definition `plugins.fzf-lua.iconsEnabled' in ${showFiles opt.iconsEnabled.files} has been deprecated; please remove it.
+          The option definition `plugins.fzf-lua.iconsEnabled' in ${lib.showFiles opt.iconsEnabled.files} has been deprecated; please remove it.
           You should use `plugins.fzf-lua.iconsPackage' instead.
         ''
       ];
@@ -133,11 +132,11 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
       plugins.fzf-lua.settings.__unkeyed_profile = cfg.profile;
 
-      keymaps = mapAttrsToList (
+      keymaps = lib.mapAttrsToList (
         key: mapping:
         let
           actionStr =
-            if isString mapping then
+            if lib.isString mapping then
               "${mapping}()"
             else
               "${mapping.action}(${helpers.toLuaObject mapping.settings})";

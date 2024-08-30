@@ -85,7 +85,7 @@ with lib;
         '';
       };
 
-    modules = mkOption {
+    modules = lib.mkOption {
       type = with types; attrsOf attrs;
       description = "Modules configuration.";
       default = { };

@@ -408,7 +408,7 @@ in
           with types;
           either (enum [ false ]) (submodule {
             options = {
-              modes = mkOption {
+              modes = lib.mkOption {
                 type = either str (listOf str);
                 description = ''
                   Either a string or list representing the mode(s) that the mapping should apply
@@ -420,7 +420,7 @@ in
                 ];
               };
 
-              key = mkOption {
+              key = lib.mkOption {
                 type = str;
                 description = "String representing the keymap.";
                 example = "<Space>";

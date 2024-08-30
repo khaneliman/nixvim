@@ -223,7 +223,7 @@ with lib;
         with types;
         attrsOf (submodule {
           options = {
-            action = mkOption {
+            action = lib.mkOption {
               type = helpers.nixvimTypes.strLua;
               description = "The lua code for this keymap action.";
               apply = helpers.mkRaw;
@@ -371,12 +371,12 @@ with lib;
           with types;
           submodule {
             options = {
-              char = mkOption {
+              char = lib.mkOption {
                 type = with helpers.nixvimTypes; maybeRaw str;
                 description = "The character to use for this checkbox.";
               };
 
-              hl_group = mkOption {
+              hl_group = lib.mkOption {
                 type = with helpers.nixvimTypes; maybeRaw str;
                 description = "The name of the highlight group to use for this checkbox.";
               };

@@ -15,7 +15,7 @@ in
 
     package = helpers.mkPluginPackageOption "vim-bbye" pkgs.vimPlugins.vim-bbye;
 
-    keymapsSilent = mkOption {
+    keymapsSilent = lib.mkOption {
       type = types.bool;
       description = "Whether vim-bbye keymaps should be silent.";
       default = false;

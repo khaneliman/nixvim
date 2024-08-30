@@ -5,15 +5,13 @@
   pkgs,
   ...
 }:
-with lib;
-with helpers.vim-plugin;
-mkVimPlugin config {
+lib.nixvim.vim-plugin.mkVimPlugin config {
   name = "startify";
   originalName = "vim-startify";
   defaultPackage = pkgs.vimPlugins.vim-startify;
   globalPrefix = "startify_";
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO introduced 2024-03-01: remove 2024-05-01
   deprecateExtraConfig = true;
@@ -46,7 +44,7 @@ mkVimPlugin config {
     map
       (
         option:
-        mkRenamedOptionModule
+        lib.mkRenamedOptionModule
           [
             "plugins"
             "startify"

@@ -4,7 +4,6 @@
   pkgs,
   ...
 }:
-with lib;
 let
   inherit (lib.nixvim)
     defaultNullOpts
@@ -25,7 +24,7 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
 
   # TODO: Added 2023-11-06, remove after 24.11
   imports = [
-    (mkRemovedOptionModule [
+    (lib.mkRemovedOptionModule [
       "plugins"
       "todo-comments"
       "keymapsSilent"
@@ -366,7 +365,7 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
 
   extraOptions = {
     keymaps =
-      mapAttrs
+      lib.mapAttrs
         (
           optionName: action:
           mkNullOrOption' {
@@ -377,14 +376,14 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
               };
 
               extraOptions = {
-                cwd = mkOption {
+                cwd = lib.mkOption {
                   type = types.nullOr types.str;
                   description = "Specify the directory to search for comments";
                   default = null;
                   example = "~/projects/foobar";
                 };
 
-                keywords = mkOption {
+                keywords = lib.mkOption {
                   type = with types; transitionType str (splitString ",") (nullOr (listOf str));
                   description = ''
                     Comma separated list of keywords to filter results by.
@@ -432,16 +431,16 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
     extraPackages = [ cfg.ripgrepPackage ];
 
     keymaps = lib.pipe cfg.keymaps [
-      (filterAttrs (n: keymap: keymap != null))
-      (mapAttrsToList (
+      (lib.filterAttrs (n: keymap: keymap != null))
+      (lib.mapAttrsToList (
         name: keymap: {
           inherit (keymap) key mode options;
           action =
             let
-              cwd = optionalString (keymap.cwd != null) " cwd=${keymap.cwd}";
-              keywords = optionalString (
+              cwd = lib.optionalString (keymap.cwd != null) " cwd=${keymap.cwd}";
+              keywords = lib.optionalString (
                 keymap.keywords != null && keymap.keywords != [ ]
-              ) " keywords=${concatStringsSep "," keymap.keywords}";
+              ) " keywords=${lib.concatStringsSep "," keymap.keywords}";
             in
             "<cmd>${keymap.action}${cwd}${keywords}<cr>";
         }

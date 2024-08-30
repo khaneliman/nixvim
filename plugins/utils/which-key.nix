@@ -5,7 +5,6 @@
   options,
   ...
 }:
-with lib;
 let
   inherit (lib.nixvim) defaultNullOpts mkRaw toLuaObject;
   types = lib.nixvim.nixvimTypes;
@@ -571,7 +570,7 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
 
   # TODO: introduced 2024-07-29: remove after 24.11
   extraOptions = {
-    registrations = mkOption {
+    registrations = lib.mkOption {
       type = with types; attrsOf anything;
       description = ''
         This option is deprecated, use `settings.spec` instead.
@@ -590,7 +589,7 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
       warnings = [
         ''
           nixvim (plugins.which-key):
-          The option definition `plugins.which-key.registrations' in ${showFiles opt.registrations.files} has been deprecated in which-key v3; please remove it.
+          The option definition `plugins.which-key.registrations' in ${lib.showFiles opt.registrations.files} has been deprecated in which-key v3; please remove it.
           You should use `plugins.which-key.settings.spec' instead.
 
           Note: the spec format has changed in which-key v3

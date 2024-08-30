@@ -1,8 +1,7 @@
 { lib, helpers }:
-with lib;
 let
-  hydraType = types.submodule {
-    freeformType = with types; attrsOf anything;
+  hydraType = lib.types.submodule {
+    freeformType = with lib.types; attrsOf anything;
     options = {
       name = helpers.mkNullOrStr ''
         Hydra's name.
@@ -30,8 +29,8 @@ let
 
       heads =
         let
-          headsOptType = types.submodule {
-            freeformType = with types; attrsOf anything;
+          headsOptType = lib.types.submodule {
+            freeformType = with lib.types; attrsOf anything;
             options = {
               private = helpers.defaultNullOpts.mkBool false ''
                 "When the hydra hides, this head does not stick out".
@@ -93,7 +92,7 @@ let
               )
             );
         in
-        helpers.mkNullOrOption (types.listOf headType) ''
+        helpers.mkNullOrOption (lib.types.listOf headType) ''
           Each Hydra's head has the form:
           `[head rhs opts]
 
@@ -109,8 +108,8 @@ let
     };
   };
 in
-mkOption {
-  type = types.listOf hydraType;
+lib.mkOption {
+  type = lib.types.listOf hydraType;
   default = [ ];
   description = ''
     A list of hydra configurations.

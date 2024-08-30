@@ -2,10 +2,8 @@
   config,
   helpers,
   pkgs,
-  lib,
   ...
 }:
-with lib;
 helpers.vim-plugin.mkVimPlugin config {
   name = "direnv";
   originalName = "direnv.vim";

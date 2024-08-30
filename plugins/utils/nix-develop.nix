@@ -15,7 +15,7 @@ in
 
     package = helpers.mkPluginPackageOption "nix-develop.nvim" pkgs.vimPlugins.nix-develop-nvim;
 
-    ignoredVariables = mkOption {
+    ignoredVariables = lib.mkOption {
       type = with types; attrsOf bool;
       default = { };
       description = "An attrs specifying the variables should be ignored.";
@@ -28,7 +28,7 @@ in
       };
     };
 
-    separatedVariables = mkOption {
+    separatedVariables = lib.mkOption {
       type = with types; attrsOf str;
       default = { };
       description = "An attrs specifying the separator to use for particular environment variables.";

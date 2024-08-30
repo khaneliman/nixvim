@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-with lib;
 # This plugin is only configured through keymaps, so we use `mkVimPlugin` without the
 # `globalPrefix` argument to avoid the creation of the `settings` option.
 helpers.vim-plugin.mkVimPlugin config {
@@ -13,10 +12,10 @@ helpers.vim-plugin.mkVimPlugin config {
   originalName = "improved-search.nvim";
   defaultPackage = pkgs.vimPlugins.improved-search-nvim;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   extraOptions = {
-    keymaps = mkOption {
+    keymaps = lib.mkOption {
       description = ''
         Keymap definitions for search functions
 
@@ -26,7 +25,7 @@ helpers.vim-plugin.mkVimPlugin config {
         with helpers.nixvimTypes;
         listOf (submodule {
           options = {
-            key = mkOption {
+            key = lib.mkOption {
               type = str;
               description = "The key to map.";
               example = "!";
@@ -34,7 +33,7 @@ helpers.vim-plugin.mkVimPlugin config {
 
             mode = helpers.keymaps.mkModeOption "";
 
-            action = mkOption {
+            action = lib.mkOption {
               type =
                 with helpers.nixvimTypes;
                 maybeRaw (
@@ -118,7 +117,7 @@ helpers.vim-plugin.mkVimPlugin config {
       inherit (keymap) key options mode;
       action =
         if
-          isString keymap.action
+          lib.isString keymap.action
         # One of the plugin builtin functions
         then
           helpers.mkRaw "require('improved-search').${keymap.action}"

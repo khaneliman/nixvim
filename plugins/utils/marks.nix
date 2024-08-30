@@ -104,7 +104,7 @@ in
       "m[" will not.
     '';
 
-    bookmarks = mkOption {
+    bookmarks = lib.mkOption {
       description = "Configuration table for each bookmark group (see `|marks-bookmarks|`).";
       type =
         with types;

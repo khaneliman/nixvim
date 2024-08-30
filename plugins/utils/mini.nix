@@ -5,18 +5,17 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.mini;
 in
 {
   options.plugins.mini = {
-    enable = mkEnableOption "mini.nvim";
+    enable = lib.mkEnableOption "mini.nvim";
 
     package = helpers.mkPluginPackageOption "mini.nvim" pkgs.vimPlugins.mini-nvim;
 
-    modules = mkOption {
-      type = with types; attrsOf attrs;
+    modules = lib.mkOption {
+      type = with lib.types; attrsOf attrs;
       default = { };
       description = ''
         Enable and configure the mini modules.
@@ -34,11 +33,11 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     extraPlugins = [ cfg.package ];
 
-    extraConfigLua = concatLines (
-      mapAttrsToList (
+    extraConfigLua = lib.concatLines (
+      lib.mapAttrsToList (
         name: config: "require('mini.${name}').setup(${helpers.toLuaObject config})"
       ) cfg.modules
     );

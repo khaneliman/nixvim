@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.commentary;
 in
@@ -14,11 +13,11 @@ in
 
   options = {
     plugins.commentary = {
-      enable = mkEnableOption "commentary";
+      enable = lib.mkEnableOption "commentary";
 
       package = helpers.mkPluginPackageOption "commentary" pkgs.vimPlugins.vim-commentary;
     };
   };
 
-  config = mkIf cfg.enable { extraPlugins = [ cfg.package ]; };
+  config = lib.mkIf cfg.enable { extraPlugins = [ cfg.package ]; };
 }

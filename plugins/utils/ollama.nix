@@ -72,7 +72,7 @@ in
     prompts =
       let
         promptOptions = {
-          prompt = mkOption {
+          prompt = lib.mkOption {
             type = with helpers.nixvimTypes; maybeRaw str;
             description = ''
               The prompt to send to the model.
@@ -149,7 +149,7 @@ in
           else
             prompt;
       in
-      mkOption {
+      lib.mkOption {
         type = with types; attrsOf (either (submodule { options = promptOptions; }) (enum [ false ]));
         default = { };
         apply = v: mapAttrs (_: processPrompt) v;

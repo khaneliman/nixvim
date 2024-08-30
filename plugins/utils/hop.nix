@@ -5,13 +5,12 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "hop";
   originalName = "hop.nvim";
   defaultPackage = pkgs.vimPlugins.hop-nvim;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   description = ''
     Hop doesn’t set any keybindings; you will have to define them by yourself.
@@ -228,7 +227,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       Determines which one of the `registers` stores the yanked text.
     '';
 
-    extensions = helpers.mkNullOrOption (with types; listOf str) ''
+    extensions = helpers.mkNullOrOption (with lib.types; listOf str) ''
       List-table of extensions to enable (names).
       As described in `|hop-extension|`, extensions for which the name in that list must have a
       `register(opts)` function in their public API for Hop to correctly initialized them.
@@ -243,7 +242,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       should be good if you have enough keys in `|hop-config-keys|`).
     '';
 
-    excluded_filetypes = helpers.defaultNullOpts.mkListOf types.str [ ] ''
+    excluded_filetypes = helpers.defaultNullOpts.mkListOf lib.types.str [ ] ''
       Skip hinting windows with the excluded filetypes.
       Those windows to check filetypes are collected only when you enable `multi_windows` or
       execute `MW`-commands.
@@ -251,7 +250,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       for editing.
     '';
 
-    match_mappings = helpers.defaultNullOpts.mkListOf types.str [ ] ''
+    match_mappings = helpers.defaultNullOpts.mkListOf lib.types.str [ ] ''
       This option allows you to specify the match mappings to use when applying the hint.
       If you set a non-empty `match_mappings`, the hint will be used as a key to look up the
       pattern to search for.

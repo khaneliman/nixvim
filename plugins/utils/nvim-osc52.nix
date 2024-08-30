@@ -11,7 +11,7 @@
 with lib;
 {
   options.plugins.nvim-osc52 = {
-    enable = mkOption {
+    enable = lib.mkOption {
       type = types.bool;
       default = false;
       example = true;
@@ -36,25 +36,25 @@ with lib;
     keymaps = {
       enable = mkEnableOption "keymaps for copying using OSC52";
 
-      silent = mkOption {
+      silent = lib.mkOption {
         type = types.bool;
         description = "Whether nvim-osc52 keymaps should be silent";
         default = false;
       };
 
-      copy = mkOption {
+      copy = lib.mkOption {
         type = types.str;
         description = "Copy into the system clipboard using OSC52";
         default = "<leader>y";
       };
 
-      copyLine = mkOption {
+      copyLine = lib.mkOption {
         type = types.str;
         description = "Copy line into the system clipboard using OSC52";
         default = "<leader>yy";
       };
 
-      copyVisual = mkOption {
+      copyVisual = lib.mkOption {
         type = types.str;
         description = "Copy visual selection into the system clipboard using OSC52";
         default = "<leader>y";

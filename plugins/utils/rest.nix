@@ -215,7 +215,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       Skip SSL verification, useful for unknown certificates.
     '';
 
-    custom_dynamic_variables = mkOption {
+    custom_dynamic_variables = lib.mkOption {
       type = with helpers.nixvimTypes; nullOr (maybeRaw (attrsOf strLuaFn));
       default = null;
       example = {

@@ -5,8 +5,9 @@
   pkgs,
   ...
 }:
-with lib;
 let
+  inherit (lib) types;
+
   cfg = config.plugins.floaterm;
 
   settings = {
@@ -173,12 +174,14 @@ in
       # Misc options
       # `OPTION = VALUE`
       # which will translate to `globals.floaterm_OPTION = VALUE;`
-      miscOptions = mapAttrs (name: value: helpers.mkNullOrOption value.type value.description) settings;
+      miscOptions = lib.mapAttrs (
+        name: value: helpers.mkNullOrOption value.type value.description
+      ) settings;
 
       # Keymaps options
       # `keymaps.ACTION = KEY`
       # which will translate to `globals.floaterm_keymap_ACTION = KEY;`
-      keymapOptions = listToAttrs (
+      keymapOptions = lib.listToAttrs (
         map
           (name: {
             inherit name;
@@ -198,7 +201,7 @@ in
       );
     in
     {
-      enable = mkEnableOption "floaterm";
+      enable = lib.mkEnableOption "floaterm";
 
       package = helpers.mkPluginPackageOption "floaterm" pkgs.vimPlugins.vim-floaterm;
 
@@ -206,21 +209,21 @@ in
     }
     // miscOptions;
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     extraPlugins = [ cfg.package ];
 
     globals =
       let
         # misc options
-        optionGlobals = listToAttrs (
+        optionGlobals = lib.listToAttrs (
           map (optionName: {
             name = "floaterm_${optionName}";
             value = cfg.${optionName};
-          }) (attrNames settings)
+          }) (lib.attrNames settings)
         );
 
         # keymaps options
-        keymapGlobals = mapAttrs' (name: key: {
+        keymapGlobals = lib.mapAttrs' (name: key: {
           name = "floaterm_keymap_${name}";
           value = key;
         }) cfg.keymaps;

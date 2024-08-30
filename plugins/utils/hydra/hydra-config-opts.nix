@@ -6,7 +6,6 @@
 #
 # -> https://github.com/nvimtools/hydra.nvim?tab=readme-ov-file#config
 { helpers, lib, ... }:
-with lib;
 {
   debug = helpers.defaultNullOpts.mkBool false ''
     Whether to enable debug mode.
@@ -36,7 +35,7 @@ with lib;
   '';
 
   buffer = helpers.defaultNullOpts.mkNullable (
-    with types; either (enum [ true ]) ints.unsigned
+    with lib.types; either (enum [ true ]) ints.unsigned
   ) null "Define a hydra for the given buffer, pass `true` for current buf.";
 
   invoke_on_body = helpers.defaultNullOpts.mkBool false ''
@@ -61,7 +60,7 @@ with lib;
     Called after every hydra head.
   '';
 
-  timeout = helpers.defaultNullOpts.mkNullable (with types; either bool ints.unsigned) false ''
+  timeout = helpers.defaultNullOpts.mkNullable (with lib.types; either bool ints.unsigned) false ''
     Timeout after which the hydra is automatically disabled.
     Calling any head will refresh the timeout
     - `true`: timeout set to value of `timeoutlen` (`:h timeoutlen`)
@@ -72,12 +71,12 @@ with lib;
 
   hint =
     let
-      hintConfigType = types.submodule {
-        freeformType = with types; attrsOf anything;
+      hintConfigType = lib.types.submodule {
+        freeformType = with lib.types; attrsOf anything;
         options = {
           type =
             helpers.mkNullOrOption
-              (types.enum [
+              (lib.types.enum [
                 "window"
                 "cmdline"
                 "statusline"
@@ -109,7 +108,7 @@ with lib;
             Offset of the floating window from the nearest editor border.
           '';
 
-          float_opts = helpers.mkNullOrOption (with types; attrsOf anything) ''
+          float_opts = helpers.mkNullOrOption (with lib.types; attrsOf anything) ''
             Options passed to `nvim_open_win()`. See `:h nvim_open_win()`.
             Lets you set `border`, `header`, `footer`, etc.
 
@@ -128,7 +127,7 @@ with lib;
             close it with `Hydra.hint:close()`.
           '';
 
-          funcs = mkOption {
+          funcs = lib.mkOption {
             type = with helpers.nixvimTypes; attrsOf strLuaFn;
             description = ''
               Table from function names to function.
@@ -156,12 +155,12 @@ with lib;
                 end
               '';
             };
-            apply = mapAttrs (_: helpers.mkRaw);
+            apply = lib.mapAttrs (_: helpers.mkRaw);
           };
         };
       };
     in
-    helpers.defaultNullOpts.mkNullable (with types; either (enum [ false ]) hintConfigType)
+    helpers.defaultNullOpts.mkNullable (with lib.types; either (enum [ false ]) hintConfigType)
       {
         show_name = true;
         position = "bottom";

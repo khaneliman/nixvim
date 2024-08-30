@@ -65,7 +65,7 @@ in
 
     package = helpers.mkPluginPackageOption "nvim-coverage" pkgs.vimPlugins.nvim-coverage;
 
-    keymapsSilent = mkOption {
+    keymapsSilent = lib.mkOption {
       type = types.bool;
       description = "Whether nvim-coverage keymaps should be silent";
       default = false;

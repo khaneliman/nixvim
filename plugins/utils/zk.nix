@@ -5,13 +5,12 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "zk";
   originalName = "zk.nvim";
   defaultPackage = pkgs.vimPlugins.zk-nvim;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO: introduced 2024-06-28. Remove after 24.11 release.
   optionsRenamedToSettings = [
@@ -49,10 +48,10 @@ helpers.neovim-plugin.mkNeovimPlugin config {
     lsp = {
       config =
         helpers.defaultNullOpts.mkNullable
-          (types.submodule {
-            freeformType = with types; attrsOf anything;
+          (lib.types.submodule {
+            freeformType = with lib.types; attrsOf anything;
             options = {
-              cmd = helpers.defaultNullOpts.mkListOf types.str [
+              cmd = helpers.defaultNullOpts.mkListOf lib.types.str [
                 "zk"
                 "lsp"
               ] "Command to start the language server.";
@@ -82,7 +81,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           Automatically attach buffers in a zk notebook.
         '';
 
-        filetypes = helpers.defaultNullOpts.mkListOf types.str [ "markdown" ] ''
+        filetypes = helpers.defaultNullOpts.mkListOf lib.types.str [ "markdown" ] ''
           Filetypes for which zk should automatically attach.
         '';
       };
@@ -116,11 +115,11 @@ helpers.neovim-plugin.mkNeovimPlugin config {
   extraConfig = cfg: {
     extraPackages = [ cfg.zkPackage ];
 
-    warnings = flatten (
-      mapAttrsToList
+    warnings = lib.flatten (
+      lib.mapAttrsToList
         (
           picker: pluginName:
-          optional ((cfg.settings.picker == picker) && !config.plugins.${pluginName}.enable) ''
+          lib.optional ((cfg.settings.picker == picker) && !config.plugins.${pluginName}.enable) ''
             Nixvim (plugins.zk): You have set `plugins.zk.settings.picker = "${picker}"` but `plugins.${pluginName}` is not enabled in your config.
           ''
         )

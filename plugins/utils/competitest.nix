@@ -37,7 +37,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           with types;
           attrsOf (submodule {
             options = {
-              exec = mkOption {
+              exec = lib.mkOption {
                 type = str;
                 description = "Command to execute";
               };
@@ -62,7 +62,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           with types;
           attrsOf (submodule {
             options = {
-              exec = mkOption {
+              exec = lib.mkOption {
                 type = str;
                 description = "Command to execute.";
               };

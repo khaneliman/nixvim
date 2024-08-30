@@ -29,7 +29,7 @@ in
 
     enableTelescope = mkEnableOption "telescope integration";
 
-    keymapsSilent = mkOption {
+    keymapsSilent = lib.mkOption {
       type = types.bool;
       description = "Whether harpoon keymaps should be silent.";
       default = false;
@@ -117,7 +117,7 @@ in
       Set marks specific to each git branch inside git repository.
     '';
 
-    projects = mkOption {
+    projects = lib.mkOption {
       default = { };
       description = ''
         Predefined projetcs. The keys of this attrs should be the path to the project.

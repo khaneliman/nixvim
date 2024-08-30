@@ -5,14 +5,13 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.vim-plugin.mkVimPlugin config {
   name = "tmux-navigator";
   originalName = "vim-tmux-navigator";
   defaultPackage = pkgs.vimPlugins.vim-tmux-navigator;
   globalPrefix = "tmux_navigator_";
 
-  maintainers = [ maintainers.MattSturgeon ];
+  maintainers = [ lib.maintainers.MattSturgeon ];
 
   description = ''
     When combined with a set of tmux key bindings, the plugin will allow you to navigate seamlessly between vim splits and tmux panes using a consistent set of hotkeys.
@@ -69,7 +68,7 @@ helpers.vim-plugin.mkVimPlugin config {
   settingsOptions = {
     save_on_switch =
       helpers.mkNullOrOption
-        (types.enum [
+        (lib.types.enum [
           1
           2
         ])
@@ -133,7 +132,7 @@ helpers.vim-plugin.mkVimPlugin config {
   };
 
   extraOptions = {
-    keymaps = mkOption {
+    keymaps = lib.mkOption {
       description = ''
         Keymaps for the `:TmuxNavigate*` commands.
 
@@ -166,11 +165,11 @@ helpers.vim-plugin.mkVimPlugin config {
         }
       ];
       default = [ ];
-      type = types.listOf (
+      type = lib.types.listOf (
         helpers.keymaps.mkMapOptionSubmodule {
           action = {
             description = "The direction in which to navigate.";
-            type = types.enum [
+            type = lib.types.enum [
               "left"
               "down"
               "up"

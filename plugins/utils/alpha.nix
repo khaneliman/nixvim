@@ -6,15 +6,14 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.alpha;
 
-  sectionType = types.submodule {
-    freeformType = with types; attrsOf anything;
+  sectionType = lib.types.submodule {
+    freeformType = with lib.types; attrsOf anything;
     options = {
-      type = mkOption {
-        type = types.enum [
+      type = lib.mkOption {
+        type = lib.types.enum [
           "button"
           "group"
           "padding"
@@ -41,8 +40,8 @@ let
         ])
       ) "Value for section";
 
-      opts = mkOption {
-        type = with types; attrsOf anything;
+      opts = lib.mkOption {
+        type = with lib.types; attrsOf anything;
         default = { };
         description = "Additional options for the section";
       };
@@ -52,13 +51,13 @@ in
 {
   options = {
     plugins.alpha = {
-      enable = mkEnableOption "alpha-nvim";
+      enable = lib.mkEnableOption "alpha-nvim";
 
       package = helpers.mkPluginPackageOption "alpha-nvim" pkgs.vimPlugins.alpha-nvim;
 
       # TODO: deprecated 2024-08-29 remove after 24.11
-      iconsEnabled = mkOption {
-        type = types.bool;
+      iconsEnabled = lib.mkOption {
+        type = lib.types.bool;
         description = "Toggle icon support. Installs nvim-web-devicons.";
         visible = false;
       };
@@ -68,16 +67,16 @@ in
         default = pkgs.vimPlugins.nvim-web-devicons;
       };
 
-      theme = mkOption {
+      theme = lib.mkOption {
         type = with helpers.nixvimTypes; nullOr (maybeRaw str);
-        apply = v: if isString v then helpers.mkRaw "require'alpha.themes.${v}'.config" else v;
+        apply = v: if lib.isString v then helpers.mkRaw "require'alpha.themes.${v}'.config" else v;
         default = null;
         example = "dashboard";
         description = "You can directly use a pre-defined theme.";
       };
 
-      layout = mkOption {
-        type = types.listOf sectionType;
+      layout = lib.mkOption {
+        type = lib.types.listOf sectionType;
         default = [ ];
         description = "List of sections to layout for the dashboard";
         example = [
@@ -136,7 +135,7 @@ in
         ];
       };
 
-      opts = helpers.mkNullOrOption (with types; attrsOf anything) ''
+      opts = helpers.mkNullOrOption (with lib.types; attrsOf anything) ''
         Optional global options.
       '';
     };
@@ -149,12 +148,12 @@ in
 
       opt = options.plugins.alpha;
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       # TODO: deprecated 2024-08-29 remove after 24.11
       warnings = lib.mkIf opt.iconsEnabled.isDefined [
         ''
           nixvim (plugins.alpha):
-          The option definition `plugins.alpha.iconsEnabled' in ${showFiles opt.iconsEnabled.files} has been deprecated; please remove it.
+          The option definition `plugins.alpha.iconsEnabled' in ${lib.showFiles opt.iconsEnabled.files} has been deprecated; please remove it.
           You should use `plugins.alpha.iconsPackage' instead.
         ''
       ];

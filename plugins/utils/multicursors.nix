@@ -13,7 +13,7 @@ let
     with types;
     attrsOf (submodule {
       options = {
-        method = mkOption {
+        method = lib.mkOption {
           type = either str (enum [ false ]);
           description = ''
             Assigning `"nil"` exits from multi cursor mode.
@@ -32,7 +32,7 @@ let
           '';
         };
 
-        opts = mkOption {
+        opts = lib.mkOption {
           type = attrsOf str;
           default = { };
           description = "You can pass `:map-arguments` here.";

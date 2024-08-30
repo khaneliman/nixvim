@@ -15,7 +15,7 @@ in
 
     package = helpers.mkPluginPackageOption "leap.nvim" pkgs.vimPlugins.leap-nvim;
 
-    addDefaultMappings = mkOption {
+    addDefaultMappings = lib.mkOption {
       type = types.bool;
       default = true;
       description = "Whether to enable the default mappings.";

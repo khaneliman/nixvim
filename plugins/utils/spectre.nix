@@ -32,7 +32,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
             attrsOf (submodule {
               freeformType = with types; attrsOf anything;
               options = {
-                cmd = mkOption {
+                cmd = lib.mkOption {
                   type = types.str;
                   description = "Executable to run.";
                 };
@@ -43,13 +43,13 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
                 options = helpers.defaultNullOpts.mkAttrsOf (types.submodule {
                   options = {
-                    value = mkOption {
+                    value = lib.mkOption {
                       type = types.str;
                       example = "-i";
                       description = "The option flag.";
                     };
 
-                    icon = mkOption {
+                    icon = lib.mkOption {
                       type = types.str;
                       example = "[I]";
                       description = "The option icon.";
@@ -110,12 +110,12 @@ helpers.neovim-plugin.mkNeovimPlugin config {
             with types;
             attrsOf (submodule {
               options = {
-                map = mkOption {
+                map = lib.mkOption {
                   type = types.str;
                   description = "Keyboard shortcut.";
                 };
 
-                cmd = mkOption {
+                cmd = lib.mkOption {
                   type = types.str;
                   description = "Command to run.";
                   example = "<cmd>lua require('spectre').tab()<cr>";

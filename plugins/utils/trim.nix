@@ -18,7 +18,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       Filetypes to exclude.
     '';
 
-    patterns = mkOption {
+    patterns = lib.mkOption {
       type = with helpers.nixvimTypes; listOf strLua;
       apply = map helpers.mkRaw;
       default = [ ];

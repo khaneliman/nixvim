@@ -53,7 +53,7 @@ in
       optionsName: properties: helpers.mkNullOrOption types.str properties.description
     ) keymapDef;
 
-    keymapsSilent = mkOption {
+    keymapsSilent = lib.mkOption {
       type = types.bool;
       description = "Whether Neogen keymaps should be silent";
       default = false;

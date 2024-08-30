@@ -18,7 +18,7 @@ in
     keymap = {
       key = helpers.mkNullOrOption types.str "Keymap to run the `:Quickmath` command.";
 
-      silent = mkOption {
+      silent = lib.mkOption {
         type = types.bool;
         description = "Whether the quickmath keymap should be silent.";
         default = false;

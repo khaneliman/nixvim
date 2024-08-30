@@ -16,12 +16,12 @@ let
         with types;
         either str (submodule {
           options = {
-            key = mkOption {
+            key = lib.mkOption {
               type = str;
               description = desc;
             };
 
-            fallback = mkOption {
+            fallback = lib.mkOption {
               type = either str (enum [ false ]);
               description = ''
                 For a no-op, set <fallback> to "".

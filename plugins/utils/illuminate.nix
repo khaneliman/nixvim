@@ -96,7 +96,7 @@ in
             The keys are strings to represent the filetype.
           '';
 
-      largeFileOverrides = mkOption {
+      largeFileOverrides = lib.mkOption {
         type = types.submodule { options = commonOptions // filetypeOptions; };
         description = ''
           Config to use for large files (based on large_file_cutoff).

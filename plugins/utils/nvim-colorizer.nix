@@ -10,52 +10,52 @@ let
   cfg = config.plugins.nvim-colorizer;
 
   colorizer-options = {
-    RGB = mkOption {
+    RGB = lib.mkOption {
       description = "#RGB hex codes";
       type = types.nullOr types.bool;
       default = null;
     };
-    RRGGBB = mkOption {
+    RRGGBB = lib.mkOption {
       description = "#RRGGBB hex codes";
       type = types.nullOr types.bool;
       default = null;
     };
-    names = mkOption {
+    names = lib.mkOption {
       description = "\"Name\" codes like Blue or blue";
       type = types.nullOr types.bool;
       default = null;
     };
-    RRGGBBAA = mkOption {
+    RRGGBBAA = lib.mkOption {
       description = "#RRGGBBAA hex codes";
       type = types.nullOr types.bool;
       default = null;
     };
-    AARRGGBB = mkOption {
+    AARRGGBB = lib.mkOption {
       description = "0xAARRGGBB hex codes";
       type = types.nullOr types.bool;
       default = null;
     };
-    rgb_fn = mkOption {
+    rgb_fn = lib.mkOption {
       description = "CSS rgb() and rgba() functions";
       type = types.nullOr types.bool;
       default = null;
     };
-    hsl_fn = mkOption {
+    hsl_fn = lib.mkOption {
       description = "CSS hsl() and hsla() functions";
       type = types.nullOr types.bool;
       default = null;
     };
-    css = mkOption {
+    css = lib.mkOption {
       description = "Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB";
       type = types.nullOr types.bool;
       default = null;
     };
-    css_fn = mkOption {
+    css_fn = lib.mkOption {
       description = "Enable all CSS *functions*: rgb_fn, hsl_fn";
       type = types.nullOr types.bool;
       default = null;
     };
-    mode = mkOption {
+    mode = lib.mkOption {
       description = "Set the display mode";
       type = types.nullOr (
         types.enum [
@@ -66,7 +66,7 @@ let
       );
       default = null;
     };
-    tailwind = mkOption {
+    tailwind = lib.mkOption {
       description = "Enable tailwind colors";
       type = types.nullOr (
         types.oneOf [
@@ -81,18 +81,18 @@ let
       default = null;
     };
     sass = {
-      enable = mkOption {
+      enable = lib.mkOption {
         description = "Enable sass colors";
         type = types.nullOr types.bool;
         default = null;
       };
-      parsers = mkOption {
+      parsers = lib.mkOption {
         description = "sass parsers settings";
         type = types.nullOr types.attrs;
         default = null;
       };
     };
-    virtualtext = mkOption {
+    virtualtext = lib.mkOption {
       description = "Set the virtualtext character (only used when mode is set to 'virtualtext')";
       type = types.nullOr types.str;
       default = null;
@@ -106,7 +106,7 @@ in
 
       package = helpers.mkPluginPackageOption "nvim-colorizer" pkgs.vimPlugins.nvim-colorizer-lua;
 
-      fileTypes = mkOption {
+      fileTypes = lib.mkOption {
         description = "Enable and/or configure highlighting for certain filetypes";
         type =
           with types;
@@ -115,7 +115,7 @@ in
               either str (
                 types.submodule {
                   options = {
-                    language = mkOption {
+                    language = lib.mkOption {
                       type = types.str;
                       description = "The language this configuration should apply to.";
                     };
@@ -127,13 +127,13 @@ in
         default = null;
       };
 
-      userDefaultOptions = mkOption {
+      userDefaultOptions = lib.mkOption {
         description = "Default options";
         type = types.nullOr (types.submodule { options = colorizer-options; });
         default = null;
       };
 
-      bufTypes = mkOption {
+      bufTypes = lib.mkOption {
         description = "Buftype value is fetched by vim.bo.buftype";
         type = types.nullOr (types.listOf types.str);
         default = null;

@@ -215,7 +215,7 @@ mkVimPlugin config {
   };
 
   extraOptions = {
-    python3Dependencies = mkOption {
+    python3Dependencies = lib.mkOption {
       type = with types; functionTo (listOf package);
       default =
         p: with p; [

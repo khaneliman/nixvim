@@ -23,7 +23,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
         The default color used when a color cannot be picked. It must be HEX format.
       '';
 
-      inputs = mkOption {
+      inputs = lib.mkOption {
         type = listOfRawLua;
         apply = mapToRawLua;
         default = [ ];
@@ -59,7 +59,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
         '';
       };
 
-      outputs = mkOption {
+      outputs = lib.mkOption {
         type = listOfRawLua;
         apply = mapToRawLua;
         default = [ ];
@@ -95,7 +95,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
         '';
       };
 
-      pickers = mkOption {
+      pickers = lib.mkOption {
         type = listOfRawLua;
         apply = mapToRawLua;
         default = [ ];
@@ -179,7 +179,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
         '';
       };
 
-      convert = mkOption {
+      convert = lib.mkOption {
         type =
           with helpers.nixvimTypes;
           nullOr (

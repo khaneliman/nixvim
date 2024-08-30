@@ -5,13 +5,12 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "yanky";
   originalName = "yanky.nvim";
   defaultPackage = pkgs.vimPlugins.yanky-nvim;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO: introduced 2024-06-28. Remove after 24.11 release.
   deprecateExtraOptions = true;
@@ -82,7 +81,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       ];
     in
     [
-      (mkRemovedOptionModule
+      (lib.mkRemovedOptionModule
         (
           basePluginPath
           ++ [
@@ -96,7 +95,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           However, be careful as we do not perform any manipulation on the provided string.
         ''
       )
-      (mkRenamedOptionModule (
+      (lib.mkRenamedOptionModule (
         basePluginPath
         ++ [
           "picker"
@@ -104,7 +103,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           "enable"
         ]
       ) (basePluginPath ++ [ "enableTelescope" ]))
-      (mkRemovedOptionModule
+      (lib.mkRemovedOptionModule
         (
           basePluginPath
           ++ [
@@ -183,7 +182,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
             cursor or content changed.
           '';
 
-      ignore_registers = helpers.defaultNullOpts.mkListOf types.str [ "_" ] ''
+      ignore_registers = helpers.defaultNullOpts.mkListOf lib.types.str [ "_" ] ''
         Define registers to be ignored.
         By default the black hole register is ignored.
       '';
@@ -220,14 +219,14 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           apply =
             mappings:
             helpers.ifNonNull' mappings (
-              mapAttrs (
+              lib.mapAttrs (
                 _: v:
-                if isString v then
+                if lib.isString v then
                   # `mappings.default` is a lua function
                   helpers.mkRaw v
                 else
                   # `mappings.<mode>` is an attrs of lua function
-                  mapAttrs (_: helpers.mkRaw) v
+                  lib.mapAttrs (_: helpers.mkRaw) v
               ) mappings
             );
           pluginDefault = null;
@@ -342,7 +341,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
   };
 
   extraOptions = {
-    enableTelescope = mkEnableOption "the `yank_history` telescope picker.";
+    enableTelescope = lib.mkEnableOption "the `yank_history` telescope picker.";
   };
 
   callSetup = false;
@@ -359,14 +358,14 @@ helpers.neovim-plugin.mkNeovimPlugin config {
     extraConfigLua = ''
       do
         local utils = require('yanky.utils')
-        ${optionalString config.plugins.telescope.enable "local mapping = require('yanky.telescope.mapping')"}
+        ${lib.optionalString config.plugins.telescope.enable "local mapping = require('yanky.telescope.mapping')"}
 
         require('yanky').setup(${helpers.toLuaObject cfg.settings})
       end
     '';
 
-    extraPlugins = mkIf (cfg.settings.ring.storage == "sqlite") [ pkgs.vimPlugins.sqlite-lua ];
+    extraPlugins = lib.mkIf (cfg.settings.ring.storage == "sqlite") [ pkgs.vimPlugins.sqlite-lua ];
 
-    plugins.telescope.enabledExtensions = mkIf cfg.enableTelescope [ "yank_history" ];
+    plugins.telescope.enabledExtensions = lib.mkIf cfg.enableTelescope [ "yank_history" ];
   };
 }

@@ -5,15 +5,13 @@
   pkgs,
   ...
 }:
-with lib;
-with helpers.vim-plugin;
-mkVimPlugin config {
+lib.nixvim.vim-plugin.mkVimPlugin config {
   name = "instant";
   originalName = "instant.nvim";
   defaultPackage = pkgs.vimPlugins.instant-nvim;
   globalPrefix = "instant_";
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO introduced 2024-03-02: remove 2024-05-02
   deprecateExtraConfig = true;
