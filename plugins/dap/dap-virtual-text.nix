@@ -5,13 +5,12 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.dap.extensions.dap-virtual-text;
 in
 {
   options.plugins.dap.extensions.dap-virtual-text = {
-    enable = mkEnableOption "dap-virtual-text";
+    enable = lib.mkEnableOption "dap-virtual-text";
 
     package = helpers.mkPluginPackageOption "dap-virtual-text" pkgs.vimPlugins.nvim-dap-virtual-text;
 
@@ -57,7 +56,7 @@ in
 
     virtLines = helpers.defaultNullOpts.mkBool false "Show virtual lines instead of virtual text (will flicker!).";
 
-    virtTextWinCol = helpers.mkNullOrOption types.int ''
+    virtTextWinCol = helpers.mkNullOrOption lib.types.int ''
       Position the virtual text at a fixed window column (starting from the first text column).
       See `:h nvim_buf_set_extmark()`.
     '';
@@ -82,7 +81,7 @@ in
         virt_text_win_col = virtTextWinCol;
       };
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [ cfg.package ];
 
       plugins.dap = {

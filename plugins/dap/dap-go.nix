@@ -5,18 +5,17 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.dap.extensions.dap-go;
   dapHelpers = import ./dapHelpers.nix { inherit lib helpers; };
 in
 {
   options.plugins.dap.extensions.dap-go = {
-    enable = mkEnableOption "dap-go";
+    enable = lib.mkEnableOption "dap-go";
 
     package = helpers.mkPluginPackageOption "dap-go" pkgs.vimPlugins.nvim-dap-go;
 
-    dapConfigurations = helpers.mkNullOrOption (types.listOf dapHelpers.configurationOption) ''
+    dapConfigurations = helpers.mkNullOrOption (lib.types.listOf dapHelpers.configurationOption) ''
       Additional dap configurations.
       See `:h dap-configuration` for more detail.
     '';
@@ -34,7 +33,7 @@ in
         to start the process in a random available port.
       '';
 
-      args = helpers.mkNullOrOption (types.listOf types.str) "Additional args to pass to dlv.";
+      args = helpers.mkNullOrOption (lib.types.listOf lib.types.str) "Additional args to pass to dlv.";
 
       buildFlags = helpers.defaultNullOpts.mkStr "" "Build flags to pass to dlv.";
     };
@@ -52,7 +51,7 @@ in
         };
       };
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [ cfg.package ];
 
       plugins.dap = {

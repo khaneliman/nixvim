@@ -5,21 +5,20 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.dap.extensions.dap-python;
   dapHelpers = import ./dapHelpers.nix { inherit lib helpers; };
 in
 {
   options.plugins.dap.extensions.dap-python = {
-    enable = mkEnableOption "dap-python";
+    enable = lib.mkEnableOption "dap-python";
 
     package = helpers.mkPluginPackageOption "dap-python" pkgs.vimPlugins.nvim-dap-python;
 
-    adapterPythonPath = mkOption {
+    adapterPythonPath = lib.mkOption {
       default = "${pkgs.python3.withPackages (ps: with ps; [ debugpy ])}/bin/python3";
       description = "Path to the python interpreter. Path must be absolute or in $PATH and needs to have the debugpy package installed.";
-      type = types.str;
+      type = lib.types.str;
     };
 
     console = helpers.defaultNullOpts.mkEnumFirstDefault [
@@ -28,7 +27,7 @@ in
       "externalTerminal"
     ] "Debugpy console.";
 
-    customConfigurations = helpers.mkNullOrOption (types.listOf dapHelpers.configurationOption) "Custom python configurations for dap.";
+    customConfigurations = helpers.mkNullOrOption (lib.types.listOf dapHelpers.configurationOption) "Custom python configurations for dap.";
 
     includeConfigs = helpers.defaultNullOpts.mkBool true "Add default configurations.";
 
@@ -37,7 +36,7 @@ in
       By default the `VIRTUAL_ENV` and `CONDA_PREFIX` environment variables are used if present.
     '';
 
-    testRunner = helpers.mkNullOrOption (types.either types.str helpers.nixvimTypes.rawLua) ''
+    testRunner = helpers.mkNullOrOption (lib.types.either lib.types.str helpers.nixvimTypes.rawLua) ''
       The name of test runner to use by default.
       The default value is dynamic and depends on `pytest.ini` or `manage.py` markers.
       If neither is found "unittest" is used.
@@ -59,7 +58,7 @@ in
         include_configs = includeConfigs;
       };
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [ cfg.package ];
 
       plugins.dap = {

@@ -5,12 +5,10 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.dap;
   dapHelpers = import ./dapHelpers.nix { inherit lib helpers; };
 in
-with dapHelpers;
 {
   imports = [
     ./dap-go.nix
@@ -20,35 +18,35 @@ with dapHelpers;
   ];
 
   options.plugins.dap = helpers.neovim-plugin.extraOptionsOptions // {
-    enable = mkEnableOption "dap";
+    enable = lib.mkEnableOption "dap";
 
     package = helpers.mkPluginPackageOption "dap" pkgs.vimPlugins.nvim-dap;
 
     adapters = helpers.mkCompositeOption "Dap adapters." {
-      executables = mkAdapterOption "executable" executableAdapterOption;
-      servers = mkAdapterOption "server" serverAdapterOption;
+      executables = dapHelpers.mkAdapterOption "executable" dapHelpers.executableAdapterOption;
+      servers = dapHelpers.mkAdapterOption "server" dapHelpers.serverAdapterOption;
     };
 
     configurations =
-      helpers.mkNullOrOption (with types; attrsOf (listOf dapHelpers.configurationOption))
+      helpers.mkNullOrOption (with lib.types; attrsOf (listOf dapHelpers.configurationOption))
         ''
           Debuggee configurations, see `:h dap-configuration` for more info.
         '';
 
     signs = helpers.mkCompositeOption "Signs for dap." {
-      dapBreakpoint = mkSignOption "B" "Sign for breakpoints.";
+      dapBreakpoint = dapHelpers.mkSignOption "B" "Sign for breakpoints.";
 
-      dapBreakpointCondition = mkSignOption "C" "Sign for conditional breakpoints.";
+      dapBreakpointCondition = dapHelpers.mkSignOption "C" "Sign for conditional breakpoints.";
 
-      dapLogPoint = mkSignOption "L" "Sign for log points.";
+      dapLogPoint = dapHelpers.mkSignOption "L" "Sign for log points.";
 
-      dapStopped = mkSignOption "→" "Sign to indicate where the debuggee is stopped.";
+      dapStopped = dapHelpers.mkSignOption "→" "Sign to indicate where the debuggee is stopped.";
 
-      dapBreakpointRejected = mkSignOption "R" "Sign to indicate breakpoints rejected by the debug adapter.";
+      dapBreakpointRejected = dapHelpers.mkSignOption "R" "Sign to indicate breakpoints rejected by the debug adapter.";
     };
 
-    extensionConfigLua = mkOption {
-      type = types.lines;
+    extensionConfigLua = lib.mkOption {
+      type = lib.types.lines;
       description = ''
         Extension configuration for dap. Don't use this directly !
       '';
@@ -66,9 +64,11 @@ with dapHelpers;
 
           adapters =
             (lib.optionalAttrs (adapters.executables != null) (
-              processAdapters "executable" adapters.executables
+              dapHelpers.processAdapters "executable" adapters.executables
             ))
-            // (lib.optionalAttrs (adapters.servers != null) (processAdapters "server" adapters.servers));
+            // (lib.optionalAttrs (adapters.servers != null) (
+              dapHelpers.processAdapters "server" adapters.servers
+            ));
 
           signs = with signs; {
             DapBreakpoint = dapBreakpoint;
@@ -80,17 +80,17 @@ with dapHelpers;
         }
         // cfg.extraOptions;
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [ cfg.package ];
 
       extraConfigLua =
-        (optionalString (cfg.adapters != null) ''
+        (lib.optionalString (cfg.adapters != null) ''
           require("dap").adapters = ${helpers.toLuaObject options.adapters}
         '')
-        + (optionalString (options.configurations != null) ''
+        + (lib.optionalString (options.configurations != null) ''
           require("dap").configurations = ${helpers.toLuaObject options.configurations}
         '')
-        + (optionalString (cfg.signs != null) ''
+        + (lib.optionalString (cfg.signs != null) ''
           local __dap_signs = ${helpers.toLuaObject options.signs}
           for sign_name, sign in pairs(__dap_signs) do
             vim.fn.sign_define(sign_name, sign)

@@ -5,15 +5,16 @@
   pkgs,
   ...
 }:
-with lib;
 let
+  inherit (lib) types;
+
   cfg = config.plugins.dap.extensions.dap-ui;
 
-  mkSizeOption = helpers.mkNullOrOption (with types; either int (numbers.between 0.0 1.0));
+  mkSizeOption = helpers.mkNullOrOption (with lib.types; either int (numbers.between 0.0 1.0));
 
   mkKeymapOptions =
     name:
-    mapAttrs (
+    lib.mapAttrs (
       key: default:
       helpers.defaultNullOpts.mkNullable (
         with types; either str (listOf str)
@@ -30,19 +31,19 @@ let
 
   layoutOption = types.submodule {
     options = {
-      elements = mkOption {
+      elements = lib.mkOption {
         default = [ ];
         description = "Elements to display in this layout.";
         type = with types; listOf (either str elementOption);
       };
 
-      size = mkOption {
+      size = lib.mkOption {
         default = 10;
         description = "Size of the layout in lines/columns.";
         type = types.int;
       };
 
-      position = mkOption {
+      position = lib.mkOption {
         default = "left";
         description = "Which side of editor to open layout on.";
         type = types.enum [
@@ -57,7 +58,7 @@ let
 in
 {
   options.plugins.dap.extensions.dap-ui = helpers.neovim-plugin.extraOptionsOptions // {
-    enable = mkEnableOption "dap-ui";
+    enable = lib.mkEnableOption "dap-ui";
 
     package = helpers.mkPluginPackageOption "dap-ui" pkgs.vimPlugins.nvim-dap-ui;
 
@@ -229,7 +230,7 @@ in
         }
         // cfg.extraOptions;
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [ cfg.package ];
 
       plugins.dap = {
