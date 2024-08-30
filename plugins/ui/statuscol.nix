@@ -42,7 +42,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
         segmentType = types.submodule {
           freeformType = with types; attrsOf anything;
           options = {
-            text = mkOption {
+            text = lib.mkOption {
               type = with helpers.nixvimTypes; nullOr (listOf (either str rawLua));
               default = null;
               description = "Segment text.";
@@ -125,7 +125,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       `a` for Alt, `c` for Ctrl and `m` for Meta.
     '';
 
-    clickhandlers = mkOption {
+    clickhandlers = lib.mkOption {
       type = with helpers.nixvimTypes; attrsOf strLuaFn;
       default = { };
       description = ''

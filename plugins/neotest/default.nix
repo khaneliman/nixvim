@@ -4,7 +4,6 @@
   pkgs,
   ...
 }:
-with lib;
 let
   inherit (lib.nixvim) mkRaw;
 in
@@ -12,13 +11,13 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
   name = "neotest";
   defaultPackage = pkgs.vimPlugins.neotest;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   imports = [ ./adapters.nix ];
 
   settingsOptions = (import ./options.nix { inherit lib; }) // {
-    adapters = mkOption {
-      type = with types; listOf strLua;
+    adapters = lib.mkOption {
+      type = with lib.types; listOf strLua;
       default = [ ];
       apply = map mkRaw;
       # NOTE: We hide this option from the documentation as users should use the top-level

@@ -26,7 +26,7 @@ let
       listOf (
         either str (submodule {
           options = {
-            name = mkOption {
+            name = lib.mkOption {
               type = types.either types.str helpers.nixvimTypes.rawLua;
               description = "Component name or function";
               default = defaultName;
@@ -42,7 +42,7 @@ let
                 freeformType = attrsOf anything;
 
                 options = {
-                  icon = mkOption {
+                  icon = lib.mkOption {
                     type = str;
                     description = "Icon character.";
                   };
@@ -59,11 +59,11 @@ let
             padding = helpers.defaultNullOpts.mkNullable (types.either types.int (
               types.submodule {
                 options = {
-                  left = mkOption {
+                  left = lib.mkOption {
                     type = types.int;
                     description = "left padding";
                   };
-                  right = mkOption {
+                  right = lib.mkOption {
                     type = types.int;
                     description = "left padding";
                   };
@@ -82,7 +82,7 @@ let
               ```
             '';
 
-            extraConfig = mkOption {
+            extraConfig = lib.mkOption {
               type = types.attrs;
               default = { };
               description = "extra options for the component";
@@ -113,7 +113,7 @@ in
         default = pkgs.git;
       };
 
-      iconsEnabled = mkOption {
+      iconsEnabled = lib.mkOption {
         type = types.bool;
         description = "Whether to enable/disable icons for all components.";
         default = true;
@@ -195,7 +195,7 @@ in
 
       inactiveWinbar = mkEmptySectionOption "Inactive Winbar configuration";
 
-      extensions = mkOption {
+      extensions = lib.mkOption {
         type = types.nullOr (types.listOf types.str);
         default = null;
         example = ''[ "fzf" ]'';

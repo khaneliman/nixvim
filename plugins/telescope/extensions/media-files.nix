@@ -57,7 +57,7 @@ in
             enabledByDefault ? false,
           }:
           {
-            enable = mkOption {
+            enable = lib.mkOption {
               type = types.bool;
               default = enabledByDefault;
               description = ''
@@ -66,7 +66,7 @@ in
               '';
             };
 
-            package = mkOption {
+            package = lib.mkOption {
               type = types.package;
               default = package;
               description = "The package to use for the ${name} dependency.";

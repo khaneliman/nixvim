@@ -11,7 +11,7 @@ let
 
   loaderSubmodule = types.submodule {
     options = {
-      lazyLoad = mkOption {
+      lazyLoad = lib.mkOption {
         type = types.bool;
         default = true;
         description = ''
@@ -67,7 +67,7 @@ in
 
     package = helpers.mkPluginPackageOption "luasnip" pkgs.vimPlugins.luasnip;
 
-    settings = mkOption {
+    settings = lib.mkOption {
       type = with types; attrsOf anything;
       description = ''
         Options provided to the `require('luasnip').config.setup()` function.",
@@ -79,7 +79,7 @@ in
       default = { };
     };
 
-    fromVscode = mkOption {
+    fromVscode = lib.mkOption {
       default = [ ];
       example = literalExpression ''
         [
@@ -102,7 +102,7 @@ in
       type = types.listOf loaderSubmodule;
     };
 
-    fromSnipmate = mkOption {
+    fromSnipmate = lib.mkOption {
       default = [ ];
       description = ''
         Luasnip does not support the full snipmate format: Only
@@ -117,7 +117,7 @@ in
       type = types.listOf loaderSubmodule;
     };
 
-    fromLua = mkOption {
+    fromLua = lib.mkOption {
       default = [ ];
       description = ''
         Load lua snippets with the lua loader.
@@ -134,7 +134,7 @@ in
       type = types.listOf loaderSubmodule;
     };
 
-    filetypeExtend = mkOption {
+    filetypeExtend = lib.mkOption {
       default = { };
       type = with types; attrsOf (listOf str);
       example = {

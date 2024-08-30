@@ -37,13 +37,13 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
   ];
 
   extraOptions = {
-    keymaps = mkOption {
+    keymaps = lib.mkOption {
       type =
         with types;
         attrsOf (
           either str (submodule {
             options = {
-              action = mkOption {
+              action = lib.mkOption {
                 type = types.str;
                 description = "The telescope action to run.";
               };
@@ -63,13 +63,13 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
       };
     };
 
-    highlightTheme = mkOption {
+    highlightTheme = lib.mkOption {
       type = types.nullOr types.str;
       description = "The colorscheme to use for syntax highlighting";
       default = config.colorscheme;
     };
 
-    enabledExtensions = mkOption {
+    enabledExtensions = lib.mkOption {
       type = types.listOf types.str;
       default = [ ];
       description = ''
@@ -128,7 +128,7 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
       Default configuration for builtin pickers.
     '';
 
-    extensions = mkOption {
+    extensions = lib.mkOption {
       type = with types; attrsOf anything;
       default = { };
       # NOTE: We hide this option from the documentation as users should use the top-level
