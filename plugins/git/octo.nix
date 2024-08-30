@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "octo";
   originalName = "octo.nvim";
@@ -25,7 +24,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
     '';
 
     default_remote =
-      helpers.defaultNullOpts.mkListOf types.str
+      helpers.defaultNullOpts.mkListOf lib.types.str
         [
           "upstream"
           "origin"
@@ -34,7 +33,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           Order to try remotes
         '';
 
-    ssh_aliases = helpers.defaultNullOpts.mkAttrsOf types.str { } ''
+    ssh_aliases = helpers.defaultNullOpts.mkAttrsOf lib.types.str { } ''
       SSH aliases.
     '';
 
@@ -170,10 +169,10 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
   extraConfig =
     cfg:
-    mkMerge [
-      (mkIf (cfg.settings.picker == null || cfg.settings.picker == "telescope") {
-        plugins.telescope.enable = mkDefault true;
+    lib.mkMerge [
+      (lib.mkIf (cfg.settings.picker == null || cfg.settings.picker == "telescope") {
+        plugins.telescope.enable = lib.mkDefault true;
       })
-      (mkIf (cfg.settings.picker == "fzf-lua") { plugins.fzf-lua.enable = mkDefault true; })
+      (lib.mkIf (cfg.settings.picker == "fzf-lua") { plugins.fzf-lua.enable = lib.mkDefault true; })
     ];
 }

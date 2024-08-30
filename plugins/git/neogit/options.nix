@@ -1,6 +1,7 @@
 { lib, helpers }:
-with lib;
 let
+  inherit (lib) types;
+
   mkKindOption = helpers.defaultNullOpts.mkEnum [
     "split"
     "vsplit"
@@ -169,7 +170,7 @@ in
   };
 
   signs =
-    mapAttrs
+    lib.mapAttrs
       (
         n: v:
         helpers.defaultNullOpts.mkListOf types.str
@@ -215,25 +216,25 @@ in
   };
 
   sections =
-    mapAttrs
+    lib.mapAttrs
       (
         name: default:
-        mkOption {
-          type =
-            with types;
-            nullOr (submodule {
+        lib.mkOption {
+          type = types.nullOr (
+            types.submodule {
               options = {
-                folded = mkOption {
+                folded = lib.mkOption {
                   type = types.bool;
                   description = "Whether or not this section should be open or closed by default.";
                 };
 
-                hidden = mkOption {
+                hidden = lib.mkOption {
                   type = types.bool;
                   description = "Whether or not this section should be shown.";
                 };
               };
-            });
+            }
+          );
           inherit default;
           description = "Settings for the ${name} section";
         }
@@ -421,7 +422,7 @@ in
     Set to false if you want to be responsible for creating _ALL_ keymappings.
   '';
 
-  highlight = genAttrs [
+  highlight = lib.genAttrs [
     "italic"
     "bold"
     "underline"

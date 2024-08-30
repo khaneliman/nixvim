@@ -5,14 +5,15 @@
   pkgs,
   ...
 }:
-with lib;
 let
+  inherit (lib) mkIf types;
+
   cfg = config.plugins.gitgutter;
 in
 {
   options = {
     plugins.gitgutter = {
-      enable = mkEnableOption "gitgutter";
+      enable = lib.mkEnableOption "gitgutter";
 
       package = helpers.mkPluginPackageOption "gitgutter" pkgs.vimPlugins.gitgutter;
 
@@ -21,54 +22,54 @@ in
         default = pkgs.git;
       };
 
-      recommendedSettings = mkOption {
+      recommendedSettings = lib.mkOption {
         type = types.bool;
         default = true;
         description = "Use recommended settings";
       };
 
-      maxSigns = mkOption {
+      maxSigns = lib.mkOption {
         type = types.nullOr types.int;
         default = null;
         description = "Maximum number of signs to show on the screen. Unlimited by default.";
       };
 
-      showMessageOnHunkJumping = mkOption {
+      showMessageOnHunkJumping = lib.mkOption {
         type = types.bool;
         default = true;
         description = "Show a message when jumping between hunks";
       };
 
-      defaultMaps = mkOption {
+      defaultMaps = lib.mkOption {
         type = types.bool;
         default = true;
         description = "Let gitgutter set default mappings";
       };
 
-      allowClobberSigns = mkOption {
+      allowClobberSigns = lib.mkOption {
         type = types.bool;
         default = false;
         description = "Don't preserve other signs on the sign column";
       };
 
-      signPriority = mkOption {
+      signPriority = lib.mkOption {
         type = types.nullOr types.int;
         default = null;
         description = "GitGutter's sign priority on the sign column";
       };
 
-      matchBackgrounds = mkOption {
+      matchBackgrounds = lib.mkOption {
         type = types.bool;
         default = false;
         description = "Make the background colors match the sign column";
       };
 
-      signs = mkOption {
+      signs = lib.mkOption {
         type =
           let
             signOption =
               desc:
-              mkOption {
+              lib.mkOption {
                 type = types.nullOr types.str;
                 default = null;
                 description = "Sign for ${desc}";
@@ -89,35 +90,35 @@ in
         description = "Custom signs for the sign column";
       };
 
-      diffRelativeToWorkingTree = mkOption {
+      diffRelativeToWorkingTree = lib.mkOption {
         type = types.bool;
         default = false;
         description = "Make diffs relative to the working tree instead of the index";
       };
 
-      extraGitArgs = mkOption {
+      extraGitArgs = lib.mkOption {
         type = types.str;
         default = "";
         description = "Extra arguments to pass to git";
       };
 
-      extraDiffArgs = mkOption {
+      extraDiffArgs = lib.mkOption {
         type = types.str;
         default = "";
         description = "Extra arguments to pass to git diff";
       };
 
-      grep = mkOption {
+      grep = lib.mkOption {
         type = types.nullOr (
           types.oneOf [
             (types.submodule {
               options = {
-                command = mkOption {
+                command = lib.mkOption {
                   type = types.str;
                   description = "The command to use as a grep alternative";
                 };
 
-                package = mkOption {
+                package = lib.mkOption {
                   type = types.package;
                   description = "The package of the grep alternative to use";
                 };
@@ -130,49 +131,49 @@ in
         description = "A non-standard grep to use instead of the default";
       };
 
-      enableByDefault = mkOption {
+      enableByDefault = lib.mkOption {
         type = types.bool;
         default = true;
         description = "Enable gitgutter by default";
       };
 
-      signsByDefault = mkOption {
+      signsByDefault = lib.mkOption {
         type = types.bool;
         default = true;
         description = "Show signs by default";
       };
 
-      highlightLines = mkOption {
+      highlightLines = lib.mkOption {
         type = types.bool;
         default = true;
         description = "Highlight lines by default";
       };
 
-      highlightLineNumbers = mkOption {
+      highlightLineNumbers = lib.mkOption {
         type = types.bool;
         default = true;
         description = "Highlight line numbers by default";
       };
 
-      runAsync = mkOption {
+      runAsync = lib.mkOption {
         type = types.bool;
         default = true;
         description = "Disable this to run git diff syncrhonously instead of asynchronously";
       };
 
-      previewWinFloating = mkOption {
+      previewWinFloating = lib.mkOption {
         type = types.bool;
         default = false;
         description = "Preview hunks on floating windows";
       };
 
-      useLocationList = mkOption {
+      useLocationList = lib.mkOption {
         type = types.bool;
         default = false;
         description = "Load chunks into windows's location list instead of the quickfix list";
       };
 
-      terminalReportFocus = mkOption {
+      terminalReportFocus = lib.mkOption {
         type = types.bool;
         default = true;
         description = "Let the terminal report its focus status";

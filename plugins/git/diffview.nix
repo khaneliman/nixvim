@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.diffview;
   mkWinConfig =
@@ -109,7 +108,7 @@ in
         The hg executable followed by default args.
       '';
 
-      useIcons = mkOption {
+      useIcons = lib.mkOption {
         type = types.bool;
         description = "Requires nvim-web-devicons";
         default = true;
@@ -576,26 +575,26 @@ in
         let
           keymapList =
             desc:
-            mkOption {
+            lib.mkOption {
               type = types.listOf (
                 types.submodule {
                   options = {
-                    mode = mkOption {
+                    mode = lib.mkOption {
                       type = types.str;
                       description = "mode to bind keybinding to";
                       example = "n";
                     };
-                    key = mkOption {
+                    key = lib.mkOption {
                       type = types.str;
                       description = "key to bind keybinding to";
                       example = "<tab>";
                     };
-                    action = mkOption {
+                    action = lib.mkOption {
                       type = types.str;
                       description = "action for keybinding";
                       example = "action.select_next_entry";
                     };
-                    description = mkOption {
+                    description = lib.mkOption {
                       type = types.nullOr types.str;
                       description = "description for keybinding";
                       default = null;
@@ -821,10 +820,10 @@ in
           };
       };
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [
         cfg.package
-      ] ++ (optional (cfg.iconsPackage != null && cfg.useIcons) cfg.iconsPackage);
+      ] ++ (lib.optional (cfg.iconsPackage != null && cfg.useIcons) cfg.iconsPackage);
 
       extraConfigLua = ''
         require("diffview").setup(${helpers.toLuaObject setupOptions})

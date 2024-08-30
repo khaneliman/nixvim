@@ -5,13 +5,12 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "gitsigns";
   originalName = "gitsigns.nvim";
   defaultPackage = pkgs.vimPlugins.gitsigns-nvim;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO: introduced 2024-03-12, remove on 2024-05-12
   deprecateExtraOptions = true;
@@ -146,10 +145,10 @@ helpers.neovim-plugin.mkNeovimPlugin config {
         numhl = "Nr";
       };
 
-      highlightRemovals = flatten (
-        mapAttrsToList (
+      highlightRemovals = lib.flatten (
+        lib.mapAttrsToList (
           opt: hlg:
-          mapAttrsToList (subOpt: subHlg: {
+          lib.mapAttrsToList (subOpt: subHlg: {
             optionPath = settingsPath ++ [
               "signs"
               opt
@@ -165,14 +164,14 @@ helpers.neovim-plugin.mkNeovimPlugin config {
       helpers.mkDeprecatedSubOptionModule optionPath "Please define the `${hlg}` highlight group instead."
     ) highlightRemovals)
     ++ [
-      (mkRenamedOptionModule (
+      (lib.mkRenamedOptionModule (
         basePluginPaths
         ++ [
           "onAttach"
           "function"
         ]
       ) (settingsPath ++ [ "on_attach" ]))
-      (mkRenamedOptionModule
+      (lib.mkRenamedOptionModule
         (
           basePluginPaths
           ++ [
@@ -188,14 +187,14 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           ]
         )
       )
-      (mkRemovedOptionModule (
+      (lib.mkRemovedOptionModule (
         basePluginPaths
         ++ [
           "watchGitDir"
           "interval"
         ]
       ) "The option has been removed from upstream.")
-      (mkRenamedOptionModule
+      (lib.mkRenamedOptionModule
         (
           basePluginPaths
           ++ [
@@ -211,21 +210,21 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           ]
         )
       )
-      (mkRenamedOptionModule (
+      (lib.mkRenamedOptionModule (
         basePluginPaths
         ++ [
           "statusFormatter"
           "function"
         ]
       ) (settingsPath ++ [ "status_formatter" ]))
-      (mkRenamedOptionModule (
+      (lib.mkRenamedOptionModule (
         basePluginPaths
         ++ [
           "currentLineBlameFormatter"
           "normal"
         ]
       ) (settingsPath ++ [ "current_line_blame_formatter" ]))
-      (mkRenamedOptionModule (
+      (lib.mkRenamedOptionModule (
         basePluginPaths
         ++ [
           "currentLineBlameFormatter"
@@ -270,7 +269,8 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
   extraConfig = cfg: {
     warnings =
-      optional ((isBool cfg.settings.trouble && cfg.settings.trouble) && !config.plugins.trouble.enable)
+      lib.optional
+        ((lib.isBool cfg.settings.trouble && cfg.settings.trouble) && !config.plugins.trouble.enable)
         ''
           Nixvim (plugins.gitsigns): You have enabled `plugins.gitsigns.settings.trouble` but
           `plugins.trouble.enable` is `false`.

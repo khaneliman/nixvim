@@ -1,5 +1,7 @@
 { lib, helpers }:
-with lib;
+let
+  inherit (lib) types;
+in
 {
   signs =
     let
@@ -57,14 +59,14 @@ with lib;
       worktreeType = types.submodule {
         freeformType = with types; attrsOf anything;
         options = {
-          toplevel = mkOption {
+          toplevel = lib.mkOption {
             type = with helpers.nixvimTypes; maybeRaw str;
             description = ''
               Path to the top-level of the parent git repository.
             '';
           };
 
-          gitdir = mkOption {
+          gitdir = lib.mkOption {
             type = with helpers.nixvimTypes; maybeRaw str;
             description = ''
               Path to the git directory of the parent git repository (typically the `.git/` directory).

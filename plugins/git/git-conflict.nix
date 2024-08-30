@@ -5,13 +5,12 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "git-conflict";
   originalName = "git-conflict.nvim";
   defaultPackage = pkgs.vimPlugins.git-conflict-nvim;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   extraOptions = {
     gitPackage = helpers.mkPackageOption {
@@ -24,7 +23,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
 
   settingsOptions = {
     default_mappings =
-      helpers.defaultNullOpts.mkNullable (with types; either bool (attrsOf str)) true
+      helpers.defaultNullOpts.mkNullable (with lib.types; either bool (attrsOf str)) true
         ''
           This plugin offers default buffer local mappings inside conflicted files.
           This is primarily because applying these mappings only to relevant buffers is impossible

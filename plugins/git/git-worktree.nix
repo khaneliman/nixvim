@@ -5,14 +5,13 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.plugins.git-worktree;
 in
 {
   options = {
     plugins.git-worktree = {
-      enable = mkEnableOption "git-worktree";
+      enable = lib.mkEnableOption "git-worktree";
 
       package = helpers.mkPluginPackageOption "git-worktree" pkgs.vimPlugins.git-worktree-nvim;
 
@@ -21,7 +20,7 @@ in
         default = pkgs.git;
       };
 
-      enableTelescope = mkEnableOption "telescope integration";
+      enableTelescope = lib.mkEnableOption "telescope integration";
 
       changeDirectoryCommand = helpers.defaultNullOpts.mkStr "cd" ''
         The vim command used to change to the new worktree directory.
@@ -61,7 +60,7 @@ in
         inherit autopush;
       };
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       assertions = [
         {
           assertion = cfg.enableTelescope -> config.plugins.telescope.enable;

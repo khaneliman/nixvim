@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.vim-plugin.mkVimPlugin config {
   name = "lazygit";
   originalName = "lazygit.nvim";
@@ -15,15 +14,15 @@ helpers.vim-plugin.mkVimPlugin config {
   maintainers = [ helpers.maintainers.AndresBermeoMarinelli ];
 
   settingsOptions = {
-    floating_window_winblend = helpers.defaultNullOpts.mkNullable (types.ints.between 0 100) 0 ''
+    floating_window_winblend = helpers.defaultNullOpts.mkNullable (lib.types.ints.between 0 100) 0 ''
       Set the transparency of the floating window.
     '';
 
     floating_window_scaling_factor =
-      helpers.defaultNullOpts.mkNullable types.numbers.nonnegative 0.9
+      helpers.defaultNullOpts.mkNullable lib.types.numbers.nonnegative 0.9
         "Set the scaling factor for floating window.";
 
-    floating_window_border_chars = helpers.defaultNullOpts.mkListOf types.str [
+    floating_window_border_chars = helpers.defaultNullOpts.mkListOf lib.types.str [
       "╭"
       "─"
       "╮"
@@ -47,7 +46,7 @@ helpers.vim-plugin.mkVimPlugin config {
     '';
 
     config_file_path = helpers.defaultNullOpts.mkNullable (
-      with types; either str (listOf str)
+      with lib.types; either str (listOf str)
     ) [ ] "Custom config file path or list of custom config file paths.";
   };
 

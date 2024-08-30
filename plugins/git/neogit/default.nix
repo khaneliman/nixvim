@@ -5,12 +5,11 @@
   pkgs,
   ...
 }:
-with lib;
 helpers.neovim-plugin.mkNeovimPlugin config {
   name = "neogit";
   defaultPackage = pkgs.vimPlugins.neogit;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   # TODO introduced 2024-02-29: remove 2024-04-29
   deprecateExtraOptions = true;
@@ -18,7 +17,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
     map
       (
         optionPath:
-        mkRemovedOptionModule
+        lib.mkRemovedOptionModule
           (
             [
               "plugins"
@@ -115,7 +114,7 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           assertion =
             let
               enabled = cfg.settings.integrations.${name};
-              isEnabled = (isBool enabled) && enabled;
+              isEnabled = (lib.isBool enabled) && enabled;
             in
             isEnabled -> config.plugins.${name}.enable;
           message = ''
@@ -128,9 +127,13 @@ helpers.neovim-plugin.mkNeovimPlugin config {
           "fzf-lua"
         ];
 
-    extraPackages = [
-      cfg.gitPackage
-    ] ++ optional (hasInfix "which" (cfg.settings.commit_view.verify_commit.__raw or "")) pkgs.which;
+    extraPackages =
+      [
+        cfg.gitPackage
+      ]
+      ++ lib.optional (lib.hasInfix "which" (
+        cfg.settings.commit_view.verify_commit.__raw or ""
+      )) pkgs.which;
 
   };
 }

@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-with lib;
 # We use `mkVimPlugin` to avoid having a `settings` option.
 # Indeed, this plugin is not configurable in the common sense (no `setup` function).
 helpers.vim-plugin.mkVimPlugin config {
@@ -13,16 +12,16 @@ helpers.vim-plugin.mkVimPlugin config {
   originalName = "gitignore.nvim";
   defaultPackage = pkgs.vimPlugins.gitignore-nvim;
 
-  maintainers = [ maintainers.GaetanLepage ];
+  maintainers = [ lib.maintainers.GaetanLepage ];
 
   extraOptions = {
-    keymap = mkOption {
+    keymap = lib.mkOption {
       type =
-        with types;
+        with lib.types;
         nullOr (
           either str (submodule {
             options = {
-              key = mkOption {
+              key = lib.mkOption {
                 type = str;
                 description = "The key to map.";
                 example = "<leader>gi";
@@ -47,9 +46,9 @@ helpers.vim-plugin.mkVimPlugin config {
   };
 
   extraConfig = cfg: {
-    keymaps = optional (cfg.keymap != null) (
+    keymaps = lib.optional (cfg.keymap != null) (
       (
-        if isString cfg.keymap then
+        if lib.isString cfg.keymap then
           {
             mode = "n";
             key = cfg.keymap;

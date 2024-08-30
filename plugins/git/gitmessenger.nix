@@ -5,12 +5,11 @@
   pkgs,
   ...
 }:
-with lib;
 {
-  meta.maintainers = [ maintainers.traxys ];
+  meta.maintainers = [ lib.maintainers.traxys ];
 
   options.plugins.gitmessenger = {
-    enable = mkEnableOption "gitmessenger";
+    enable = lib.mkEnableOption "gitmessenger";
 
     package = helpers.mkPluginPackageOption "git-messenger" pkgs.vimPlugins.git-messenger-vim;
 
@@ -56,16 +55,16 @@ with lib;
       the current window. Please see :help <mods> for more details.
     '';
 
-    maxPopupHeight = mkOption {
-      type = types.nullOr types.int;
+    maxPopupHeight = lib.mkOption {
+      type = lib.types.nullOr lib.types.int;
       default = null;
       description = ''
         Max lines of popup window in an integer value. Setting null means no limit.
       '';
     };
 
-    maxPopupWidth = mkOption {
-      type = types.nullOr types.int;
+    maxPopupWidth = lib.mkOption {
+      type = lib.types.nullOr lib.types.int;
       default = null;
       description = ''
         Max characters of popup window in an integer value. Setting null means no limit.
@@ -84,7 +83,7 @@ with lib;
       Note: Word diff is enabled by typing "r" in a popup window.
     '';
 
-    floatingWinOps = helpers.defaultNullOpts.mkAttrsOf types.anything { } ''
+    floatingWinOps = helpers.defaultNullOpts.mkAttrsOf lib.types.anything { } ''
       Options passed to nvim_open_win() on opening a popup window. This is useful when you want to
       override some window options.
     '';
@@ -100,7 +99,7 @@ with lib;
     let
       cfg = config.plugins.gitmessenger;
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [ cfg.package ];
       globals = {
         git_messenger_close_on_cursor_moved = cfg.closeOnCursorMoved;

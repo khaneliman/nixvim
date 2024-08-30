@@ -5,21 +5,20 @@
   pkgs,
   ...
 }:
-with lib;
 {
   options.plugins.gitlinker = helpers.neovim-plugin.extraOptionsOptions // {
-    enable = mkEnableOption "gitlinker.nvim";
+    enable = lib.mkEnableOption "gitlinker.nvim";
 
     package = helpers.mkPluginPackageOption "gitlinker.nvim" pkgs.vimPlugins.gitlinker-nvim;
 
-    remote = helpers.mkNullOrOption types.str "Force the use of a specific remote.";
+    remote = helpers.mkNullOrOption lib.types.str "Force the use of a specific remote.";
 
     addCurrentLineOnNormalMode = helpers.defaultNullOpts.mkBool true ''
       Adds current line nr in the url for normal mode.
     '';
 
     actionCallback =
-      helpers.defaultNullOpts.mkNullable (with types; either str helpers.nixvimTypes.rawLua)
+      helpers.defaultNullOpts.mkNullable (with lib.types; either str helpers.nixvimTypes.rawLua)
         "copy_to_clipboard"
         ''
           Callback for what to do with the url.
@@ -39,7 +38,7 @@ with lib;
     mappings = helpers.defaultNullOpts.mkStr "<leader>gy" "Mapping to call url generation.";
 
     callbacks =
-      helpers.defaultNullOpts.mkAttrsOf types.str
+      helpers.defaultNullOpts.mkAttrsOf lib.types.str
         {
           "github.com" = "get_github_type_url";
           "gitlab.com" = "get_gitlab_type_url";
@@ -70,7 +69,7 @@ with lib;
     let
       cfg = config.plugins.gitlinker;
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       extraPlugins = [ cfg.package ];
 
       extraConfigLua =
