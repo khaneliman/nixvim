@@ -238,4 +238,19 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin config {
       }
     ```
   '';
+
+  extraOptions = {
+    autoInstallFormatters = defaultNullOpts.mkBool false "Automatically install formatters configured in `plugins.conform-nvim.settings.formatters_by_ft`.";
+  };
+
+  extraConfig =
+    cfg:
+    lib.mkIf cfg.autoInstallFormatters {
+      extraPackages = map (
+        pkg:
+        pkgs.${pkg} or (with pkgs; {
+          inherit (nodePackages) prettier;
+        }).${pkg}
+      ) (lib.flatten (lib.attrValues cfg.settings.formatters_by_ft));
+    };
 }

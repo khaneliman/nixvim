@@ -161,4 +161,29 @@
       };
     };
   };
+
+  auto-install = {
+    plugins.conform-nvim = {
+      enable = true;
+      autoInstallFormatters = true;
+
+      settings = {
+        formatters_by_ft = {
+          lua = [ "stylua" ];
+          python = [
+            "isort"
+            "black"
+          ];
+          javascript = {
+            __unkeyed-1 = "prettierd";
+            __unkeyed-2 = "prettier";
+            timeout_ms = 2000;
+            stop_after_first = true;
+          };
+          "*" = [ "codespell" ];
+          "_" = [ "trimWhitespace" ];
+        };
+      };
+    };
+  };
 }
