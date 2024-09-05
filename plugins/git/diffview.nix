@@ -92,6 +92,198 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin {
 
   # TODO: added 2024-09-04 remove after 24.11
   deprecateExtraOptions = true;
+  optionsRenamedToSettings = [
+    "diffBinaries"
+    "enhancedDiffHl"
+    "gitCmd"
+    "hgCmd"
+    "useIcons"
+    "showHelpHints"
+    "watchIndex"
+    [
+      "icons"
+      "folderClosed"
+    ]
+    [
+      "icons"
+      "folderOpen"
+    ]
+    [
+      "signs"
+      "folderClosed"
+    ]
+    [
+      "signs"
+      "folderOpen"
+    ]
+    [
+      "signs"
+      "done"
+    ]
+    [
+      "view"
+      "default"
+      "layout"
+    ]
+    [
+      "view"
+      "default"
+      "disableDiagnostics"
+    ]
+    [
+      "view"
+      "default"
+      "winbarInfo"
+    ]
+    [
+      "view"
+      "mergeTool"
+      "layout"
+    ]
+    [
+      "view"
+      "mergeTool"
+      "disableDiagnostics"
+    ]
+    [
+      "view"
+      "mergeTool"
+      "winbarInfo"
+    ]
+    [
+      "filePanel"
+      "listingStyle"
+    ]
+    [
+      "filePanel"
+      "treeOptions"
+      "flattenDirs"
+    ]
+    [
+      "filePanel"
+      "treeOptions"
+      "folderStatuses"
+    ]
+    [
+      "filePanel"
+      "winConfig"
+      "type"
+    ]
+    [
+      "filePanel"
+      "winConfig"
+      "width"
+    ]
+    [
+      "filePanel"
+      "winConfig"
+      "height"
+    ]
+    [
+      "filePanel"
+      "winConfig"
+      "position"
+    ]
+    [
+      "filePanel"
+      "winConfig"
+      "relative"
+    ]
+    [
+      "filePanel"
+      "winConfig"
+      "win"
+    ]
+    [
+      "filePanel"
+      "winConfig"
+      "winOpts"
+    ]
+    [
+      "hooks"
+      "viewOpened"
+    ]
+    [
+      "hooks"
+      "viewClosed"
+    ]
+    [
+      "hooks"
+      "viewEnter"
+    ]
+    [
+      "hooks"
+      "viewLeave"
+    ]
+    [
+      "hooks"
+      "viewPostLayout"
+    ]
+    [
+      "hooks"
+      "diffBufRead"
+    ]
+    [
+      "hooks"
+      "diffBufWinEnter"
+    ]
+    [
+      "fileHistoryPanel"
+      "logOptions"
+      "git"
+      "multiFile"
+    ]
+    [
+      "fileHistoryPanel"
+      "logOptions"
+      "git"
+      "singleFile"
+    ]
+    [
+      "fileHistoryPanel"
+      "logOptions"
+      "hg"
+      "multiFile"
+    ]
+    [
+      "fileHistoryPanel"
+      "logOptions"
+      "hg"
+      "singleFile"
+    ]
+    (map
+      (optionName: [
+        "fileHistoryPanel"
+        "logOptions"
+        "git"
+        "singleFile"
+        optionName
+      ])
+      [
+        "base"
+        "revRange"
+        "pathArgs"
+        "follow"
+        "firstParent"
+        "showPulls"
+        "reflog"
+        "all"
+        "merges"
+        "noMerges"
+        "reverse"
+        "cherryPick"
+        "leftOnly"
+        "rightOnly"
+        "maxCount"
+        "l"
+        "diffMerges"
+        "author"
+        "grep"
+        "g"
+        "s"
+      ]
+    )
+  ];
 
   extraOptions = {
     iconsPackage = lib.mkPackageOption pkgs [
@@ -672,62 +864,6 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin {
     cfg:
     let
       setupOptions = with cfg; {
-        diff_binaries = diffBinaries;
-        enhanced_diff_hl = enhancedDiffHl;
-        git_cmd = gitCmd;
-        hg_cmd = hgCmd;
-        use_icons = useIcons;
-        show_help_hints = showHelpHints;
-        watch_index = watchIndex;
-
-        icons = {
-          folder_closed = icons.folderClosed;
-          folder_open = icons.folderOpen;
-        };
-
-        signs = with signs; {
-          fold_closed = foldClosed;
-          fold_open = foldOpen;
-          inherit done;
-        };
-
-        view = with view; {
-          default = with default; {
-            inherit layout;
-            winbar_info = winbarInfo;
-          };
-
-          merge_tool = with mergeTool; {
-            inherit layout;
-            disable_diagnostics = disableDiagnostics;
-            winbar_info = winbarInfo;
-          };
-
-          file_history = with fileHistory; {
-            inherit layout;
-            winbar_info = winbarInfo;
-          };
-        };
-
-        file_panel = with filePanel; {
-          listing_style = listingStyle;
-
-          tree_options = with treeOptions; {
-            flatten_dirs = flattenDirs;
-            folder_statuses = folderStatuses;
-          };
-
-          win_config = with winConfig; {
-            inherit type;
-            inherit width;
-            inherit height;
-            inherit position;
-            inherit relative;
-            inherit win;
-            win_opts = winOpts;
-          };
-        };
-
         file_history_panel = with fileHistoryPanel; {
           log_options =
             with logOptions;
@@ -795,16 +931,6 @@ lib.nixvim.neovim-plugin.mkNeovimPlugin {
         default_args = with defaultArgs; {
           DiffviewOpen = diffviewOpen;
           DiffviewFileHistory = diffviewFileHistory;
-        };
-
-        hooks = with hooks; {
-          view_opened = viewOpened;
-          view_closed = viewClosed;
-          view_enter = viewEnter;
-          view_leave = viewLeave;
-          view_post_layout = viewPostLayout;
-          diff_buf_read = diffBufRead;
-          diff_buf_win_enter = diffBufWinEnter;
         };
 
         keymaps =
