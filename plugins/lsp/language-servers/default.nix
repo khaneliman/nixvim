@@ -79,6 +79,41 @@ let
       name = "csharp-ls";
       description = "csharp-ls for C#";
       serverName = "csharp_ls";
+      extraOptions = {
+        enableExtended = mkOption {
+          type = types.bool;
+          default = false;
+          description = "Enable extended LSP capabilities";
+        };
+        enableExtendedTelescope = lib.mkEnableOption "extended csharp telescope integration";
+        extendedCSharpLspPackage =
+          lib.mkPackageOption pkgs
+            [
+              "vimPlugins"
+              "csharpls-extended-lsp-nvim"
+            ]
+            {
+              nullable = true;
+            };
+      };
+      extraConfig = cfg: {
+        extraPlugins = lib.optional (
+          cfg.enableExtended && cfg.extendedCSharpLspPackage != null
+        ) cfg.extendedCSharpLspPackage;
+
+        extraConfigLuaPost = lib.mkIf (
+          cfg.enableExtended && cfg.enableExtendedTelescope
+        ) ''require("telescope").load_extension("csharpls_definition")'';
+        plugins.lsp.servers.csharp-ls = lib.mkIf cfg.enableExtended {
+
+          settings = {
+            handlers = {
+              "textDocument/definition".__raw = "require('csharpls_extended').handler";
+              "textDocument/typeDefinition".__raw = "require('csharpls_extended').handler";
+            };
+          };
+        };
+      };
     }
     {
       name = "cssls";
