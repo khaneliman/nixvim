@@ -81,6 +81,17 @@
             args = [ ".#checks.${system}.maintainers" ];
             pass_filenames = false;
           };
+          maintainers-sort = {
+            enable = true;
+            name = "maintainers-sort";
+            description = "Check maintainers sorting when it is modified.";
+            files = "^lib/maintainers[.]nix$";
+            package = pkgs.nix;
+            entry = "nix-instantiate --eval flake-modules/dev/sort-maintainers.nix";
+            # args = [ ".#checks.${system}.maintainers" ];
+            pass_filenames = false;
+          };
+
           plugins-by-name = {
             enable = true;
             name = "plugins-by-name";
