@@ -162,16 +162,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1728018373,
-        "narHash": "sha256-NOiTvBbRLIOe5F6RbHaAh6++BNjsb149fGZd1T4+KBg=",
-        "owner": "NixOS",
+        "lastModified": 1728255543,
+        "narHash": "sha256-XzU0rEzgWIpCDqC0IhmNKqfAfFVxb/ydWW/iv23E3gk=",
+        "owner": "teto",
         "repo": "nixpkgs",
-        "rev": "bc947f541ae55e999ffdb4013441347d83b00feb",
+        "rev": "e6388b4e687685973a0b1809d40bc5e9a257abb0",
         "type": "github"
       },
       "original": {
-        "owner": "NixOS",
-        "ref": "nixos-unstable",
+        "owner": "teto",
+        "ref": "teto/neovim-move-plugins-to-wrapper",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -184,11 +184,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1728017046,
-        "narHash": "sha256-ofWYux/uUAv8wq7sWw8XWke0sh8p4qYxSOn8d+EaJ8c=",
+        "lastModified": 1728187175,
+        "narHash": "sha256-m+0/11yzFKacQMF8RCctvF08wLy4fMi2X8zpplGCJvM=",
         "owner": "NuschtOS",
         "repo": "search",
-        "rev": "ba81d9c1eae20fc3a1cd066062a05ac2e799e629",
+        "rev": "6490f252c0517caf3cb9f403b3cafe15ad707a19",
         "type": "github"
       },
       "original": {

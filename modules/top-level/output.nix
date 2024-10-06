@@ -259,31 +259,18 @@ in
       # Plugins to use in build.package
       plugins = if config.performance.combinePlugins.enable then combinedPlugins else normalizedPlugins;
 
-      neovimConfig = pkgs.neovimUtils.makeNeovimConfig (
-        {
-          inherit (config)
-            extraPython3Packages
-            extraLuaPackages
-            viAlias
-            vimAlias
-            withRuby
-            withNodeJs
-            ;
-          # inherit customRC;
-          inherit plugins;
-        }
-        # Necessary to make sure the runtime path is set properly in NixOS 22.05,
-        # or more generally before the commit:
-        # cda1f8ae468 - neovim: pass packpath via the wrapper
-        // optionalAttrs (lib.functionArgs pkgs.neovimUtils.makeNeovimConfig ? configure) {
-          configure.packages = {
-            nixvim = {
-              start = map (x: x.plugin) plugins;
-              opt = [ ];
-            };
-          };
-        }
-      );
+      neovimConfig = pkgs.neovimUtils.makeNeovimConfig ({
+        inherit (config)
+          extraPython3Packages
+          extraLuaPackages
+          viAlias
+          vimAlias
+          withRuby
+          withNodeJs
+          ;
+        # inherit customRC;
+        inherit plugins;
+      });
 
       customRC = helpers.concatNonEmptyLines [
         (helpers.wrapVimscriptForLua neovimConfig.neovimRcContent)
@@ -302,12 +289,19 @@ in
         else
           initSource;
 
-      extraWrapperArgs = builtins.concatStringsSep " " (
-        (optional (
-          config.extraPackages != [ ]
-        ) ''--prefix PATH : "${lib.makeBinPath config.extraPackages}"'')
-        ++ (optional config.wrapRc ''--add-flags -u --add-flags "${initFile}"'')
-      );
+      extraWrapperArgs =
+        let
+          luaEnv = package.lua.withPackages config.extraLuaPackages;
+        in
+        builtins.concatStringsSep " " (
+          (optional (
+            config.extraPackages != [ ]
+          ) ''--prefix PATH : "${lib.makeBinPath config.extraPackages}"'')
+          ++ (lib.optional (luaEnv != null)) ''
+            --prefix LUA_PATH; "${package.lua.pkgs.luaLib.genLuaPathAbsStr luaEnv}"
+            --prefix LUA_CPATH; "${package.lua.pkgs.luaLib.genLuaCPathAbsStr luaEnv}"''
+          ++ (optional config.wrapRc ''--add-flags -u --add-flags "${initFile}"'')
+        );
 
       package =
         if config.performance.byteCompileLua.enable && config.performance.byteCompileLua.nvimRuntime then
