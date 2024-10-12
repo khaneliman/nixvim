@@ -119,6 +119,19 @@
                 description = "The plugin's lua configuration";
               };
             }
+            // {
+              lazyLoad = lib.mkOption {
+                type = lib.types.bool;
+                default = false;
+                description = ''
+                  Whether to lazy load the plugin.
+
+                  If you enable this, the plugin's lua configuration will need to be manually loaded by other means.
+
+                  A usage would be passing the plugin's luaConfig to the `plugins.lz-n.plugins` configuration.
+                '';
+              };
+            }
             // extraOptions;
 
           config =
@@ -142,7 +155,9 @@
                 ])
                 ++ (lib.optionals hasConfigAttrs [
                   (lib.optionalAttrs callSetup { ${namespace}.${name}.luaConfig.content = setupCode; })
-                  (lib.optionalAttrs (configLocation != null) (setLuaConfig cfg.luaConfig.content))
+                  (lib.mkIf (!cfg.lazyLoad) (
+                    lib.optionalAttrs (configLocation != null) (setLuaConfig cfg.luaConfig.content)
+                  ))
                 ])
               )
             );
