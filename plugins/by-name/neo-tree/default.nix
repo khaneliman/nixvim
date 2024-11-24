@@ -12,1136 +12,1258 @@ let
     "plugins"
     "neo-tree"
   ];
+
+  listOfRendererComponents = with types; listOf (either str attrs);
+
+  mkRendererComponentListOption = defaultNullOpts.mkNullable listOfRendererComponents;
+
+  mkMappingsOption =
+    defaults:
+    defaultNullOpts.mkNullable (with types; attrsOf (either str attrs)) defaults "Mapping options";
+
+  mkWindowMappingsOption = defaults: { mappings = mkMappingsOption defaults; };
+
+  mkFollowCurrentFileOption = default: {
+    enabled = defaultNullOpts.mkBool default ''
+      This will find and focus the file in the active buffer every time the current file is
+      changed while the tree is open.
+    '';
+
+    leaveDirsOpen = defaultNullOpts.mkBool false ''
+      `false` closes auto expanded dirs, such as with `:Neotree reveal`.
+    '';
+  };
 in
-{
-  imports = [
-    (lib.mkRemovedOptionModule (
-      basePluginPath
-      ++ [
-        "sourceSelector"
-        "tabLabels"
-      ]
-    ) "Use `plugins.neo-tree.sourceSelector.sources` to achieve the same functionality.")
-    (lib.mkRemovedOptionModule (
-      basePluginPath ++ [ "closeFloatsOnEscapeKey" ]
-    ) "This option has been removed from upstream.")
-  ];
-  options.plugins.neo-tree =
+
+lib.nixvim.neovim-plugin.mkNeovimPlugin {
+  name = "neo-tree";
+  originalName = "neo-tree.nvim";
+  package = "neo-tree-nvim";
+
+  maintainers = [ lib.maintainers.khaneliman ];
+
+  extraOptions = {
+    gitPackage = lib.mkPackageOption pkgs "git" {
+      nullable = true;
+    };
+  };
+
+  # TODO: Added 2024-11-23, remove after 25.05
+  deprecateExtraOptions = true;
+  optionsRenamedToSettings =
     let
-      listOfRendererComponents = with types; listOf (either str attrs);
-
-      mkRendererComponentListOption = defaultNullOpts.mkNullable listOfRendererComponents;
-
-      mkMappingsOption =
-        defaults:
-        defaultNullOpts.mkNullable (with types; attrsOf (either str attrs)) defaults "Mapping options";
-
-      mkWindowMappingsOption = defaults: { mappings = mkMappingsOption defaults; };
-
-      mkFollowCurrentFileOption = default: {
-        enabled = defaultNullOpts.mkBool default ''
-          This will find and focus the file in the active buffer every time the current file is
-          changed while the tree is open.
-        '';
-
-        leaveDirsOpen = defaultNullOpts.mkBool false ''
-          `false` closes auto expanded dirs, such as with `:Neotree reveal`.
-        '';
-      };
+      mkOptionPaths = map (lib.splitString ".");
     in
-    lib.nixvim.neovim-plugin.extraOptionsOptions
-    // {
-      enable = lib.mkEnableOption "neo-tree";
+    mkOptionPaths [
+      "sources"
+      "extraSources"
+      "addBlankLineAtTop"
+      "autoCleanAfterSessionRestore"
+      "closeIfLastWindow"
+      "defaultSource"
+      "enableDiagnostics"
+      "enableGitStatus"
+      "enableModifiedMarkers"
+      "enableRefreshOnWrite"
+      "gitStatusAsync"
+      "gitStatusAsyncOptions.batchSize"
+      "gitStatusAsyncOptions.batchDelay"
+      "gitStatusAsyncOptions.maxLines"
+      "hideRootNode"
+      "retainHiddenRootIndent"
+      "logLevel"
+      "logToFile"
+      "openFilesInLastWindow"
+      "popupBorderStyle"
+      "resizeTimerInterval"
+      "sortCaseInsensitive"
+      "sortFunction"
+      "usePopupsForInput"
+      "useDefaultMappings"
+      "sourceSelector.winbar"
+      "sourceSelector.statusline"
+      "sourceSelector.showScrolledOffParentNode"
+      "sourceSelector.sources"
+      "sourceSelector.contentLayout"
+      "sourceSelector.tabsLayout"
+      "sourceSelector.truncationCharacter"
+      "sourceSelector.tabsMinWidth"
+      "sourceSelector.tabsMaxWidth"
+      "sourceSelector.padding"
+      "sourceSelector.separator"
+      "sourceSelector.separatorActive"
+      "sourceSelector.showSeparatorOnEdge"
+      "sourceSelector.highlightTab"
+      "sourceSelector.highlightTabActive"
+      "sourceSelector.highlightBackground"
+      "sourceSelector.highlightSeparator"
+      "sourceSelector.highlightSeparatorActive"
+      "eventHandlers"
+      "defaultComponentConfigs.container.enableCharacterFade"
+      "defaultComponentConfigs.container.width"
+      "defaultComponentConfigs.container.rightPadding"
+      "defaultComponentConfigs.diagnostics.symbols.hint"
+      "defaultComponentConfigs.diagnostics.symbols.info"
+      "defaultComponentConfigs.diagnostics.symbols.warn"
+      "defaultComponentConfigs.diagnostics.symbols.error"
+      "defaultComponentConfigs.diagnostics.highlights.hint"
+      "defaultComponentConfigs.diagnostics.highlights.info"
+      "defaultComponentConfigs.diagnostics.highlights.warn"
+      "defaultComponentConfigs.diagnostics.highlights.error"
+      "defaultComponentConfigs.indent.indentSize"
+      "defaultComponentConfigs.indent.padding"
+      "defaultComponentConfigs.indent.withMarkers"
+      "defaultComponentConfigs.indent.indentMarker"
+      "defaultComponentConfigs.indent.lastIndentMarker"
+      "defaultComponentConfigs.indent.highlight"
+      "defaultComponentConfigs.indent.withExpanders"
+      "defaultComponentConfigs.indent.expanderCollapsed"
+      "defaultComponentConfigs.indent.expanderExpanded"
+      "defaultComponentConfigs.indent.expanderHighlight"
+      "defaultComponentConfigs.icon.folderClosed"
+      "defaultComponentConfigs.icon.folderOpen"
+      "defaultComponentConfigs.icon.folderEmpty"
+      "defaultComponentConfigs.icon.folderEmptyOpen"
+      "defaultComponentConfigs.icon.default"
+      "defaultComponentConfigs.icon.highlight"
+      "defaultComponentConfigs.modified.symbol"
+      "defaultComponentConfigs.modified.highlight"
+      "defaultComponentConfigs.name.trailingSlash"
+      "defaultComponentConfigs.name.useGitStatusColors"
+      "defaultComponentConfigs.name.highlight"
+      "defaultComponentConfigs.gitStatus.symbols.added"
+      "defaultComponentConfigs.gitStatus.symbols.deleted"
+      "defaultComponentConfigs.gitStatus.symbols.modified"
+      "defaultComponentConfigs.gitStatus.symbols.renamed"
+      "defaultComponentConfigs.gitStatus.symbols.untracked"
+      "defaultComponentConfigs.gitStatus.symbols.ignored"
+      "defaultComponentConfigs.gitStatus.symbols.unstaged"
+      "defaultComponentConfigs.gitStatus.symbols.staged"
+      "defaultComponentConfigs.gitStatus.symbols.conflict"
+      "defaultComponentConfigs.gitStatus.align"
+      "renderers.directory"
+      "renderers.file"
+      "renderers.message"
+      "renderers.terminal"
+      "nestingRules"
+      "window.position"
+      "window.width"
+      "window.height"
+      "window.autoExpandWidth"
+      "window.popup.size.height"
+      "window.popup.size.width"
+      "window.popup.position"
+      "window.sameLevel"
+      "window.insertAs"
+      "window.mappingOptions.noremap"
+      "window.mappingOptions.nowait"
+      "window.mappings"
+      "filesystem.window.mappings"
+      "filesystem.asyncDirectoryScan"
+      "filesystem.scanMode"
+      "filesystem.bindToCwd"
+      "filesystem.cwdTarget.sidebar"
+      "filesystem.cwdTarget.current"
+      "filesystem.filteredItems.visible"
+      "filesystem.filteredItems.forceVisibleInEmptyFolder"
+      "filesystem.filteredItems.showHiddenCount"
+      "filesystem.filteredItems.hideDotfiles"
+      "filesystem.filteredItems.hideGitignored"
+      "filesystem.filteredItems.hideHidden"
+      "filesystem.filteredItems.hideByName"
+      "filesystem.filteredItems.hideByPattern"
+      "filesystem.filteredItems.alwaysShow"
+      "filesystem.filteredItems.neverShow"
+      "filesystem.filteredItems.neverShowByPattern"
+      "filesystem.findByFullPathWords"
+      "filesystem.findCommand"
+      "filesystem.findArgs"
+      "filesystem.groupEmptyDirs"
+      "filesystem.searchLimit"
+      "filesystem.followCurrentFile"
+      "filesystem.hijackNetrwBehavior"
+      "filesystem.useLibuvFileWatcher"
+      "buffers.bindToCwd"
+      "buffers.followCurrentFile"
+      "buffers.groupEmptyDirs"
+      "buffers.window.mappings"
+      "gitStatus.window.mappings"
+      "example.renderers.custom"
+      "example.window.mappings"
+      "documentSymbols.followCursor"
+      "documentSymbols.kinds"
+      "documentSymbols.customKinds"
+      "documentSymbols.window.mappings"
+    ];
 
-      package = lib.mkPackageOption pkgs "neo-tree" {
-        default = [
-          "vimPlugins"
-          "neo-tree-nvim"
-        ];
-      };
+  settingsOptions = {
+    sources =
+      defaultNullOpts.mkListOf types.str
+        [
+          "filesystem"
+          "buffers"
+          "git_status"
+        ]
+        ''
+          If a user has a sources list it will replace this one.
+          Only sources listed here will be loaded.
+          You can also add an external source by adding it's name to this list.
+          The name used here must be the same name you would use in a require() call.
+        '';
 
-      gitPackage = lib.mkPackageOption pkgs "git" {
-        nullable = true;
-      };
+    extra_sources = lib.nixvim.mkNullOrOption (types.listOf types.str) ''
+      Extra sources to be added to the sources. This is an internal nixvim option.
+    '';
 
-      sources =
-        defaultNullOpts.mkListOf types.str
+    add_blank_line_at_top = defaultNullOpts.mkBool false "Add a blank line at the top of the tree.";
+
+    auto_clean_after_session_restore = defaultNullOpts.mkBool false "Automatically clean up broken neo-tree buffers saved in sessions";
+
+    close_if_last_window = defaultNullOpts.mkBool false "Close Neo-tree if it is the last window left in the tab";
+
+    default_source = defaultNullOpts.mkStr "filesystem" "";
+
+    enable_diagnostics = defaultNullOpts.mkBool true "";
+
+    enable_git_status = defaultNullOpts.mkBool true "";
+
+    enable_modified_markers = defaultNullOpts.mkBool true "Show markers for files with unsaved changes.";
+
+    enable_refresh_on_write = defaultNullOpts.mkBool true "Refresh the tree when a file is written. Only used if `use_libuv_file_watcher` is false.";
+
+    git_status_async = defaultNullOpts.mkBool true "";
+
+    git_status_async_options = {
+      batch_size = defaultNullOpts.mkInt 1000 "How many lines of git status results to process at a time";
+
+      batch_delay =
+        defaultNullOpts.mkInt 10
+          "delay in ms between batches. Spreads out the workload to let other processes run.";
+
+      max_lines = defaultNullOpts.mkInt 10000 ''
+        How many lines of git status results to process. Anything after this will be dropped.
+        Anything before this will be used.
+        The last items to be processed are the untracked files.
+      '';
+    };
+
+    hide_root_node = defaultNullOpts.mkBool false "Hide the root node.";
+
+    retain_hidden_root_indent = defaultNullOpts.mkBool false ''
+      If the root node is hidden, keep the indentation anyhow.
+      This is needed if you use expanders because they render in the indent.
+    '';
+
+    log_level = defaultNullOpts.mkEnum [
+      "trace"
+      "debug"
+      "info"
+      "warn"
+      "error"
+      "fatal"
+    ] "info" "";
+
+    log_to_file =
+      defaultNullOpts.mkNullable (types.either types.bool types.str) false
+        "use :NeoTreeLogs to show the file";
+
+    open_files_in_last_window = defaultNullOpts.mkBool true "If `false`, open files in top left window";
+
+    popup_border_style = defaultNullOpts.mkEnumFirstDefault [
+      "NC"
+      "double"
+      "none"
+      "rounded"
+      "shadow"
+      "single"
+      "solid"
+    ] "";
+
+    resize_timer_interval = defaultNullOpts.mkInt 500 ''
+      In ms, needed for containers to redraw right aligned and faded content.
+      Set to -1 to disable the resize timer entirely.
+
+      NOTE: this will speed up to 50 ms for 1 second following a resize
+    '';
+
+    sort_case_insensitive = defaultNullOpts.mkBool false "Used when sorting files and directories in the tree";
+
+    sort_function = defaultNullOpts.mkLuaFn "nil" "Uses a custom function for sorting files and directories in the tree";
+
+    use_popups_for_input = defaultNullOpts.mkBool true "If false, inputs will use vim.ui.input() instead of custom floats.";
+
+    use_default_mappings = defaultNullOpts.mkBool true "";
+
+    # sourceSelector provides clickable tabs to switch between sources."
+    source_selector = {
+      winbar = defaultNullOpts.mkBool false "toggle to show selector on winbar";
+
+      statusline = defaultNullOpts.mkBool false "toggle to show selector on statusline";
+
+      show_scrolled_off_parent_node = defaultNullOpts.mkBool false ''
+        If `true`, tabs are replaced with the parent path of the top visible node when
+        scrolled down.
+      '';
+
+      sources = lib.nixvim.mkNullOrOption (
+        with types;
+        listOf (submodule {
+          options = {
+            source = mkOption {
+              type = str;
+              description = "Name of the source to add to the bar.";
+            };
+
+            displayName = lib.nixvim.mkNullOrOption str "How that source to appear in the bar.";
+          };
+        })
+      ) "Configure the characters shown on each tab.";
+
+      content_layout =
+        defaultNullOpts.mkEnumFirstDefault
           [
-            "filesystem"
-            "buffers"
-            "git_status"
+            "start"
+            "end"
+            "focus"
           ]
           ''
-            If a user has a sources list it will replace this one.
-            Only sources listed here will be loaded.
-            You can also add an external source by adding it's name to this list.
-            The name used here must be the same name you would use in a require() call.
+            Defines how the labels are placed inside a tab.
+            This only takes effect when the tab width is greater than the length of label i.e.
+            `tabsLayout = "equal", "focus"` or when `tabsMinWidth` is large enough.
+
+            Following options are available.
+                "start"  : left aligned                  / 裡 bufname     \/..
+                "end"    : right aligned                 /     裡 bufname \/...
+                "center" : centered with equal padding   /   裡 bufname   \/...
           '';
 
-      extraSources = lib.nixvim.mkNullOrOption (types.listOf types.str) ''
-        Extra sources to be added to the sources. This is an internal nixvim option.
-      '';
-
-      addBlankLineAtTop = defaultNullOpts.mkBool false "Add a blank line at the top of the tree.";
-
-      autoCleanAfterSessionRestore = defaultNullOpts.mkBool false "Automatically clean up broken neo-tree buffers saved in sessions";
-
-      closeIfLastWindow = defaultNullOpts.mkBool false "Close Neo-tree if it is the last window left in the tab";
-
-      defaultSource = defaultNullOpts.mkStr "filesystem" "";
-
-      enableDiagnostics = defaultNullOpts.mkBool true "";
-
-      enableGitStatus = defaultNullOpts.mkBool true "";
-
-      enableModifiedMarkers = defaultNullOpts.mkBool true "Show markers for files with unsaved changes.";
-
-      enableRefreshOnWrite = defaultNullOpts.mkBool true "Refresh the tree when a file is written. Only used if `use_libuv_file_watcher` is false.";
-
-      gitStatusAsync = defaultNullOpts.mkBool true "";
-
-      gitStatusAsyncOptions = {
-        batchSize = defaultNullOpts.mkInt 1000 "How many lines of git status results to process at a time";
-
-        batchDelay =
-          defaultNullOpts.mkInt 10
-            "delay in ms between batches. Spreads out the workload to let other processes run.";
-
-        maxLines = defaultNullOpts.mkInt 10000 ''
-          How many lines of git status results to process. Anything after this will be dropped.
-          Anything before this will be used.
-          The last items to be processed are the untracked files.
-        '';
-      };
-
-      hideRootNode = defaultNullOpts.mkBool false "Hide the root node.";
-
-      retainHiddenRootIndent = defaultNullOpts.mkBool false ''
-        If the root node is hidden, keep the indentation anyhow.
-        This is needed if you use expanders because they render in the indent.
-      '';
-
-      logLevel = defaultNullOpts.mkEnum [
-        "trace"
-        "debug"
-        "info"
-        "warn"
-        "error"
-        "fatal"
-      ] "info" "";
-
-      logToFile =
-        defaultNullOpts.mkNullable (types.either types.bool types.str) false
-          "use :NeoTreeLogs to show the file";
-
-      openFilesInLastWindow = defaultNullOpts.mkBool true "If `false`, open files in top left window";
-
-      popupBorderStyle = defaultNullOpts.mkEnumFirstDefault [
-        "NC"
-        "double"
-        "none"
-        "rounded"
-        "shadow"
-        "single"
-        "solid"
-      ] "";
-
-      resizeTimerInterval = defaultNullOpts.mkInt 500 ''
-        In ms, needed for containers to redraw right aligned and faded content.
-        Set to -1 to disable the resize timer entirely.
-
-        NOTE: this will speed up to 50 ms for 1 second following a resize
-      '';
-
-      sortCaseInsensitive = defaultNullOpts.mkBool false "Used when sorting files and directories in the tree";
-
-      sortFunction = defaultNullOpts.mkLuaFn "nil" "Uses a custom function for sorting files and directories in the tree";
-
-      usePopupsForInput = defaultNullOpts.mkBool true "If false, inputs will use vim.ui.input() instead of custom floats.";
-
-      useDefaultMappings = defaultNullOpts.mkBool true "";
-
-      # sourceSelector provides clickable tabs to switch between sources."
-      sourceSelector = {
-        winbar = defaultNullOpts.mkBool false "toggle to show selector on winbar";
-
-        statusline = defaultNullOpts.mkBool false "toggle to show selector on statusline";
-
-        showScrolledOffParentNode = defaultNullOpts.mkBool false ''
-          If `true`, tabs are replaced with the parent path of the top visible node when
-          scrolled down.
-        '';
-
-        sources = lib.nixvim.mkNullOrOption (
-          with types;
-          listOf (submodule {
-            options = {
-              source = mkOption {
-                type = str;
-                description = "Name of the source to add to the bar.";
-              };
-
-              displayName = lib.nixvim.mkNullOrOption str "How that source to appear in the bar.";
-            };
-          })
-        ) "Configure the characters shown on each tab.";
-
-        contentLayout =
-          defaultNullOpts.mkEnumFirstDefault
-            [
-              "start"
-              "end"
-              "focus"
-            ]
-            ''
-              Defines how the labels are placed inside a tab.
-              This only takes effect when the tab width is greater than the length of label i.e.
-              `tabsLayout = "equal", "focus"` or when `tabsMinWidth` is large enough.
-
-              Following options are available.
-                  "start"  : left aligned                  / 裡 bufname     \/..
-                  "end"    : right aligned                 /     裡 bufname \/...
-                  "center" : centered with equal padding   /   裡 bufname   \/...
-            '';
-
-        tabsLayout =
-          defaultNullOpts.mkEnum
-            [
-              "start"
-              "end"
-              "center"
-              "equal"
-              "focus"
-            ]
+      tabs_layout =
+        defaultNullOpts.mkEnum
+          [
+            "start"
+            "end"
+            "center"
             "equal"
-            ''
-              Defines how the tabs are aligned inside the window when there is more than enough
-              space.
-              The following options are available.
-              `active` will expand the focused tab as much as possible. Bars denote the edge of window.
+            "focus"
+          ]
+          "equal"
+          ''
+            Defines how the tabs are aligned inside the window when there is more than enough
+            space.
+            The following options are available.
+            `active` will expand the focused tab as much as possible. Bars denote the edge of window.
 
-                  "start"  : left aligned                                       ┃/  ~  \/  ~  \/  ~  \            ┃
-                  "end"    : right aligned                                      ┃            /  ~  \/  ~  \/  ~  \┃
-                  "center" : centered with equal padding                        ┃      /  ~  \/  ~  \/  ~  \      ┃
-                  "equal"  : expand all tabs equally to fit the window width    ┃/    ~    \/    ~    \/    ~    \┃
-                  "active" : expand the focused tab to fit the window width     ┃/  focused tab    \/  ~  \/  ~  \┃
-            '';
+                "start"  : left aligned                                       ┃/  ~  \/  ~  \/  ~  \            ┃
+                "end"    : right aligned                                      ┃            /  ~  \/  ~  \/  ~  \┃
+                "center" : centered with equal padding                        ┃      /  ~  \/  ~  \/  ~  \      ┃
+                "equal"  : expand all tabs equally to fit the window width    ┃/    ~    \/    ~    \/    ~    \┃
+                "active" : expand the focused tab to fit the window width     ┃/  focused tab    \/  ~  \/  ~  \┃
+          '';
 
-        truncationCharacter = defaultNullOpts.mkStr "…" "Character to use when truncating the tab label";
+      truncation_character = defaultNullOpts.mkStr "…" "Character to use when truncating the tab label";
 
-        tabsMinWidth =
-          defaultNullOpts.mkNullable types.int null
-            "If int padding is added based on `contentLayout`";
+      tabs_min_width =
+        defaultNullOpts.mkNullable types.int null
+          "If int padding is added based on `contentLayout`";
 
-        tabsMaxWidth =
-          defaultNullOpts.mkNullable types.int null
-            "This will truncate text even if `textTruncToFit = false`";
+      tabs_max_width =
+        defaultNullOpts.mkNullable types.int null
+          "This will truncate text even if `textTruncToFit = false`";
 
-        padding = defaultNullOpts.mkNullable (with types; either int (attrsOf int)) 0 ''
-          Defines the global padding of the source selector.
-          It can be an integer or an attrs with keys `left` and `right`.
-          Setting `padding = 2` is exactly the same as `{ left = 2; right = 2; }`.
+      padding = defaultNullOpts.mkNullable (with types; either int (attrsOf int)) 0 ''
+        Defines the global padding of the source selector.
+        It can be an integer or an attrs with keys `left` and `right`.
+        Setting `padding = 2` is exactly the same as `{ left = 2; right = 2; }`.
 
-          Example: `{ left = 2; right = 0; }`
-        '';
-
-        separator =
-          defaultNullOpts.mkNullable
-            (
-              with types;
-              either str (submodule {
-                options = {
-                  left = defaultNullOpts.mkStr "▏" "";
-                  right = defaultNullOpts.mkStr "\\" "";
-                  override = defaultNullOpts.mkStr null "";
-                };
-              })
-            )
-            {
-              left = "▏";
-              right = "▕";
-            }
-            "Can be a string or a table";
-
-        separatorActive =
-          defaultNullOpts.mkNullable
-            (
-              with types;
-              either str (submodule {
-                options = {
-                  left = lib.nixvim.mkNullOrOption types.str "";
-                  right = lib.nixvim.mkNullOrOption types.str "";
-                  override = lib.nixvim.mkNullOrOption types.str "";
-                };
-              })
-            )
-            null
-            ''
-              Set separators around the active tab.
-              null falls back to `sourceSelector.separator`.
-            '';
-
-        showSeparatorOnEdge = defaultNullOpts.mkBool false ''
-          Takes a boolean value where `false` (default) hides the separators on the far
-          left / right.
-          Especially useful when left and right separator are the same.
-
-              'true'  : ┃/    ~    \/    ~    \/    ~    \┃
-              'false' : ┃     ~    \/    ~    \/    ~     ┃
-        '';
-
-        highlightTab = defaultNullOpts.mkStr "NeoTreeTabInactive" "";
-
-        highlightTabActive = defaultNullOpts.mkStr "NeoTreeTabActive" "";
-
-        highlightBackground = defaultNullOpts.mkStr "NeoTreeTabInactive" "";
-
-        highlightSeparator = defaultNullOpts.mkStr "NeoTreeTabSeparatorInactive" "";
-
-        highlightSeparatorActive = defaultNullOpts.mkStr "NeoTreeTabSeparatorActive" "";
-      };
-      eventHandlers = lib.nixvim.mkNullOrOption (with types; attrsOf str) ''
-        Configuration of event handlers.
-        Attrs:
-        - keys are the events (e.g. `before_render`, `file_opened`)
-        - values are lua code defining the callback function.
-
-        Example:
-        ```nix
-        {
-          before_render = \'\'
-            function (state)
-              -- add something to the state that can be used by custom components
-            end
-          \'\';
-
-          file_opened = \'\'
-            function(file_path)
-              --auto close
-              require("neo-tree").close_all()
-            end
-          \'\';
-        }
-        ```
+        Example: `{ left = 2; right = 0; }`
       '';
 
-      defaultComponentConfigs = {
-        container = {
-          enableCharacterFade = defaultNullOpts.mkBool true "";
-
-          width = defaultNullOpts.mkStr "100%" "";
-
-          rightPadding = defaultNullOpts.mkInt 0 "";
-        };
-
-        diagnostics = {
-          symbols = {
-            hint = defaultNullOpts.mkStr "H" "";
-
-            info = defaultNullOpts.mkStr "I" "";
-
-            warn = defaultNullOpts.mkStr "!" "";
-
-            error = defaultNullOpts.mkStr "X" "";
-          };
-
-          highlights = {
-            hint = defaultNullOpts.mkStr "DiagnosticSignHint" "";
-
-            info = defaultNullOpts.mkStr "DiagnosticSignInfo" "";
-
-            warn = defaultNullOpts.mkStr "DiagnosticSignWarn" "";
-
-            error = defaultNullOpts.mkStr "DiagnosticSignError" "";
-          };
-        };
-
-        indent = {
-          indentSize = defaultNullOpts.mkInt 2 "";
-
-          padding = defaultNullOpts.mkInt 1 "";
-
-          withMarkers = defaultNullOpts.mkBool true "";
-
-          indentMarker = defaultNullOpts.mkStr "│" "";
-
-          lastIndentMarker = defaultNullOpts.mkStr "└" "";
-
-          highlight = defaultNullOpts.mkStr "NeoTreeIndentMarker" "";
-
-          withExpanders =
-            defaultNullOpts.mkNullable types.bool null
-              "If null and file nesting is enabled, will enable expanders.";
-
-          expanderCollapsed = defaultNullOpts.mkStr "" "";
-
-          expanderExpanded = defaultNullOpts.mkStr "" "";
-
-          expanderHighlight = defaultNullOpts.mkStr "NeoTreeExpander" "";
-        };
-
-        icon = {
-          folderClosed = defaultNullOpts.mkStr "" "";
-
-          folderOpen = defaultNullOpts.mkStr "" "";
-
-          folderEmpty = defaultNullOpts.mkStr "ﰊ" "";
-
-          folderEmptyOpen = defaultNullOpts.mkStr "ﰊ" "";
-
-          default = defaultNullOpts.mkStr "*" ''
-            Only a fallback, if you use nvim-web-devicons and configure default icons there
-            then this will never be used.
-          '';
-
-          highlight = defaultNullOpts.mkStr "NeoTreeFileIcon" ''
-            Only a fallback, if you use nvim-web-devicons and configure default icons there
-            then this will never be used.
-          '';
-        };
-
-        modified = {
-          symbol = defaultNullOpts.mkStr "[+] " "";
-
-          highlight = defaultNullOpts.mkStr "NeoTreeModified" "";
-        };
-
-        name = {
-          trailingSlash = defaultNullOpts.mkBool false "";
-
-          useGitStatusColors = defaultNullOpts.mkBool true "";
-
-          highlight = defaultNullOpts.mkStr "NeoTreeFileName" "";
-        };
-
-        gitStatus = {
-          symbols = lib.mapAttrs (optionName: default: defaultNullOpts.mkStr default optionName) {
-            added = "✚";
-            deleted = "✖";
-            modified = "";
-            renamed = "";
-            untracked = "";
-            ignored = "";
-            unstaged = "";
-            staged = "";
-            conflict = "";
-          };
-
-          align = defaultNullOpts.mkStr "right" "icon alignment";
-        };
-      };
-
-      renderers = {
-        directory = mkRendererComponentListOption [
-          "indent"
-          "icon"
-          "current_filter"
-          {
-            name = "container";
-            content = [
-              {
-                name = "name";
-                zindex = 10;
-              }
-              {
-                name = "clipboard";
-                zindex = 10;
-              }
-              {
-                name = "diagnostics";
-                errors_only = true;
-                zindex = 20;
-                align = "right";
-                hide_when_expanded = true;
-              }
-              {
-                name = "git_status";
-                zindex = 20;
-                align = "right";
-                hide_when_expanded = true;
-              }
-            ];
-          }
-        ] "directory renderers";
-
-        file = mkRendererComponentListOption [
-          "indent"
-          "icon"
-          {
-            name = "container";
-            content = [
-              {
-                name = "name";
-                zindex = 10;
-              }
-              {
-                name = "clipboard";
-                zindex = 10;
-              }
-              {
-                name = "bufnr";
-                zindex = 10;
-              }
-              {
-                name = "modified";
-                zindex = 20;
-                align = "right";
-              }
-              {
-                name = "diagnostics";
-                zindex = 20;
-                align = "right";
-              }
-              {
-                name = "git_status";
-                zindex = 20;
-                align = "right";
-              }
-            ];
-          }
-        ] "file renderers";
-
-        message = mkRendererComponentListOption [
-          {
-            name = "indent";
-            with_markers = false;
-          }
-          {
-            name = "name";
-            highlight = "NeoTreeMessage";
-          }
-        ] "message renderers";
-
-        terminal = mkRendererComponentListOption [
-          "indent"
-          "icon"
-          "name"
-          "bufnr"
-        ] "message renderers";
-      };
-
-      nestingRules = defaultNullOpts.mkAttrsOf types.str { } "nesting rules";
-
-      window = {
-        position = defaultNullOpts.mkEnumFirstDefault [
-          "left"
-          "right"
-          "top"
-          "bottom"
-          "float"
-          "current"
-        ] "position";
-
-        width = defaultNullOpts.mkInt 40 "Applies to left and right positions";
-
-        height = defaultNullOpts.mkInt 15 "Applies to top and bottom positions";
-
-        autoExpandWidth = defaultNullOpts.mkBool false ''
-          Expand the window when file exceeds the window width. does not work with
-          position = "float"
-        '';
-
-        popup = {
-          size = {
-            height = defaultNullOpts.mkStr "80%" "height";
-
-            width = defaultNullOpts.mkStr "50%" "height";
-          };
-
-          position = defaultNullOpts.mkStr "80%" ''
-            50% means center it.
-            You can also specify border here, if you want a different setting from the global
-            `popupBorderStyle`.
-          '';
-        };
-
-        sameLevel = defaultNullOpts.mkBool false ''
-          Create and paste/move files/directories on the same level as the directory under cursor
-          (as opposed to within the directory under cursor).
-        '';
-
-        insertAs =
-          defaultNullOpts.mkEnumFirstDefault
-            [
-              "child"
-              "sibling"
-            ]
-            ''
-              Affects how nodes get inserted into the tree during creation/pasting/moving of files if
-              the node under the cursor is a directory:
-
-              - "child":   Insert nodes as children of the directory under cursor.
-              - "sibling": Insert nodes  as siblings of the directory under cursor.
-            '';
-
-        mappingOptions = {
-          noremap = defaultNullOpts.mkBool true "noremap";
-
-          nowait = defaultNullOpts.mkBool true "nowait";
-        };
-
-        mappings = mkMappingsOption (
-          lib.literalMD ''
-            ```nix
-              {
-                "<space>" = {
-                  command = "toggle_node";
-                  # disable `nowait` if you have existing combos starting with this char that you want to use
-                  nowait = false;
-                };
-                "<2-LeftMouse>" = "open";
-                "<cr>" = "open";
-                "<esc>" = "revert_preview";
-                P = {
-                  command = "toggle_preview";
-                  config = { use_float = true; };
-                };
-                l = "focus_preview";
-                S = "open_split";
-                # S = "split_with_window_picker";
-                s = "open_vsplit";
-                # s = "vsplit_with_window_picker";
-                t = "open_tabnew";
-                # "<cr>" = "open_drop";
-                # t = "open_tab_drop";
-                w = "open_with_window_picker";
-                C = "close_node";
-                z = "close_all_nodes";
-                # Z = "expand_all_nodes";
-                R = "refresh";
-                a = {
-                  command = "add";
-                  # some commands may take optional config options, see `:h neo-tree-mappings` for details
-                  config = {
-                    show_path = "none"; # "none", "relative", "absolute"
-                  };
-                };
-                A = "add_directory"; # also accepts the config.show_path and config.insert_as options.
-                d = "delete";
-                r = "rename";
-                y = "copy_to_clipboard";
-                x = "cut_to_clipboard";
-                p = "paste_from_clipboard";
-                c = "copy"; # takes text input for destination, also accepts the config.show_path and config.insert_as options
-                m = "move"; # takes text input for destination, also accepts the config.show_path and config.insert_as options
-                e = "toggle_auto_expand_width";
-                q = "close_window";
-                "?" = "show_help";
-                "<" = "prev_source";
-                ">" = "next_source";
-              }
-            ```
-          ''
-        );
-      };
-      filesystem = {
-        window = mkWindowMappingsOption (
-          lib.literalMD ''
-            ```nix
-              {
-                H = "toggle_hidden";
-                "/" = "fuzzy_finder";
-                D = "fuzzy_finder_directory";
-                # "/" = "filter_as_you_type"; # this was the default until v1.28
-                "#" = "fuzzy_sorter"; # fuzzy sorting using the fzy algorithm
-                # D = "fuzzy_sorter_directory";
-                f = "filter_on_submit";
-                "<C-x>" = "clear_filter";
-                "<bs>" = "navigate_up";
-                "." = "set_root";
-                "[g" = "prev_git_modified";
-                "]g" = "next_git_modified";
-              }
-            ```
-          ''
-        );
-        asyncDirectoryScan =
-          defaultNullOpts.mkEnumFirstDefault
-            [
-              "auto"
-              "always"
-              "never"
-            ]
-            ''
-              - "auto" means refreshes are async, but it's synchronous when called from the Neotree
-              commands.
-              - "always" means directory scans are always async.
-              - "never"  means directory scans are never async.
-            '';
-
-        scanMode =
-          defaultNullOpts.mkEnumFirstDefault
-            [
-              "shallow"
-              "deep"
-            ]
-            ''
-              - "shallow": Don't scan into directories to detect possible empty directory a priori.
-              - "deep": Scan into directories to detect empty or grouped empty directories a priori.
-            '';
-
-        bindToCwd = defaultNullOpts.mkBool true "true creates a 2-way binding between vim's cwd and neo-tree's root.";
-
-        cwdTarget = {
-          sidebar = defaultNullOpts.mkStr "tab" "sidebar is when position = left or right";
-          current = defaultNullOpts.mkStr "window" "current is when position = current";
-        };
-
-        filteredItems = {
-          visible = defaultNullOpts.mkBool false "when true, they will just be displayed differently than normal items";
-
-          forceVisibleInEmptyFolder = defaultNullOpts.mkBool false "when true, hidden files will be shown if the root folder is otherwise empty";
-
-          showHiddenCount = defaultNullOpts.mkBool true "when true, the number of hidden items in each folder will be shown as the last entry";
-
-          hideDotfiles = defaultNullOpts.mkBool true "hide dotfiles";
-
-          hideGitignored = defaultNullOpts.mkBool true "hide gitignored files";
-
-          hideHidden = defaultNullOpts.mkBool true "only works on Windows for hidden files/directories";
-
-          hideByName = defaultNullOpts.mkListOf types.str [
-            ".DS_Store"
-            "thumbs.db"
-          ] "hide by name";
-
-          hideByPattern = defaultNullOpts.mkListOf' {
-            type = types.str;
-            pluginDefault = [ ];
-            description = "Hide by pattern.";
-            example = [
-              "*.meta"
-              "*/src/*/tsconfig.json"
-            ];
-          };
-
-          alwaysShow = defaultNullOpts.mkListOf' {
-            type = types.str;
-            pluginDefault = [ ];
-            description = "Files/folders to always show.";
-            example = [ ".gitignore" ];
-          };
-
-          neverShow = defaultNullOpts.mkListOf' {
-            type = types.str;
-            pluginDefault = [ ];
-            description = "Files/folders to never show.";
-            example = [
-              ".DS_Store"
-              "thumbs.db"
-            ];
-          };
-
-          neverShowByPattern = defaultNullOpts.mkListOf' {
-            type = types.str;
-            pluginDefault = [ ];
-            description = "Files/folders to never show (by pattern).";
-            example = [ ".null-ls_*" ];
-          };
-        };
-
-        findByFullPathWords = defaultNullOpts.mkBool false ''
-          `false` means it only searches the tail of a path.
-          `true` will change the filter into a full path
-
-          search with space as an implicit ".*", so `fi init` will match:
-          `./sources/filesystem/init.lua
-        '';
-
-        findCommand = defaultNullOpts.mkStr "fd" "This is determined automatically, you probably don't need to set it";
-
-        findArgs =
-          lib.nixvim.mkNullOrStrLuaFnOr
-            (types.submodule {
+      separator =
+        defaultNullOpts.mkNullable
+          (
+            with types;
+            either str (submodule {
               options = {
-                fd = defaultNullOpts.mkListOf types.str [
-                  "--exclude"
-                  ".git"
-                  "--exclude"
-                  "node_modules"
-                ] "You can specify extra args to pass to the find command.";
+                left = defaultNullOpts.mkStr "▏" "";
+                right = defaultNullOpts.mkStr "\\" "";
+                override = defaultNullOpts.mkStr null "";
               };
             })
-            ''
-              Find arguments
+          )
+          {
+            left = "▏";
+            right = "▕";
+          }
+          "Can be a string or a table";
 
-              Either use a list of strings:
-
-              ```nix
-              findArgs = {
-                fd = [
-                  "--exclude"
-                  ".git"
-                  "--exclude"
-                  "node_modules"
-                ];
+      separator_active =
+        defaultNullOpts.mkNullable
+          (
+            with types;
+            either str (submodule {
+              options = {
+                left = lib.nixvim.mkNullOrOption types.str "";
+                right = lib.nixvim.mkNullOrOption types.str "";
+                override = lib.nixvim.mkNullOrOption types.str "";
               };
-              ```
+            })
+          )
+          null
+          ''
+            Set separators around the active tab.
+            null falls back to `sourceSelector.separator`.
+          '';
 
-              Or use a function instead of list of strings
-              ```
-              findArgs = \'\'
-                find_args = function(cmd, path, search_term, args)
-                  if cmd ~= "fd" then
-                    return args
-                  end
-                  --maybe you want to force the filter to always include hidden files:
-                  table.insert(args, "--hidden")
-                  -- but no one ever wants to see .git files
-                  table.insert(args, "--exclude")
-                  table.insert(args, ".git")
-                  -- or node_modules
-                  table.insert(args, "--exclude")
-                  table.insert(args, "node_modules")
-                  --here is where it pays to use the function, you can exclude more for
-                  --short search terms, or vary based on the directory
-                  if string.len(search_term) < 4 and path == "/home/cseickel" then
-                    table.insert(args, "--exclude")
-                    table.insert(args, "Library")
-                  end
-                  return args
-                end
-              \'\';
-              ```
-            '';
+      show_separator_on_edge = defaultNullOpts.mkBool false ''
+        Takes a boolean value where `false` (default) hides the separators on the far
+        left / right.
+        Especially useful when left and right separator are the same.
 
-        groupEmptyDirs = defaultNullOpts.mkBool false "when true, empty folders will be grouped together";
+            'true'  : ┃/    ~    \/    ~    \/    ~    \┃
+            'false' : ┃     ~    \/    ~    \/    ~     ┃
+      '';
 
-        searchLimit = defaultNullOpts.mkInt 50 "max number of search results when using filters";
+      highlight_tab = defaultNullOpts.mkStr "NeoTreeTabInactive" "";
 
-        followCurrentFile = mkFollowCurrentFileOption false;
+      highlight_tab_active = defaultNullOpts.mkStr "NeoTreeTabActive" "";
 
-        hijackNetrwBehavior =
-          defaultNullOpts.mkEnumFirstDefault
-            [
-              "open_default"
-              "open_current"
-              "disabled"
-            ]
-            ''
-              - "open_default": netrw disabled, opening a directory opens neo-tree in whatever
-                position is specified in window.position
-              - "open_current": netrw disabled, opening a directory opens within the window like netrw
-                would, regardless of window.position
-              - "disabled": netrw left alone, neo-tree does not handle opening dirs
-            '';
+      highlight_background = defaultNullOpts.mkStr "NeoTreeTabInactive" "";
 
-        useLibuvFileWatcher = defaultNullOpts.mkBool false ''
-          This will use the OS level file watchers to detect changes instead of relying on nvim
-          autocmd events.
+      highlight_separator = defaultNullOpts.mkStr "NeoTreeTabSeparatorInactive" "";
+
+      highlight_separator_active = defaultNullOpts.mkStr "NeoTreeTabSeparatorActive" "";
+    };
+    event_handlers = lib.nixvim.mkNullOrOption (with types; attrsOf str) ''
+      Configuration of event handlers.
+      Attrs:
+      - keys are the events (e.g. `before_render`, `file_opened`)
+      - values are lua code defining the callback function.
+
+      Example:
+      ```nix
+      {
+        before_render = \'\'
+          function (state)
+            -- add something to the state that can be used by custom components
+          end
+        \'\';
+
+        file_opened = \'\'
+          function(file_path)
+            --auto close
+            require("neo-tree").close_all()
+          end
+        \'\';
+      }
+      ```
+    '';
+
+    default_component_configs = {
+      container = {
+        enable_character_fade = defaultNullOpts.mkBool true "";
+
+        width = defaultNullOpts.mkStr "100%" "";
+
+        right_padding = defaultNullOpts.mkInt 0 "";
+      };
+
+      diagnostics = {
+        symbols = {
+          hint = defaultNullOpts.mkStr "H" "";
+
+          info = defaultNullOpts.mkStr "I" "";
+
+          warn = defaultNullOpts.mkStr "!" "";
+
+          error = defaultNullOpts.mkStr "X" "";
+        };
+
+        highlights = {
+          hint = defaultNullOpts.mkStr "DiagnosticSignHint" "";
+
+          info = defaultNullOpts.mkStr "DiagnosticSignInfo" "";
+
+          warn = defaultNullOpts.mkStr "DiagnosticSignWarn" "";
+
+          error = defaultNullOpts.mkStr "DiagnosticSignError" "";
+        };
+      };
+
+      indent = {
+        indent_size = defaultNullOpts.mkInt 2 "";
+
+        padding = defaultNullOpts.mkInt 1 "";
+
+        with_markers = defaultNullOpts.mkBool true "";
+
+        indent_marker = defaultNullOpts.mkStr "│" "";
+
+        last_indent_marker = defaultNullOpts.mkStr "└" "";
+
+        highlight = defaultNullOpts.mkStr "NeoTreeIndentMarker" "";
+
+        with_expanders =
+          defaultNullOpts.mkNullable types.bool null
+            "If null and file nesting is enabled, will enable expanders.";
+
+        expander_collapsed = defaultNullOpts.mkStr "" "";
+
+        expander_expanded = defaultNullOpts.mkStr "" "";
+
+        expander_highlight = defaultNullOpts.mkStr "NeoTreeExpander" "";
+      };
+
+      icon = {
+        folder_closed = defaultNullOpts.mkStr "" "";
+
+        folder_open = defaultNullOpts.mkStr "" "";
+
+        folder_empty = defaultNullOpts.mkStr "ﰊ" "";
+
+        folder_empty_open = defaultNullOpts.mkStr "ﰊ" "";
+
+        default = defaultNullOpts.mkStr "*" ''
+          Only a fallback, if you use nvim-web-devicons and configure default icons there
+          then this will never be used.
+        '';
+
+        highlight = defaultNullOpts.mkStr "NeoTreeFileIcon" ''
+          Only a fallback, if you use nvim-web-devicons and configure default icons there
+          then this will never be used.
         '';
       };
 
-      buffers = {
-        bindToCwd = defaultNullOpts.mkBool true "Bind to current working directory.";
+      modified = {
+        symbol = defaultNullOpts.mkStr "[+] " "";
 
-        followCurrentFile = mkFollowCurrentFileOption true;
-
-        groupEmptyDirs = defaultNullOpts.mkBool true "When true, empty directories will be grouped together.";
-
-        window = mkWindowMappingsOption {
-          "<bs>" = "navigate_up";
-          "." = "set_root";
-          bd = "buffer_delete";
-        };
+        highlight = defaultNullOpts.mkStr "NeoTreeModified" "";
       };
 
-      gitStatus = {
-        window = mkWindowMappingsOption {
-          A = "git_add_all";
-          gu = "git_unstage_file";
-          ga = "git_add_file";
-          gr = "git_revert_file";
-          gc = "git_commit";
-          gp = "git_push";
-          gg = "git_commit_and_push";
-        };
+      name = {
+        trailing_slash = defaultNullOpts.mkBool false "";
+
+        use_git_status_colors = defaultNullOpts.mkBool true "";
+
+        highlight = defaultNullOpts.mkStr "NeoTreeFileName" "";
       };
 
-      example = {
-        renderers = {
-          custom = mkRendererComponentListOption [
-            "indent"
-            {
-              name = "icon";
-              default = "C";
-            }
-            "custom"
-            "name"
-          ] "custom renderers";
+      git_status = {
+        symbols = lib.mapAttrs (optionName: default: defaultNullOpts.mkStr default optionName) {
+          added = "✚";
+          deleted = "✖";
+          modified = "";
+          renamed = "";
+          untracked = "";
+          ignored = "";
+          unstaged = "";
+          staged = "";
+          conflict = "";
         };
 
-        window = mkWindowMappingsOption {
-          "<cr>" = "toggle_node";
-          "<C-e>" = "example_command";
-          d = "show_debug_info";
-        };
-      };
-
-      documentSymbols = {
-        followCursor = defaultNullOpts.mkBool false "If set to `true`, will automatically focus on the symbol under the cursor.";
-
-        kinds =
-          lib.nixvim.mkNullOrOption
-            (
-              with types;
-              attrsOf (submodule {
-                options = {
-                  icon = mkOption {
-                    description = "Icon for this LSP kind.";
-                    type = types.str;
-                    example = "";
-                  };
-                  hl = mkOption {
-                    description = "Highlight group for this LSP kind.";
-                    type = types.str;
-                    example = "Include";
-                  };
-                };
-              })
-            )
-            ''
-              An attrs specifying how LSP kinds should be rendered.
-              Each entry should map the LSP kind name to an icon and a highlight group, for example
-              `Class = { icon = ""; hl = "Include"; }`
-            '';
-
-        customKinds = lib.mkOption {
-          type = with types; attrsOf str;
-          default = { };
-          example = {
-            "252" = "TypeAlias";
-          };
-          description = ''
-            A table mapping the LSP kind id (an integer) to the LSP kind name that is used for
-            `kinds`.
-
-            For the list of kinds (id and name), please refer to
-            https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentSymbol
-          '';
-        };
-        window = mkWindowMappingsOption { };
+        align = defaultNullOpts.mkStr "right" "icon alignment";
       };
     };
 
-  config =
-    let
-      inherit (lib.nixvim) ifNonNull' mkRaw;
-
-      processRendererComponent =
-        component:
-        if lib.isString component then
-          [ component ]
-        else
-          (lib.mapAttrs' (name: value: {
-            name = if name == "name" then "__unkeyed" else name;
-            value = if lib.isList value then processRendererComponentList value else value;
-          }) component);
-
-      processRendererComponentList =
-        componentList: ifNonNull' componentList (map processRendererComponent componentList);
-
-      processMapping =
-        key: action:
-        if lib.isString action then
-          action
-        else
-          lib.mapAttrs' (k: v: {
-            name = if k == "command" then "__unkeyed" else k;
-            value = v;
-          }) action;
-
-      processMappings = mappings: ifNonNull' mappings (lib.mapAttrs processMapping mappings);
-
-      processWindowMappings = window: { mappings = processMappings window.mappings; };
-
-      setupOptions =
-        with cfg;
+    renderers = {
+      directory = mkRendererComponentListOption [
+        "indent"
+        "icon"
+        "current_filter"
         {
-          # Concatenate sources and extraSources, setting sources to it's default value if it is null
-          # and extraSources is not null
-          sources =
-            if (extraSources != null) then
-              if (sources == null) then
-                [
-                  "filesystem"
-                  "git_status"
-                  "buffers"
-                ]
-                ++ extraSources
-              else
-                sources ++ extraSources
-            else
-              sources;
-          add_blank_line_at_top = addBlankLineAtTop;
-          auto_clean_after_session_restore = autoCleanAfterSessionRestore;
-          close_if_last_window = closeIfLastWindow;
-          default_source = defaultSource;
-          enable_diagnostics = enableDiagnostics;
-          enable_git_status = enableGitStatus;
-          enable_modified_markers = enableModifiedMarkers;
-          enable_refresh_on_write = enableRefreshOnWrite;
-          git_status_async = gitStatusAsync;
-          git_status_async_options = with gitStatusAsyncOptions; {
-            batch_size = batchSize;
-            batch_delay = batchDelay;
-            max_lines = maxLines;
-          };
-          hide_root_node = hideRootNode;
-          retain_hidden_root_indent = retainHiddenRootIndent;
-          log_level = logLevel;
-          log_to_file = logToFile;
-          open_files_in_last_window = openFilesInLastWindow;
-          popup_border_style = popupBorderStyle;
-          resize_timer_interval = resizeTimerInterval;
-          sort_case_insensitive = sortCaseInsensitive;
-          sort_function = sortFunction;
-          use_popups_for_input = usePopupsForInput;
-          use_default_mappings = useDefaultMappings;
-          source_selector = with sourceSelector; {
-            inherit winbar statusline;
-            show_scrolled_off_parent_node = showScrolledOffParentNode;
-            sources = ifNonNull' sources (
-              map (source: {
-                inherit (source) source;
-                display_name = source.displayName;
-              }) sources
-            );
-            content_layout = contentLayout;
-            tabs_layout = tabsLayout;
-            truncation_character = truncationCharacter;
-            tabs_min_width = tabsMinWidth;
-            tabs_max_width = tabsMaxWidth;
-            inherit padding separator;
-            separator_active = separatorActive;
-            show_separator_on_edge = showSeparatorOnEdge;
-            highlight_tab = highlightTab;
-            highlight_tab_active = highlightTabActive;
-            highlight_background = highlightBackground;
-            highlight_separator = highlightSeparator;
-            highlight_separator_active = highlightSeparatorActive;
-          };
-          event_handlers = ifNonNull' eventHandlers (
-            mapAttrsToList (event: handler: {
-              inherit event;
-              handler = lib.nixvim.mkRaw handler;
-            }) eventHandlers
-          );
-          default_component_configs = with defaultComponentConfigs; {
-            container = with container; {
-              enable_character_fade = enableCharacterFade;
-              inherit width;
-              right_padding = rightPadding;
-            };
-            inherit diagnostics;
-            indent = with indent; {
-              indent_size = indentSize;
-              inherit padding;
-              with_markers = withMarkers;
-              indent_markers = indentMarker;
-              last_indent_marker = lastIndentMarker;
-              inherit highlight;
-              with_expanders = withExpanders;
-              expander_collapsed = expanderCollapsed;
-              expander_expanded = expanderExpanded;
-              expander_highlight = expanderHighlight;
-            };
-            icon = with icon; {
-              folder_closed = folderClosed;
-              folder_open = folderOpen;
-              folder_empty = folderEmpty;
-              folder_empty_open = folderEmptyOpen;
-              inherit default highlight;
-            };
-            inherit modified;
-            name = with name; {
-              trailing_slash = trailingSlash;
-              use_git_status_colors = useGitStatusColors;
-              inherit highlight;
-            };
-            git_status = gitStatus;
-          };
-          renderers = ifNonNull' cfg.renderers (mapAttrs (name: processRendererComponentList) cfg.renderers);
-          nesting_rules = cfg.nestingRules;
-          window = with window; {
-            inherit position width height;
-            auto_expand_width = autoExpandWidth;
-            inherit popup;
-            same_level = sameLevel;
-            insert_as = insertAs;
-            mapping_options = mappingOptions;
-            mappings = processMappings mappings;
-          };
-          filesystem = with filesystem; {
-            window = processWindowMappings window;
-            async_directory_scan = asyncDirectoryScan;
-            scan_mode = scanMode;
-            bind_to_cwd = bindToCwd;
-            cwd_target = cwdTarget;
-            filtered_items = with filteredItems; {
-              inherit visible;
-              force_visible_in_empty_folder = forceVisibleInEmptyFolder;
-              show_hidden_count = showHiddenCount;
-              hide_dotfiles = hideDotfiles;
-              hide_gitignored = hideGitignored;
-              hide_hidden = hideHidden;
-              hide_by_name = hideByName;
-              hide_by_pattern = hideByPattern;
-              always_show = alwaysShow;
-              never_show = neverShow;
-              never_show_by_pattern = neverShowByPattern;
-            };
-            find_by_full_path_words = findByFullPathWords;
-            find_command = findCommand;
-            find_args = findArgs;
-            group_empty_dirs = groupEmptyDirs;
-            search_limit = searchLimit;
-            follow_current_file = followCurrentFile;
-            hijack_netrw_behavior = hijackNetrwBehavior;
-            use_libuv_file_watcher = useLibuvFileWatcher;
-          };
-          buffers = with buffers; {
-            bind_to_cwd = bindToCwd;
-            follow_current_file = followCurrentFile;
-            group_empty_dirs = groupEmptyDirs;
-            window = processWindowMappings window;
-          };
-          git_status = {
-            window = processWindowMappings cfg.gitStatus.window;
-          };
-          example = with example; {
-            renderers = with renderers; {
-              custom = processRendererComponentList custom;
-            };
-          };
-          document_symbols = with documentSymbols; {
-            follow_cursor = followCursor;
-            inherit kinds;
-            custom_kinds.__raw =
-              "{" + (concatStringsSep "," (mapAttrsToList (id: name: ''[${id}] = "${name}"'') customKinds)) + "}";
-            window = processWindowMappings window;
-          };
+          name = "container";
+          content = [
+            {
+              name = "name";
+              zindex = 10;
+            }
+            {
+              name = "clipboard";
+              zindex = 10;
+            }
+            {
+              name = "diagnostics";
+              errors_only = true;
+              zindex = 20;
+              align = "right";
+              hide_when_expanded = true;
+            }
+            {
+              name = "git_status";
+              zindex = 20;
+              align = "right";
+              hide_when_expanded = true;
+            }
+          ];
         }
-        // cfg.extraOptions;
-    in
-    lib.mkIf cfg.enable {
-      # TODO: added 2024-09-20 remove after 24.11
-      plugins.web-devicons = lib.mkIf (
-        !(
-          config.plugins.mini.enable
-          && config.plugins.mini.modules ? icons
-          && config.plugins.mini.mockDevIcons
-        )
-      ) { enable = lib.mkOverride 1490 true; };
+      ] "directory renderers";
 
-      extraPlugins = [
-        cfg.package
-      ];
+      file = mkRendererComponentListOption [
+        "indent"
+        "icon"
+        {
+          name = "container";
+          content = [
+            {
+              name = "name";
+              zindex = 10;
+            }
+            {
+              name = "clipboard";
+              zindex = 10;
+            }
+            {
+              name = "bufnr";
+              zindex = 10;
+            }
+            {
+              name = "modified";
+              zindex = 20;
+              align = "right";
+            }
+            {
+              name = "diagnostics";
+              zindex = 20;
+              align = "right";
+            }
+            {
+              name = "git_status";
+              zindex = 20;
+              align = "right";
+            }
+          ];
+        }
+      ] "file renderers";
 
-      extraConfigLua = ''
-        require('neo-tree').setup(${lib.nixvim.toLuaObject setupOptions})
+      message = mkRendererComponentListOption [
+        {
+          name = "indent";
+          with_markers = false;
+        }
+        {
+          name = "name";
+          highlight = "NeoTreeMessage";
+        }
+      ] "message renderers";
+
+      terminal = mkRendererComponentListOption [
+        "indent"
+        "icon"
+        "name"
+        "bufnr"
+      ] "message renderers";
+    };
+
+    nesting_rules = defaultNullOpts.mkAttrsOf types.str { } "nesting rules";
+
+    window = {
+      position = defaultNullOpts.mkEnumFirstDefault [
+        "left"
+        "right"
+        "top"
+        "bottom"
+        "float"
+        "current"
+      ] "position";
+
+      width = defaultNullOpts.mkInt 40 "Applies to left and right positions";
+
+      height = defaultNullOpts.mkInt 15 "Applies to top and bottom positions";
+
+      auto_expand_width = defaultNullOpts.mkBool false ''
+        Expand the window when file exceeds the window width. does not work with
+        position = "float"
       '';
 
-      extraPackages = [ cfg.gitPackage ];
+      popup = {
+        size = {
+          height = defaultNullOpts.mkStr "80%" "height";
+
+          width = defaultNullOpts.mkStr "50%" "height";
+        };
+
+        position = defaultNullOpts.mkStr "80%" ''
+          50% means center it.
+          You can also specify border here, if you want a different setting from the global
+          `popupBorderStyle`.
+        '';
+      };
+
+      same_level = defaultNullOpts.mkBool false ''
+        Create and paste/move files/directories on the same level as the directory under cursor
+        (as opposed to within the directory under cursor).
+      '';
+
+      insert_as =
+        defaultNullOpts.mkEnumFirstDefault
+          [
+            "child"
+            "sibling"
+          ]
+          ''
+            Affects how nodes get inserted into the tree during creation/pasting/moving of files if
+            the node under the cursor is a directory:
+
+            - "child":   Insert nodes as children of the directory under cursor.
+            - "sibling": Insert nodes  as siblings of the directory under cursor.
+          '';
+
+      mapping_options = {
+        noremap = defaultNullOpts.mkBool true "noremap";
+
+        nowait = defaultNullOpts.mkBool true "nowait";
+      };
+
+      mappings = mkMappingsOption (
+        lib.literalMD ''
+          ```nix
+            {
+              "<space>" = {
+                command = "toggle_node";
+                # disable `nowait` if you have existing combos starting with this char that you want to use
+                nowait = false;
+              };
+              "<2-LeftMouse>" = "open";
+              "<cr>" = "open";
+              "<esc>" = "revert_preview";
+              P = {
+                command = "toggle_preview";
+                config = { use_float = true; };
+              };
+              l = "focus_preview";
+              S = "open_split";
+              # S = "split_with_window_picker";
+              s = "open_vsplit";
+              # s = "vsplit_with_window_picker";
+              t = "open_tabnew";
+              # "<cr>" = "open_drop";
+              # t = "open_tab_drop";
+              w = "open_with_window_picker";
+              C = "close_node";
+              z = "close_all_nodes";
+              # Z = "expand_all_nodes";
+              R = "refresh";
+              a = {
+                command = "add";
+                # some commands may take optional config options, see `:h neo-tree-mappings` for details
+                config = {
+                  show_path = "none"; # "none", "relative", "absolute"
+                };
+              };
+              A = "add_directory"; # also accepts the config.show_path and config.insert_as options.
+              d = "delete";
+              r = "rename";
+              y = "copy_to_clipboard";
+              x = "cut_to_clipboard";
+              p = "paste_from_clipboard";
+              c = "copy"; # takes text input for destination, also accepts the config.show_path and config.insert_as options
+              m = "move"; # takes text input for destination, also accepts the config.show_path and config.insert_as options
+              e = "toggle_auto_expand_width";
+              q = "close_window";
+              "?" = "show_help";
+              "<" = "prev_source";
+              ">" = "next_source";
+            }
+          ```
+        ''
+      );
     };
+    filesystem = {
+      window = mkWindowMappingsOption (
+        lib.literalMD ''
+          ```nix
+            {
+              H = "toggle_hidden";
+              "/" = "fuzzy_finder";
+              D = "fuzzy_finder_directory";
+              # "/" = "filter_as_you_type"; # this was the default until v1.28
+              "#" = "fuzzy_sorter"; # fuzzy sorting using the fzy algorithm
+              # D = "fuzzy_sorter_directory";
+              f = "filter_on_submit";
+              "<C-x>" = "clear_filter";
+              "<bs>" = "navigate_up";
+              "." = "set_root";
+              "[g" = "prev_git_modified";
+              "]g" = "next_git_modified";
+            }
+          ```
+        ''
+      );
+      async_directory_scan =
+        defaultNullOpts.mkEnumFirstDefault
+          [
+            "auto"
+            "always"
+            "never"
+          ]
+          ''
+            - "auto" means refreshes are async, but it's synchronous when called from the Neotree
+            commands.
+            - "always" means directory scans are always async.
+            - "never"  means directory scans are never async.
+          '';
+
+      scan_mode =
+        defaultNullOpts.mkEnumFirstDefault
+          [
+            "shallow"
+            "deep"
+          ]
+          ''
+            - "shallow": Don't scan into directories to detect possible empty directory a priori.
+            - "deep": Scan into directories to detect empty or grouped empty directories a priori.
+          '';
+
+      bind_to_cwd = defaultNullOpts.mkBool true "true creates a 2-way binding between vim's cwd and neo-tree's root.";
+
+      cwd_target = {
+        sidebar = defaultNullOpts.mkStr "tab" "sidebar is when position = left or right";
+        current = defaultNullOpts.mkStr "window" "current is when position = current";
+      };
+
+      filtered_items = {
+        visible = defaultNullOpts.mkBool false "when true, they will just be displayed differently than normal items";
+
+        force_visible_in_empty_folder = defaultNullOpts.mkBool false "when true, hidden files will be shown if the root folder is otherwise empty";
+
+        show_hidden_count = defaultNullOpts.mkBool true "when true, the number of hidden items in each folder will be shown as the last entry";
+
+        hide_dotfiles = defaultNullOpts.mkBool true "hide dotfiles";
+
+        hide_gitignored = defaultNullOpts.mkBool true "hide gitignored files";
+
+        hide_hidden = defaultNullOpts.mkBool true "only works on Windows for hidden files/directories";
+
+        hide_by_name = defaultNullOpts.mkListOf types.str [
+          ".DS_Store"
+          "thumbs.db"
+        ] "hide by name";
+
+        hide_by_pattern = defaultNullOpts.mkListOf' {
+          type = types.str;
+          pluginDefault = [ ];
+          description = "Hide by pattern.";
+          example = [
+            "*.meta"
+            "*/src/*/tsconfig.json"
+          ];
+        };
+
+        always_show = defaultNullOpts.mkListOf' {
+          type = types.str;
+          pluginDefault = [ ];
+          description = "Files/folders to always show.";
+          example = [ ".gitignore" ];
+        };
+
+        never_show = defaultNullOpts.mkListOf' {
+          type = types.str;
+          pluginDefault = [ ];
+          description = "Files/folders to never show.";
+          example = [
+            ".DS_Store"
+            "thumbs.db"
+          ];
+        };
+
+        never_show_by_pattern = defaultNullOpts.mkListOf' {
+          type = types.str;
+          pluginDefault = [ ];
+          description = "Files/folders to never show (by pattern).";
+          example = [ ".null-ls_*" ];
+        };
+      };
+
+      find_by_full_path_words = defaultNullOpts.mkBool false ''
+        `false` means it only searches the tail of a path.
+        `true` will change the filter into a full path
+
+        search with space as an implicit ".*", so `fi init` will match:
+        `./sources/filesystem/init.lua
+      '';
+
+      find_command = defaultNullOpts.mkStr "fd" "This is determined automatically, you probably don't need to set it";
+
+      find_args =
+        lib.nixvim.mkNullOrStrLuaFnOr
+          (types.submodule {
+            options = {
+              fd = defaultNullOpts.mkListOf types.str [
+                "--exclude"
+                ".git"
+                "--exclude"
+                "node_modules"
+              ] "You can specify extra args to pass to the find command.";
+            };
+          })
+          ''
+            Find arguments
+
+            Either use a list of strings:
+
+            ```nix
+            findArgs = {
+              fd = [
+                "--exclude"
+                ".git"
+                "--exclude"
+                "node_modules"
+              ];
+            };
+            ```
+
+            Or use a function instead of list of strings
+            ```
+            findArgs = \'\'
+              find_args = function(cmd, path, search_term, args)
+                if cmd ~= "fd" then
+                  return args
+                end
+                --maybe you want to force the filter to always include hidden files:
+                table.insert(args, "--hidden")
+                -- but no one ever wants to see .git files
+                table.insert(args, "--exclude")
+                table.insert(args, ".git")
+                -- or node_modules
+                table.insert(args, "--exclude")
+                table.insert(args, "node_modules")
+                --here is where it pays to use the function, you can exclude more for
+                --short search terms, or vary based on the directory
+                if string.len(search_term) < 4 and path == "/home/cseickel" then
+                  table.insert(args, "--exclude")
+                  table.insert(args, "Library")
+                end
+                return args
+              end
+            \'\';
+            ```
+          '';
+
+      group_empty_dirs = defaultNullOpts.mkBool false "when true, empty folders will be grouped together";
+
+      search_limit = defaultNullOpts.mkInt 50 "max number of search results when using filters";
+
+      follow_current_file = mkFollowCurrentFileOption false;
+
+      hijack_netrw_behavior =
+        defaultNullOpts.mkEnumFirstDefault
+          [
+            "open_default"
+            "open_current"
+            "disabled"
+          ]
+          ''
+            - "open_default": netrw disabled, opening a directory opens neo-tree in whatever
+              position is specified in window.position
+            - "open_current": netrw disabled, opening a directory opens within the window like netrw
+              would, regardless of window.position
+            - "disabled": netrw left alone, neo-tree does not handle opening dirs
+          '';
+
+      use_libuv_file_watcher = defaultNullOpts.mkBool false ''
+        This will use the OS level file watchers to detect changes instead of relying on nvim
+        autocmd events.
+      '';
+    };
+
+    buffers = {
+      bind_to_cwd = defaultNullOpts.mkBool true "Bind to current working directory.";
+
+      follow_current_file = mkFollowCurrentFileOption true;
+
+      group_empty_dirs = defaultNullOpts.mkBool true "When true, empty directories will be grouped together.";
+
+      window = mkWindowMappingsOption {
+        "<bs>" = "navigate_up";
+        "." = "set_root";
+        bd = "buffer_delete";
+      };
+    };
+
+    git_status = {
+      window = mkWindowMappingsOption {
+        A = "git_add_all";
+        gu = "git_unstage_file";
+        ga = "git_add_file";
+        gr = "git_revert_file";
+        gc = "git_commit";
+        gp = "git_push";
+        gg = "git_commit_and_push";
+      };
+    };
+
+    example = {
+      renderers = {
+        custom = mkRendererComponentListOption [
+          "indent"
+          {
+            name = "icon";
+            default = "C";
+          }
+          "custom"
+          "name"
+        ] "custom renderers";
+      };
+
+      window = mkWindowMappingsOption {
+        "<cr>" = "toggle_node";
+        "<C-e>" = "example_command";
+        d = "show_debug_info";
+      };
+    };
+
+    document_symbols = {
+      follow_cursor = defaultNullOpts.mkBool false "If set to `true`, will automatically focus on the symbol under the cursor.";
+
+      kinds =
+        lib.nixvim.mkNullOrOption
+          (
+            with types;
+            attrsOf (submodule {
+              options = {
+                icon = mkOption {
+                  description = "Icon for this LSP kind.";
+                  type = types.str;
+                  example = "";
+                };
+                hl = mkOption {
+                  description = "Highlight group for this LSP kind.";
+                  type = types.str;
+                  example = "Include";
+                };
+              };
+            })
+          )
+          ''
+            An attrs specifying how LSP kinds should be rendered.
+            Each entry should map the LSP kind name to an icon and a highlight group, for example
+            `Class = { icon = ""; hl = "Include"; }`
+          '';
+
+      custom_kinds = lib.mkOption {
+        type = with types; attrsOf str;
+        default = { };
+        example = {
+          "252" = "TypeAlias";
+        };
+        description = ''
+          A table mapping the LSP kind id (an integer) to the LSP kind name that is used for
+          `kinds`.
+
+          For the list of kinds (id and name), please refer to
+          https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentSymbol
+        '';
+      };
+      window = mkWindowMappingsOption { };
+    };
+  };
+
+  # config =
+  #   let
+  #     inherit (lib.nixvim) ifNonNull';
+  #     processRendererComponent =
+  #       component:
+  #       if lib.isString component then
+  #         [ component ]
+  #       else
+  #         (lib.mapAttrs' (name: value: {
+  #           name = if name == "name" then "__unkeyed" else name;
+  #           value = if lib.isList value then processRendererComponentList value else value;
+  #         }) component);
+  #
+  #     processRendererComponentList =
+  #       componentList: ifNonNull' componentList (map processRendererComponent componentList);
+  #
+  #     processMapping =
+  #       key: action:
+  #       if lib.isString action then
+  #         action
+  #       else
+  #         lib.mapAttrs' (k: v: {
+  #           name = if k == "command" then "__unkeyed" else k;
+  #           value = v;
+  #         }) action;
+  #
+  #     processMappings = mappings: ifNonNull' mappings (lib.mapAttrs processMapping mappings);
+  #
+  #     processWindowMappings = window: { mappings = processMappings window.mappings; };
+  #
+  #     setupOptions = with cfg; {
+  #       # Concatenate sources and extraSources, setting sources to it's default value if it is null
+  #       # and extraSources is not null
+  #       sources =
+  #         if (extraSources != null) then
+  #           if (sources == null) then
+  #             [
+  #               "filesystem"
+  #               "git_status"
+  #               "buffers"
+  #             ]
+  #             ++ extraSources
+  #           else
+  #             sources ++ extraSources
+  #         else
+  #           sources;
+  #       add_blank_line_at_top = addBlankLineAtTop;
+  #       auto_clean_after_session_restore = autoCleanAfterSessionRestore;
+  #       close_if_last_window = closeIfLastWindow;
+  #       default_source = defaultSource;
+  #       enable_diagnostics = enableDiagnostics;
+  #       enable_git_status = enableGitStatus;
+  #       enable_modified_markers = enableModifiedMarkers;
+  #       enable_refresh_on_write = enableRefreshOnWrite;
+  #       git_status_async = gitStatusAsync;
+  #       git_status_async_options = with gitStatusAsyncOptions; {
+  #         batch_size = batchSize;
+  #         batch_delay = batchDelay;
+  #         max_lines = maxLines;
+  #       };
+  #       hide_root_node = hideRootNode;
+  #       retain_hidden_root_indent = retainHiddenRootIndent;
+  #       log_level = logLevel;
+  #       log_to_file = logToFile;
+  #       open_files_in_last_window = openFilesInLastWindow;
+  #       popup_border_style = popupBorderStyle;
+  #       resize_timer_interval = resizeTimerInterval;
+  #       sort_case_insensitive = sortCaseInsensitive;
+  #       sort_function = sortFunction;
+  #       use_popups_for_input = usePopupsForInput;
+  #       use_default_mappings = useDefaultMappings;
+  #       source_selector = with sourceSelector; {
+  #         inherit winbar statusline;
+  #         show_scrolled_off_parent_node = showScrolledOffParentNode;
+  #         sources = ifNonNull' sources (
+  #           map (source: {
+  #             inherit (source) source;
+  #             display_name = source.displayName;
+  #           }) sources
+  #         );
+  #         content_layout = contentLayout;
+  #         tabs_layout = tabsLayout;
+  #         truncation_character = truncationCharacter;
+  #         tabs_min_width = tabsMinWidth;
+  #         tabs_max_width = tabsMaxWidth;
+  #         inherit padding separator;
+  #         separator_active = separatorActive;
+  #         show_separator_on_edge = showSeparatorOnEdge;
+  #         highlight_tab = highlightTab;
+  #         highlight_tab_active = highlightTabActive;
+  #         highlight_background = highlightBackground;
+  #         highlight_separator = highlightSeparator;
+  #         highlight_separator_active = highlightSeparatorActive;
+  #       };
+  #       event_handlers = ifNonNull' eventHandlers (
+  #         mapAttrsToList (event: handler: {
+  #           inherit event;
+  #           handler = lib.nixvim.mkRaw handler;
+  #         }) eventHandlers
+  #       );
+  #       default_component_configs = with defaultComponentConfigs; {
+  #         container = with container; {
+  #           enable_character_fade = enableCharacterFade;
+  #           inherit width;
+  #           right_padding = rightPadding;
+  #         };
+  #         inherit diagnostics;
+  #         indent = with indent; {
+  #           indent_size = indentSize;
+  #           inherit padding;
+  #           with_markers = withMarkers;
+  #           indent_markers = indentMarker;
+  #           last_indent_marker = lastIndentMarker;
+  #           inherit highlight;
+  #           with_expanders = withExpanders;
+  #           expander_collapsed = expanderCollapsed;
+  #           expander_expanded = expanderExpanded;
+  #           expander_highlight = expanderHighlight;
+  #         };
+  #         icon = with icon; {
+  #           folder_closed = folderClosed;
+  #           folder_open = folderOpen;
+  #           folder_empty = folderEmpty;
+  #           folder_empty_open = folderEmptyOpen;
+  #           inherit default highlight;
+  #         };
+  #         inherit modified;
+  #         name = with name; {
+  #           trailing_slash = trailingSlash;
+  #           use_git_status_colors = useGitStatusColors;
+  #           inherit highlight;
+  #         };
+  #         git_status = gitStatus;
+  #       };
+  #       renderers = ifNonNull' cfg.renderers (mapAttrs (name: processRendererComponentList) cfg.renderers);
+  #       nesting_rules = cfg.nestingRules;
+  #       window = with window; {
+  #         inherit position width height;
+  #         auto_expand_width = autoExpandWidth;
+  #         inherit popup;
+  #         same_level = sameLevel;
+  #         insert_as = insertAs;
+  #         mapping_options = mappingOptions;
+  #         mappings = processMappings mappings;
+  #       };
+  #       filesystem = with filesystem; {
+  #         window = processWindowMappings window;
+  #         async_directory_scan = asyncDirectoryScan;
+  #         scan_mode = scanMode;
+  #         bind_to_cwd = bindToCwd;
+  #         cwd_target = cwdTarget;
+  #         filtered_items = with filteredItems; {
+  #           inherit visible;
+  #           force_visible_in_empty_folder = forceVisibleInEmptyFolder;
+  #           show_hidden_count = showHiddenCount;
+  #           hide_dotfiles = hideDotfiles;
+  #           hide_gitignored = hideGitignored;
+  #           hide_hidden = hideHidden;
+  #           hide_by_name = hideByName;
+  #           hide_by_pattern = hideByPattern;
+  #           always_show = alwaysShow;
+  #           never_show = neverShow;
+  #           never_show_by_pattern = neverShowByPattern;
+  #         };
+  #         find_by_full_path_words = findByFullPathWords;
+  #         find_command = findCommand;
+  #         find_args = findArgs;
+  #         group_empty_dirs = groupEmptyDirs;
+  #         search_limit = searchLimit;
+  #         follow_current_file = followCurrentFile;
+  #         hijack_netrw_behavior = hijackNetrwBehavior;
+  #         use_libuv_file_watcher = useLibuvFileWatcher;
+  #       };
+  #       buffers = with buffers; {
+  #         bind_to_cwd = bindToCwd;
+  #         follow_current_file = followCurrentFile;
+  #         group_empty_dirs = groupEmptyDirs;
+  #         window = processWindowMappings window;
+  #       };
+  #       git_status = {
+  #         window = processWindowMappings cfg.gitStatus.window;
+  #       };
+  #       example = with example; {
+  #         renderers = with renderers; {
+  #           custom = processRendererComponentList custom;
+  #         };
+  #       };
+  #       document_symbols = with documentSymbols; {
+  #         follow_cursor = followCursor;
+  #         inherit kinds;
+  #         custom_kinds.__raw =
+  #           "{" + (concatStringsSep "," (mapAttrsToList (id: name: ''[${id}] = "${name}"'') customKinds)) + "}";
+  #         window = processWindowMappings window;
+  #       };
+  #     };
+  #   in
+  #   lib.mkIf cfg.enable {
+  extraConfig = cfg: {
+    # TODO: added 2024-09-20 remove after 24.11
+    plugins.web-devicons = lib.mkIf (
+      !(
+        config.plugins.mini.enable
+        && config.plugins.mini.modules ? icons
+        && config.plugins.mini.mockDevIcons
+      )
+    ) { enable = lib.mkOverride 1490 true; };
+
+    extraPackages = [ cfg.gitPackage ];
+  };
 }
