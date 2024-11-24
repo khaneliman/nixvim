@@ -1,13 +1,12 @@
 {
   lib,
-  helpers,
   config,
   pkgs,
-  options,
   ...
 }:
-with lib;
 let
+  inherit (lib) types;
+  inherit (lib.nixvim) defaultNullOpts;
   cfg = config.plugins.neo-tree;
   basePluginPath = [
     "plugins"
@@ -16,14 +15,14 @@ let
 in
 {
   imports = [
-    (mkRemovedOptionModule (
+    (lib.mkRemovedOptionModule (
       basePluginPath
       ++ [
         "sourceSelector"
         "tabLabels"
       ]
     ) "Use `plugins.neo-tree.sourceSelector.sources` to achieve the same functionality.")
-    (mkRemovedOptionModule (
+    (lib.mkRemovedOptionModule (
       basePluginPath ++ [ "closeFloatsOnEscapeKey" ]
     ) "This option has been removed from upstream.")
   ];
@@ -31,30 +30,28 @@ in
     let
       listOfRendererComponents = with types; listOf (either str attrs);
 
-      mkRendererComponentListOption = helpers.defaultNullOpts.mkNullable listOfRendererComponents;
+      mkRendererComponentListOption = defaultNullOpts.mkNullable listOfRendererComponents;
 
       mkMappingsOption =
         defaults:
-        helpers.defaultNullOpts.mkNullable (
-          with types; attrsOf (either str attrs)
-        ) defaults "Mapping options";
+        defaultNullOpts.mkNullable (with types; attrsOf (either str attrs)) defaults "Mapping options";
 
       mkWindowMappingsOption = defaults: { mappings = mkMappingsOption defaults; };
 
       mkFollowCurrentFileOption = default: {
-        enabled = helpers.defaultNullOpts.mkBool default ''
+        enabled = defaultNullOpts.mkBool default ''
           This will find and focus the file in the active buffer every time the current file is
           changed while the tree is open.
         '';
 
-        leaveDirsOpen = helpers.defaultNullOpts.mkBool false ''
+        leaveDirsOpen = defaultNullOpts.mkBool false ''
           `false` closes auto expanded dirs, such as with `:Neotree reveal`.
         '';
       };
     in
-    helpers.neovim-plugin.extraOptionsOptions
+    lib.nixvim.neovim-plugin.extraOptionsOptions
     // {
-      enable = mkEnableOption "neo-tree";
+      enable = lib.mkEnableOption "neo-tree";
 
       package = lib.mkPackageOption pkgs "neo-tree" {
         default = [
@@ -68,7 +65,7 @@ in
       };
 
       sources =
-        helpers.defaultNullOpts.mkListOf types.str
+        defaultNullOpts.mkListOf types.str
           [
             "filesystem"
             "buffers"
@@ -81,48 +78,50 @@ in
             The name used here must be the same name you would use in a require() call.
           '';
 
-      extraSources = helpers.mkNullOrOption (types.listOf types.str) ''
+      extraSources = lib.nixvim.mkNullOrOption (types.listOf types.str) ''
         Extra sources to be added to the sources. This is an internal nixvim option.
       '';
 
-      addBlankLineAtTop = helpers.defaultNullOpts.mkBool false "Add a blank line at the top of the tree.";
+      addBlankLineAtTop = defaultNullOpts.mkBool false "Add a blank line at the top of the tree.";
 
-      autoCleanAfterSessionRestore = helpers.defaultNullOpts.mkBool false "Automatically clean up broken neo-tree buffers saved in sessions";
+      autoCleanAfterSessionRestore = defaultNullOpts.mkBool false "Automatically clean up broken neo-tree buffers saved in sessions";
 
-      closeIfLastWindow = helpers.defaultNullOpts.mkBool false "Close Neo-tree if it is the last window left in the tab";
+      closeIfLastWindow = defaultNullOpts.mkBool false "Close Neo-tree if it is the last window left in the tab";
 
-      defaultSource = helpers.defaultNullOpts.mkStr "filesystem" "";
+      defaultSource = defaultNullOpts.mkStr "filesystem" "";
 
-      enableDiagnostics = helpers.defaultNullOpts.mkBool true "";
+      enableDiagnostics = defaultNullOpts.mkBool true "";
 
-      enableGitStatus = helpers.defaultNullOpts.mkBool true "";
+      enableGitStatus = defaultNullOpts.mkBool true "";
 
-      enableModifiedMarkers = helpers.defaultNullOpts.mkBool true "Show markers for files with unsaved changes.";
+      enableModifiedMarkers = defaultNullOpts.mkBool true "Show markers for files with unsaved changes.";
 
-      enableRefreshOnWrite = helpers.defaultNullOpts.mkBool true "Refresh the tree when a file is written. Only used if `use_libuv_file_watcher` is false.";
+      enableRefreshOnWrite = defaultNullOpts.mkBool true "Refresh the tree when a file is written. Only used if `use_libuv_file_watcher` is false.";
 
-      gitStatusAsync = helpers.defaultNullOpts.mkBool true "";
+      gitStatusAsync = defaultNullOpts.mkBool true "";
 
       gitStatusAsyncOptions = {
-        batchSize = helpers.defaultNullOpts.mkInt 1000 "How many lines of git status results to process at a time";
+        batchSize = defaultNullOpts.mkInt 1000 "How many lines of git status results to process at a time";
 
-        batchDelay = helpers.defaultNullOpts.mkInt 10 "delay in ms between batches. Spreads out the workload to let other processes run.";
+        batchDelay =
+          defaultNullOpts.mkInt 10
+            "delay in ms between batches. Spreads out the workload to let other processes run.";
 
-        maxLines = helpers.defaultNullOpts.mkInt 10000 ''
+        maxLines = defaultNullOpts.mkInt 10000 ''
           How many lines of git status results to process. Anything after this will be dropped.
           Anything before this will be used.
           The last items to be processed are the untracked files.
         '';
       };
 
-      hideRootNode = helpers.defaultNullOpts.mkBool false "Hide the root node.";
+      hideRootNode = defaultNullOpts.mkBool false "Hide the root node.";
 
-      retainHiddenRootIndent = helpers.defaultNullOpts.mkBool false ''
+      retainHiddenRootIndent = defaultNullOpts.mkBool false ''
         If the root node is hidden, keep the indentation anyhow.
         This is needed if you use expanders because they render in the indent.
       '';
 
-      logLevel = helpers.defaultNullOpts.mkEnum [
+      logLevel = defaultNullOpts.mkEnum [
         "trace"
         "debug"
         "info"
@@ -132,12 +131,12 @@ in
       ] "info" "";
 
       logToFile =
-        helpers.defaultNullOpts.mkNullable (types.either types.bool types.str) false
+        defaultNullOpts.mkNullable (types.either types.bool types.str) false
           "use :NeoTreeLogs to show the file";
 
-      openFilesInLastWindow = helpers.defaultNullOpts.mkBool true "If `false`, open files in top left window";
+      openFilesInLastWindow = defaultNullOpts.mkBool true "If `false`, open files in top left window";
 
-      popupBorderStyle = helpers.defaultNullOpts.mkEnumFirstDefault [
+      popupBorderStyle = defaultNullOpts.mkEnumFirstDefault [
         "NC"
         "double"
         "none"
@@ -147,33 +146,33 @@ in
         "solid"
       ] "";
 
-      resizeTimerInterval = helpers.defaultNullOpts.mkInt 500 ''
+      resizeTimerInterval = defaultNullOpts.mkInt 500 ''
         In ms, needed for containers to redraw right aligned and faded content.
         Set to -1 to disable the resize timer entirely.
 
         NOTE: this will speed up to 50 ms for 1 second following a resize
       '';
 
-      sortCaseInsensitive = helpers.defaultNullOpts.mkBool false "Used when sorting files and directories in the tree";
+      sortCaseInsensitive = defaultNullOpts.mkBool false "Used when sorting files and directories in the tree";
 
-      sortFunction = helpers.defaultNullOpts.mkLuaFn "nil" "Uses a custom function for sorting files and directories in the tree";
+      sortFunction = defaultNullOpts.mkLuaFn "nil" "Uses a custom function for sorting files and directories in the tree";
 
-      usePopupsForInput = helpers.defaultNullOpts.mkBool true "If false, inputs will use vim.ui.input() instead of custom floats.";
+      usePopupsForInput = defaultNullOpts.mkBool true "If false, inputs will use vim.ui.input() instead of custom floats.";
 
-      useDefaultMappings = helpers.defaultNullOpts.mkBool true "";
+      useDefaultMappings = defaultNullOpts.mkBool true "";
 
       # sourceSelector provides clickable tabs to switch between sources."
       sourceSelector = {
-        winbar = helpers.defaultNullOpts.mkBool false "toggle to show selector on winbar";
+        winbar = defaultNullOpts.mkBool false "toggle to show selector on winbar";
 
-        statusline = helpers.defaultNullOpts.mkBool false "toggle to show selector on statusline";
+        statusline = defaultNullOpts.mkBool false "toggle to show selector on statusline";
 
-        showScrolledOffParentNode = helpers.defaultNullOpts.mkBool false ''
+        showScrolledOffParentNode = defaultNullOpts.mkBool false ''
           If `true`, tabs are replaced with the parent path of the top visible node when
           scrolled down.
         '';
 
-        sources = helpers.mkNullOrOption (
+        sources = lib.nixvim.mkNullOrOption (
           with types;
           listOf (submodule {
             options = {
@@ -182,13 +181,13 @@ in
                 description = "Name of the source to add to the bar.";
               };
 
-              displayName = helpers.mkNullOrOption str "How that source to appear in the bar.";
+              displayName = lib.nixvim.mkNullOrOption str "How that source to appear in the bar.";
             };
           })
         ) "Configure the characters shown on each tab.";
 
         contentLayout =
-          helpers.defaultNullOpts.mkEnumFirstDefault
+          defaultNullOpts.mkEnumFirstDefault
             [
               "start"
               "end"
@@ -206,7 +205,7 @@ in
             '';
 
         tabsLayout =
-          helpers.defaultNullOpts.mkEnum
+          defaultNullOpts.mkEnum
             [
               "start"
               "end"
@@ -228,17 +227,17 @@ in
                   "active" : expand the focused tab to fit the window width     ┃/  focused tab    \/  ~  \/  ~  \┃
             '';
 
-        truncationCharacter = helpers.defaultNullOpts.mkStr "…" "Character to use when truncating the tab label";
+        truncationCharacter = defaultNullOpts.mkStr "…" "Character to use when truncating the tab label";
 
         tabsMinWidth =
-          helpers.defaultNullOpts.mkNullable types.int null
+          defaultNullOpts.mkNullable types.int null
             "If int padding is added based on `contentLayout`";
 
         tabsMaxWidth =
-          helpers.defaultNullOpts.mkNullable types.int null
+          defaultNullOpts.mkNullable types.int null
             "This will truncate text even if `textTruncToFit = false`";
 
-        padding = helpers.defaultNullOpts.mkNullable (with types; either int (attrsOf int)) 0 ''
+        padding = defaultNullOpts.mkNullable (with types; either int (attrsOf int)) 0 ''
           Defines the global padding of the source selector.
           It can be an integer or an attrs with keys `left` and `right`.
           Setting `padding = 2` is exactly the same as `{ left = 2; right = 2; }`.
@@ -247,14 +246,14 @@ in
         '';
 
         separator =
-          helpers.defaultNullOpts.mkNullable
+          defaultNullOpts.mkNullable
             (
               with types;
               either str (submodule {
                 options = {
-                  left = helpers.defaultNullOpts.mkStr "▏" "";
-                  right = helpers.defaultNullOpts.mkStr "\\" "";
-                  override = helpers.defaultNullOpts.mkStr null "";
+                  left = defaultNullOpts.mkStr "▏" "";
+                  right = defaultNullOpts.mkStr "\\" "";
+                  override = defaultNullOpts.mkStr null "";
                 };
               })
             )
@@ -265,14 +264,14 @@ in
             "Can be a string or a table";
 
         separatorActive =
-          helpers.defaultNullOpts.mkNullable
+          defaultNullOpts.mkNullable
             (
               with types;
               either str (submodule {
                 options = {
-                  left = helpers.mkNullOrOption types.str "";
-                  right = helpers.mkNullOrOption types.str "";
-                  override = helpers.mkNullOrOption types.str "";
+                  left = lib.nixvim.mkNullOrOption types.str "";
+                  right = lib.nixvim.mkNullOrOption types.str "";
+                  override = lib.nixvim.mkNullOrOption types.str "";
                 };
               })
             )
@@ -282,7 +281,7 @@ in
               null falls back to `sourceSelector.separator`.
             '';
 
-        showSeparatorOnEdge = helpers.defaultNullOpts.mkBool false ''
+        showSeparatorOnEdge = defaultNullOpts.mkBool false ''
           Takes a boolean value where `false` (default) hides the separators on the far
           left / right.
           Especially useful when left and right separator are the same.
@@ -291,17 +290,17 @@ in
               'false' : ┃     ~    \/    ~    \/    ~     ┃
         '';
 
-        highlightTab = helpers.defaultNullOpts.mkStr "NeoTreeTabInactive" "";
+        highlightTab = defaultNullOpts.mkStr "NeoTreeTabInactive" "";
 
-        highlightTabActive = helpers.defaultNullOpts.mkStr "NeoTreeTabActive" "";
+        highlightTabActive = defaultNullOpts.mkStr "NeoTreeTabActive" "";
 
-        highlightBackground = helpers.defaultNullOpts.mkStr "NeoTreeTabInactive" "";
+        highlightBackground = defaultNullOpts.mkStr "NeoTreeTabInactive" "";
 
-        highlightSeparator = helpers.defaultNullOpts.mkStr "NeoTreeTabSeparatorInactive" "";
+        highlightSeparator = defaultNullOpts.mkStr "NeoTreeTabSeparatorInactive" "";
 
-        highlightSeparatorActive = helpers.defaultNullOpts.mkStr "NeoTreeTabSeparatorActive" "";
+        highlightSeparatorActive = defaultNullOpts.mkStr "NeoTreeTabSeparatorActive" "";
       };
-      eventHandlers = helpers.mkNullOrOption (with types; attrsOf str) ''
+      eventHandlers = lib.nixvim.mkNullOrOption (with types; attrsOf str) ''
         Configuration of event handlers.
         Attrs:
         - keys are the events (e.g. `before_render`, `file_opened`)
@@ -328,95 +327,95 @@ in
 
       defaultComponentConfigs = {
         container = {
-          enableCharacterFade = helpers.defaultNullOpts.mkBool true "";
+          enableCharacterFade = defaultNullOpts.mkBool true "";
 
-          width = helpers.defaultNullOpts.mkStr "100%" "";
+          width = defaultNullOpts.mkStr "100%" "";
 
-          rightPadding = helpers.defaultNullOpts.mkInt 0 "";
+          rightPadding = defaultNullOpts.mkInt 0 "";
         };
 
         diagnostics = {
           symbols = {
-            hint = helpers.defaultNullOpts.mkStr "H" "";
+            hint = defaultNullOpts.mkStr "H" "";
 
-            info = helpers.defaultNullOpts.mkStr "I" "";
+            info = defaultNullOpts.mkStr "I" "";
 
-            warn = helpers.defaultNullOpts.mkStr "!" "";
+            warn = defaultNullOpts.mkStr "!" "";
 
-            error = helpers.defaultNullOpts.mkStr "X" "";
+            error = defaultNullOpts.mkStr "X" "";
           };
 
           highlights = {
-            hint = helpers.defaultNullOpts.mkStr "DiagnosticSignHint" "";
+            hint = defaultNullOpts.mkStr "DiagnosticSignHint" "";
 
-            info = helpers.defaultNullOpts.mkStr "DiagnosticSignInfo" "";
+            info = defaultNullOpts.mkStr "DiagnosticSignInfo" "";
 
-            warn = helpers.defaultNullOpts.mkStr "DiagnosticSignWarn" "";
+            warn = defaultNullOpts.mkStr "DiagnosticSignWarn" "";
 
-            error = helpers.defaultNullOpts.mkStr "DiagnosticSignError" "";
+            error = defaultNullOpts.mkStr "DiagnosticSignError" "";
           };
         };
 
         indent = {
-          indentSize = helpers.defaultNullOpts.mkInt 2 "";
+          indentSize = defaultNullOpts.mkInt 2 "";
 
-          padding = helpers.defaultNullOpts.mkInt 1 "";
+          padding = defaultNullOpts.mkInt 1 "";
 
-          withMarkers = helpers.defaultNullOpts.mkBool true "";
+          withMarkers = defaultNullOpts.mkBool true "";
 
-          indentMarker = helpers.defaultNullOpts.mkStr "│" "";
+          indentMarker = defaultNullOpts.mkStr "│" "";
 
-          lastIndentMarker = helpers.defaultNullOpts.mkStr "└" "";
+          lastIndentMarker = defaultNullOpts.mkStr "└" "";
 
-          highlight = helpers.defaultNullOpts.mkStr "NeoTreeIndentMarker" "";
+          highlight = defaultNullOpts.mkStr "NeoTreeIndentMarker" "";
 
           withExpanders =
-            helpers.defaultNullOpts.mkNullable types.bool null
+            defaultNullOpts.mkNullable types.bool null
               "If null and file nesting is enabled, will enable expanders.";
 
-          expanderCollapsed = helpers.defaultNullOpts.mkStr "" "";
+          expanderCollapsed = defaultNullOpts.mkStr "" "";
 
-          expanderExpanded = helpers.defaultNullOpts.mkStr "" "";
+          expanderExpanded = defaultNullOpts.mkStr "" "";
 
-          expanderHighlight = helpers.defaultNullOpts.mkStr "NeoTreeExpander" "";
+          expanderHighlight = defaultNullOpts.mkStr "NeoTreeExpander" "";
         };
 
         icon = {
-          folderClosed = helpers.defaultNullOpts.mkStr "" "";
+          folderClosed = defaultNullOpts.mkStr "" "";
 
-          folderOpen = helpers.defaultNullOpts.mkStr "" "";
+          folderOpen = defaultNullOpts.mkStr "" "";
 
-          folderEmpty = helpers.defaultNullOpts.mkStr "ﰊ" "";
+          folderEmpty = defaultNullOpts.mkStr "ﰊ" "";
 
-          folderEmptyOpen = helpers.defaultNullOpts.mkStr "ﰊ" "";
+          folderEmptyOpen = defaultNullOpts.mkStr "ﰊ" "";
 
-          default = helpers.defaultNullOpts.mkStr "*" ''
+          default = defaultNullOpts.mkStr "*" ''
             Only a fallback, if you use nvim-web-devicons and configure default icons there
             then this will never be used.
           '';
 
-          highlight = helpers.defaultNullOpts.mkStr "NeoTreeFileIcon" ''
+          highlight = defaultNullOpts.mkStr "NeoTreeFileIcon" ''
             Only a fallback, if you use nvim-web-devicons and configure default icons there
             then this will never be used.
           '';
         };
 
         modified = {
-          symbol = helpers.defaultNullOpts.mkStr "[+] " "";
+          symbol = defaultNullOpts.mkStr "[+] " "";
 
-          highlight = helpers.defaultNullOpts.mkStr "NeoTreeModified" "";
+          highlight = defaultNullOpts.mkStr "NeoTreeModified" "";
         };
 
         name = {
-          trailingSlash = helpers.defaultNullOpts.mkBool false "";
+          trailingSlash = defaultNullOpts.mkBool false "";
 
-          useGitStatusColors = helpers.defaultNullOpts.mkBool true "";
+          useGitStatusColors = defaultNullOpts.mkBool true "";
 
-          highlight = helpers.defaultNullOpts.mkStr "NeoTreeFileName" "";
+          highlight = defaultNullOpts.mkStr "NeoTreeFileName" "";
         };
 
         gitStatus = {
-          symbols = mapAttrs (optionName: default: helpers.defaultNullOpts.mkStr default optionName) {
+          symbols = lib.mapAttrs (optionName: default: defaultNullOpts.mkStr default optionName) {
             added = "✚";
             deleted = "✖";
             modified = "";
@@ -428,7 +427,7 @@ in
             conflict = "";
           };
 
-          align = helpers.defaultNullOpts.mkStr "right" "icon alignment";
+          align = defaultNullOpts.mkStr "right" "icon alignment";
         };
       };
 
@@ -521,10 +520,10 @@ in
         ] "message renderers";
       };
 
-      nestingRules = helpers.defaultNullOpts.mkAttrsOf types.str { } "nesting rules";
+      nestingRules = defaultNullOpts.mkAttrsOf types.str { } "nesting rules";
 
       window = {
-        position = helpers.defaultNullOpts.mkEnumFirstDefault [
+        position = defaultNullOpts.mkEnumFirstDefault [
           "left"
           "right"
           "top"
@@ -533,36 +532,36 @@ in
           "current"
         ] "position";
 
-        width = helpers.defaultNullOpts.mkInt 40 "Applies to left and right positions";
+        width = defaultNullOpts.mkInt 40 "Applies to left and right positions";
 
-        height = helpers.defaultNullOpts.mkInt 15 "Applies to top and bottom positions";
+        height = defaultNullOpts.mkInt 15 "Applies to top and bottom positions";
 
-        autoExpandWidth = helpers.defaultNullOpts.mkBool false ''
+        autoExpandWidth = defaultNullOpts.mkBool false ''
           Expand the window when file exceeds the window width. does not work with
           position = "float"
         '';
 
         popup = {
           size = {
-            height = helpers.defaultNullOpts.mkStr "80%" "height";
+            height = defaultNullOpts.mkStr "80%" "height";
 
-            width = helpers.defaultNullOpts.mkStr "50%" "height";
+            width = defaultNullOpts.mkStr "50%" "height";
           };
 
-          position = helpers.defaultNullOpts.mkStr "80%" ''
+          position = defaultNullOpts.mkStr "80%" ''
             50% means center it.
             You can also specify border here, if you want a different setting from the global
             `popupBorderStyle`.
           '';
         };
 
-        sameLevel = helpers.defaultNullOpts.mkBool false ''
+        sameLevel = defaultNullOpts.mkBool false ''
           Create and paste/move files/directories on the same level as the directory under cursor
           (as opposed to within the directory under cursor).
         '';
 
         insertAs =
-          helpers.defaultNullOpts.mkEnumFirstDefault
+          defaultNullOpts.mkEnumFirstDefault
             [
               "child"
               "sibling"
@@ -576,84 +575,88 @@ in
             '';
 
         mappingOptions = {
-          noremap = helpers.defaultNullOpts.mkBool true "noremap";
+          noremap = defaultNullOpts.mkBool true "noremap";
 
-          nowait = helpers.defaultNullOpts.mkBool true "nowait";
+          nowait = defaultNullOpts.mkBool true "nowait";
         };
 
-        mappings = mkMappingsOption (literalMD ''
-          ```nix
-            {
-              "<space>" = {
-                command = "toggle_node";
-                # disable `nowait` if you have existing combos starting with this char that you want to use
-                nowait = false;
-              };
-              "<2-LeftMouse>" = "open";
-              "<cr>" = "open";
-              "<esc>" = "revert_preview";
-              P = {
-                command = "toggle_preview";
-                config = { use_float = true; };
-              };
-              l = "focus_preview";
-              S = "open_split";
-              # S = "split_with_window_picker";
-              s = "open_vsplit";
-              # s = "vsplit_with_window_picker";
-              t = "open_tabnew";
-              # "<cr>" = "open_drop";
-              # t = "open_tab_drop";
-              w = "open_with_window_picker";
-              C = "close_node";
-              z = "close_all_nodes";
-              # Z = "expand_all_nodes";
-              R = "refresh";
-              a = {
-                command = "add";
-                # some commands may take optional config options, see `:h neo-tree-mappings` for details
-                config = {
-                  show_path = "none"; # "none", "relative", "absolute"
+        mappings = mkMappingsOption (
+          lib.literalMD ''
+            ```nix
+              {
+                "<space>" = {
+                  command = "toggle_node";
+                  # disable `nowait` if you have existing combos starting with this char that you want to use
+                  nowait = false;
                 };
-              };
-              A = "add_directory"; # also accepts the config.show_path and config.insert_as options.
-              d = "delete";
-              r = "rename";
-              y = "copy_to_clipboard";
-              x = "cut_to_clipboard";
-              p = "paste_from_clipboard";
-              c = "copy"; # takes text input for destination, also accepts the config.show_path and config.insert_as options
-              m = "move"; # takes text input for destination, also accepts the config.show_path and config.insert_as options
-              e = "toggle_auto_expand_width";
-              q = "close_window";
-              "?" = "show_help";
-              "<" = "prev_source";
-              ">" = "next_source";
-            }
-          ```
-        '');
+                "<2-LeftMouse>" = "open";
+                "<cr>" = "open";
+                "<esc>" = "revert_preview";
+                P = {
+                  command = "toggle_preview";
+                  config = { use_float = true; };
+                };
+                l = "focus_preview";
+                S = "open_split";
+                # S = "split_with_window_picker";
+                s = "open_vsplit";
+                # s = "vsplit_with_window_picker";
+                t = "open_tabnew";
+                # "<cr>" = "open_drop";
+                # t = "open_tab_drop";
+                w = "open_with_window_picker";
+                C = "close_node";
+                z = "close_all_nodes";
+                # Z = "expand_all_nodes";
+                R = "refresh";
+                a = {
+                  command = "add";
+                  # some commands may take optional config options, see `:h neo-tree-mappings` for details
+                  config = {
+                    show_path = "none"; # "none", "relative", "absolute"
+                  };
+                };
+                A = "add_directory"; # also accepts the config.show_path and config.insert_as options.
+                d = "delete";
+                r = "rename";
+                y = "copy_to_clipboard";
+                x = "cut_to_clipboard";
+                p = "paste_from_clipboard";
+                c = "copy"; # takes text input for destination, also accepts the config.show_path and config.insert_as options
+                m = "move"; # takes text input for destination, also accepts the config.show_path and config.insert_as options
+                e = "toggle_auto_expand_width";
+                q = "close_window";
+                "?" = "show_help";
+                "<" = "prev_source";
+                ">" = "next_source";
+              }
+            ```
+          ''
+        );
       };
       filesystem = {
-        window = mkWindowMappingsOption (literalMD ''
-          ```nix
-            {
-              H = "toggle_hidden";
-              "/" = "fuzzy_finder";
-              D = "fuzzy_finder_directory";
-              # "/" = "filter_as_you_type"; # this was the default until v1.28
-              "#" = "fuzzy_sorter"; # fuzzy sorting using the fzy algorithm
-              # D = "fuzzy_sorter_directory";
-              f = "filter_on_submit";
-              "<C-x>" = "clear_filter";
-              "<bs>" = "navigate_up";
-              "." = "set_root";
-              "[g" = "prev_git_modified";
-              "]g" = "next_git_modified";
-            }
-          ```
-        '');
+        window = mkWindowMappingsOption (
+          lib.literalMD ''
+            ```nix
+              {
+                H = "toggle_hidden";
+                "/" = "fuzzy_finder";
+                D = "fuzzy_finder_directory";
+                # "/" = "filter_as_you_type"; # this was the default until v1.28
+                "#" = "fuzzy_sorter"; # fuzzy sorting using the fzy algorithm
+                # D = "fuzzy_sorter_directory";
+                f = "filter_on_submit";
+                "<C-x>" = "clear_filter";
+                "<bs>" = "navigate_up";
+                "." = "set_root";
+                "[g" = "prev_git_modified";
+                "]g" = "next_git_modified";
+              }
+            ```
+          ''
+        );
         asyncDirectoryScan =
-          helpers.defaultNullOpts.mkEnumFirstDefault
+          defaultNullOpts.mkEnumFirstDefault
             [
               "auto"
               "always"
@@ -667,7 +670,7 @@ in
             '';
 
         scanMode =
-          helpers.defaultNullOpts.mkEnumFirstDefault
+          defaultNullOpts.mkEnumFirstDefault
             [
               "shallow"
               "deep"
@@ -677,32 +680,32 @@ in
               - "deep": Scan into directories to detect empty or grouped empty directories a priori.
             '';
 
-        bindToCwd = helpers.defaultNullOpts.mkBool true "true creates a 2-way binding between vim's cwd and neo-tree's root.";
+        bindToCwd = defaultNullOpts.mkBool true "true creates a 2-way binding between vim's cwd and neo-tree's root.";
 
         cwdTarget = {
-          sidebar = helpers.defaultNullOpts.mkStr "tab" "sidebar is when position = left or right";
-          current = helpers.defaultNullOpts.mkStr "window" "current is when position = current";
+          sidebar = defaultNullOpts.mkStr "tab" "sidebar is when position = left or right";
+          current = defaultNullOpts.mkStr "window" "current is when position = current";
         };
 
         filteredItems = {
-          visible = helpers.defaultNullOpts.mkBool false "when true, they will just be displayed differently than normal items";
+          visible = defaultNullOpts.mkBool false "when true, they will just be displayed differently than normal items";
 
-          forceVisibleInEmptyFolder = helpers.defaultNullOpts.mkBool false "when true, hidden files will be shown if the root folder is otherwise empty";
+          forceVisibleInEmptyFolder = defaultNullOpts.mkBool false "when true, hidden files will be shown if the root folder is otherwise empty";
 
-          showHiddenCount = helpers.defaultNullOpts.mkBool true "when true, the number of hidden items in each folder will be shown as the last entry";
+          showHiddenCount = defaultNullOpts.mkBool true "when true, the number of hidden items in each folder will be shown as the last entry";
 
-          hideDotfiles = helpers.defaultNullOpts.mkBool true "hide dotfiles";
+          hideDotfiles = defaultNullOpts.mkBool true "hide dotfiles";
 
-          hideGitignored = helpers.defaultNullOpts.mkBool true "hide gitignored files";
+          hideGitignored = defaultNullOpts.mkBool true "hide gitignored files";
 
-          hideHidden = helpers.defaultNullOpts.mkBool true "only works on Windows for hidden files/directories";
+          hideHidden = defaultNullOpts.mkBool true "only works on Windows for hidden files/directories";
 
-          hideByName = helpers.defaultNullOpts.mkListOf types.str [
+          hideByName = defaultNullOpts.mkListOf types.str [
             ".DS_Store"
             "thumbs.db"
           ] "hide by name";
 
-          hideByPattern = helpers.defaultNullOpts.mkListOf' {
+          hideByPattern = defaultNullOpts.mkListOf' {
             type = types.str;
             pluginDefault = [ ];
             description = "Hide by pattern.";
@@ -712,14 +715,14 @@ in
             ];
           };
 
-          alwaysShow = helpers.defaultNullOpts.mkListOf' {
+          alwaysShow = defaultNullOpts.mkListOf' {
             type = types.str;
             pluginDefault = [ ];
             description = "Files/folders to always show.";
             example = [ ".gitignore" ];
           };
 
-          neverShow = helpers.defaultNullOpts.mkListOf' {
+          neverShow = defaultNullOpts.mkListOf' {
             type = types.str;
             pluginDefault = [ ];
             description = "Files/folders to never show.";
@@ -729,7 +732,7 @@ in
             ];
           };
 
-          neverShowByPattern = helpers.defaultNullOpts.mkListOf' {
+          neverShowByPattern = defaultNullOpts.mkListOf' {
             type = types.str;
             pluginDefault = [ ];
             description = "Files/folders to never show (by pattern).";
@@ -737,7 +740,7 @@ in
           };
         };
 
-        findByFullPathWords = helpers.defaultNullOpts.mkBool false ''
+        findByFullPathWords = defaultNullOpts.mkBool false ''
           `false` means it only searches the tail of a path.
           `true` will change the filter into a full path
 
@@ -745,13 +748,13 @@ in
           `./sources/filesystem/init.lua
         '';
 
-        findCommand = helpers.defaultNullOpts.mkStr "fd" "This is determined automatically, you probably don't need to set it";
+        findCommand = defaultNullOpts.mkStr "fd" "This is determined automatically, you probably don't need to set it";
 
         findArgs =
-          helpers.mkNullOrStrLuaFnOr
+          lib.nixvim.mkNullOrStrLuaFnOr
             (types.submodule {
               options = {
-                fd = helpers.defaultNullOpts.mkListOf types.str [
+                fd = defaultNullOpts.mkListOf types.str [
                   "--exclude"
                   ".git"
                   "--exclude"
@@ -802,14 +805,14 @@ in
               ```
             '';
 
-        groupEmptyDirs = helpers.defaultNullOpts.mkBool false "when true, empty folders will be grouped together";
+        groupEmptyDirs = defaultNullOpts.mkBool false "when true, empty folders will be grouped together";
 
-        searchLimit = helpers.defaultNullOpts.mkInt 50 "max number of search results when using filters";
+        searchLimit = defaultNullOpts.mkInt 50 "max number of search results when using filters";
 
         followCurrentFile = mkFollowCurrentFileOption false;
 
         hijackNetrwBehavior =
-          helpers.defaultNullOpts.mkEnumFirstDefault
+          defaultNullOpts.mkEnumFirstDefault
             [
               "open_default"
               "open_current"
@@ -823,18 +826,18 @@ in
               - "disabled": netrw left alone, neo-tree does not handle opening dirs
             '';
 
-        useLibuvFileWatcher = helpers.defaultNullOpts.mkBool false ''
+        useLibuvFileWatcher = defaultNullOpts.mkBool false ''
           This will use the OS level file watchers to detect changes instead of relying on nvim
           autocmd events.
         '';
       };
 
       buffers = {
-        bindToCwd = helpers.defaultNullOpts.mkBool true "Bind to current working directory.";
+        bindToCwd = defaultNullOpts.mkBool true "Bind to current working directory.";
 
         followCurrentFile = mkFollowCurrentFileOption true;
 
-        groupEmptyDirs = helpers.defaultNullOpts.mkBool true "When true, empty directories will be grouped together.";
+        groupEmptyDirs = defaultNullOpts.mkBool true "When true, empty directories will be grouped together.";
 
         window = mkWindowMappingsOption {
           "<bs>" = "navigate_up";
@@ -876,10 +879,10 @@ in
       };
 
       documentSymbols = {
-        followCursor = helpers.defaultNullOpts.mkBool false "If set to `true`, will automatically focus on the symbol under the cursor.";
+        followCursor = defaultNullOpts.mkBool false "If set to `true`, will automatically focus on the symbol under the cursor.";
 
         kinds =
-          helpers.mkNullOrOption
+          lib.nixvim.mkNullOrOption
             (
               with types;
               attrsOf (submodule {
@@ -903,7 +906,7 @@ in
               `Class = { icon = ""; hl = "Include"; }`
             '';
 
-        customKinds = mkOption {
+        customKinds = lib.mkOption {
           type = with types; attrsOf str;
           default = { };
           example = {
@@ -923,16 +926,16 @@ in
 
   config =
     let
-      inherit (helpers) ifNonNull' mkRaw;
+      inherit (lib.nixvim) ifNonNull' mkRaw;
 
       processRendererComponent =
         component:
-        if isString component then
+        if lib.isString component then
           [ component ]
         else
-          (mapAttrs' (name: value: {
+          (lib.mapAttrs' (name: value: {
             name = if name == "name" then "__unkeyed" else name;
-            value = if isList value then processRendererComponentList value else value;
+            value = if lib.isList value then processRendererComponentList value else value;
           }) component);
 
       processRendererComponentList =
@@ -940,15 +943,15 @@ in
 
       processMapping =
         key: action:
-        if isString action then
+        if lib.isString action then
           action
         else
-          mapAttrs' (k: v: {
+          lib.mapAttrs' (k: v: {
             name = if k == "command" then "__unkeyed" else k;
             value = v;
           }) action;
 
-      processMappings = mappings: ifNonNull' mappings (mapAttrs processMapping mappings);
+      processMappings = mappings: ifNonNull' mappings (lib.mapAttrs processMapping mappings);
 
       processWindowMappings = window: { mappings = processMappings window.mappings; };
 
@@ -1021,7 +1024,7 @@ in
           event_handlers = ifNonNull' eventHandlers (
             mapAttrsToList (event: handler: {
               inherit event;
-              handler = helpers.mkRaw handler;
+              handler = lib.nixvim.mkRaw handler;
             }) eventHandlers
           );
           default_component_configs = with defaultComponentConfigs; {
@@ -1121,22 +1124,22 @@ in
         }
         // cfg.extraOptions;
     in
-    mkIf cfg.enable {
+    lib.mkIf cfg.enable {
       # TODO: added 2024-09-20 remove after 24.11
-      plugins.web-devicons = mkIf (
+      plugins.web-devicons = lib.mkIf (
         !(
           config.plugins.mini.enable
           && config.plugins.mini.modules ? icons
           && config.plugins.mini.mockDevIcons
         )
-      ) { enable = mkOverride 1490 true; };
+      ) { enable = lib.mkOverride 1490 true; };
 
       extraPlugins = [
         cfg.package
       ];
 
       extraConfigLua = ''
-        require('neo-tree').setup(${helpers.toLuaObject setupOptions})
+        require('neo-tree').setup(${lib.nixvim.toLuaObject setupOptions})
       '';
 
       extraPackages = [ cfg.gitPackage ];
