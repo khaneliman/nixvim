@@ -85,4 +85,35 @@
       };
     };
   };
+
+  lazy = {
+    plugins = {
+      lz-n.enable = true;
+      dap = {
+        enable = true;
+        adapters.executables.test = {
+          command = "echo";
+          args = [
+            "test works"
+          ];
+        };
+        configurations."" = [
+          {
+            name = "Test";
+            request = "launch";
+            type = "test";
+          }
+        ];
+        lazyLoad.settings = {
+          cmd = [
+            "DapContinue"
+            "DapNew"
+          ];
+        };
+      };
+    };
+    extraConfigLuaPost = ''
+      vim.cmd('DapNew')
+    '';
+  };
 }
