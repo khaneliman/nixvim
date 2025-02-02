@@ -1,0 +1,61 @@
+{
+  deprecateExtraOptions = true;
+  optionsRenamedToSettings = [
+    "model"
+    [
+      "prompts"
+      "prompt"
+    ]
+    [
+      "prompts"
+      "inputLabel"
+    ]
+    [
+      "prompts"
+      "action"
+    ]
+    [
+      "prompts"
+      "model"
+    ]
+    [
+      "prompts"
+      "extract"
+    ]
+    [
+      "prompts"
+      "options"
+    ]
+    [
+      "prompts"
+      "system"
+    ]
+    [
+      "prompts"
+      "format"
+    ]
+    "action"
+    "url"
+    [
+      "serve"
+      "onStart"
+    ]
+    [
+      "serve"
+      "command"
+    ]
+    [
+      "serve"
+      "args"
+    ]
+    [
+      "serve"
+      "stopCommand"
+    ]
+    [
+      "serve"
+      "stopArgs"
+    ]
+  ];
+
+}
