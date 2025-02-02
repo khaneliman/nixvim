@@ -126,10 +126,29 @@ lib.nixvim.plugins.mkNeovimPlugin {
             Currently the only accepted value is `"json"`.
           '';
         };
+
+        processPrompt =
+          prompt:
+          if lib.isAttrs prompt then
+            {
+              inherit (prompt) prompt;
+              input_label = prompt.inputLabel;
+              inherit (prompt)
+                action
+                model
+                extract
+                options
+                system
+                format
+                ;
+            }
+          else
+            prompt;
       in
       lib.mkOption {
         type = with types; attrsOf (either (submodule { options = promptOptions; }) (enum [ false ]));
         default = { };
+        apply = v: lib.mapAttrs (_: processPrompt) v;
         description = ''
           A table of prompts to use for each model.
           Default prompts are defined [here](https://github.com/nomnivore/ollama.nvim/blob/main/lua/ollama/prompts.lua).
