@@ -8,12 +8,33 @@
 # To regenerate: nix run .#generate-all-maintainers
 #
 {
+  "347Online" = {
+    email = "katiejanzen@347online.me";
+    github = "347Online";
+    githubId = 38228372;
+    name = "Katie Janzen";
+    source = "nixpkgs";
+  };
+  "4lxs" = {
+    github = "4lxs";
+    githubId = 66408983;
+    matrix = "@gyn:matrix.org";
+    name = "svl";
+    source = "nixpkgs";
+  };
   AidanWelch = {
     email = "aidan@freedwave.com";
     github = "AidanWelch";
     githubId = 35280359;
     name = "Aidan Welch";
     source = "nixvim";
+  };
+  Balssh = {
+    email = "george.bals25@gmail.com";
+    github = "Balssh";
+    githubId = 82440615;
+    name = "George Bals";
+    source = "nixpkgs";
   };
   Bodleum = {
     email = "daniel@daniellaing.com";
