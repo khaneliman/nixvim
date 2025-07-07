@@ -146,7 +146,7 @@ jobs:
             ---
             🤖 *This PR was automatically created by the [update-maintainers workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*
         run: |
-          branch_name="maintainers/update-$(date +%Y%m%d%H%M%S)"
+          branch_name="maintainerss/update-$(date +%Y%m%d%H%M%S)"
           git checkout -b "$branch_name"
 
           git add generated/all-maintainers.nix
