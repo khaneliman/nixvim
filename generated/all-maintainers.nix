@@ -8,13 +8,6 @@
 # To regenerate: nix run .#generate-all-maintainers
 #
 {
-  "4lxs" = {
-    github = "4lxs";
-    githubId = 66408983;
-    matrix = "@gyn:matrix.org";
-    name = "svl";
-    source = "nixpkgs";
-  };
   AidanWelch = {
     email = "aidan@freedwave.com";
     github = "AidanWelch";
