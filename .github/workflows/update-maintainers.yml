@@ -146,13 +146,13 @@ jobs:
             ---
             🤖 *This PR was automatically created by the [update-maintainers workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*
         run: |
-          branch_name="maintainerss/update-$(date +%Y%m%d%H%M%S)"
-          git checkout -b "$branch_name" --set-upstream
+          branch_name="maintainers-update"
+          git checkout -b "$branch_name"
 
           git add generated/all-maintainers.nix
           git commit -m "$title" -m "$commit_body"
 
-          git push origin "$branch_name"
+          git push --force-with-lease origin "$branch_name"
 
           PR_URL=$(gh pr create \
             --title "$title" \
