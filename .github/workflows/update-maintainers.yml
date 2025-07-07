@@ -22,6 +22,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      issues: write
     if: github.repository_owner == 'nix-community' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Create GitHub App token
@@ -33,6 +34,7 @@ jobs:
           private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
           permission-contents: write
           permission-pull-requests: write
+          permission-issues: write
 
       - name: Get GitHub App user info
         id: user-info
