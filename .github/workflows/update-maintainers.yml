@@ -55,6 +55,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ steps.app-token.outputs.token || github.token }}
+          # A fetch-depth of 0 clones the entire history
+          fetch-depth: 0
 
       - name: Install Nix
         uses: cachix/install-nix-action@v31
