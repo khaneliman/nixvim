@@ -150,7 +150,7 @@ jobs:
           git add generated/all-maintainers.nix
           git commit -m "$title" -m "$commit_body"
 
-          git push origin "$branch_name"
+          git push origin "$branch_name" --set-upstream
 
           PR_URL=$(gh pr create \
             --title "$title" \
