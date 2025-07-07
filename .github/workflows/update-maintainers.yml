@@ -154,11 +154,18 @@ jobs:
 
           git push --force-with-lease origin "$branch_name"
 
-          PR_URL=$(gh pr create \
-            --title "$title" \
-            --body "$pr_body" \
-            --label "dependencies" \
-            --label "maintainers")
+          EXISTING_PR=$(gh pr list --head "$branch_name" --json url --jq '.[0].url')
+
+          if [ -z "$EXISTING_PR" ]; then
+            echo "Creating new pull request."
+            PR_URL=$(gh pr create \
+              --title "$title" \
+              --body "$pr_body" \
+              --label "dependencies,maintainers") # Make sure these labels exist
+          else
+            echo "Pull request already exists: $EXISTING_PR"
+            PR_URL=$EXISTING_PR
+          fi
 
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
