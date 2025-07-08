@@ -12,7 +12,6 @@ jobs:
   tag-maintainers:
     runs-on: ubuntu-latest
     if: |
-      github.repository_owner == 'nix-community' &&
       github.event.pull_request.draft == false &&
       github.event.pull_request.state == 'open'
     steps:
