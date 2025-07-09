@@ -7,6 +7,7 @@ with lib;
 lib.nixvim.plugins.mkNeovimPlugin {
   name = "dashboard";
   packPathName = "dashboard-nvim";
+
   package = "dashboard-nvim";
   description = "Fancy and Blazing Fast start screen plugin for Neovim.";
 
