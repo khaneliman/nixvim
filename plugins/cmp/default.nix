@@ -10,6 +10,7 @@ in
 lib.nixvim.plugins.mkNeovimPlugin {
   name = "cmp";
   packPathName = "nvim-cmp";
+
   package = "nvim-cmp";
 
   maintainers = [ lib.maintainers.GaetanLepage ];
