@@ -33,6 +33,22 @@ jobs:
           permission-pull-requests: write
           permission-members: read
 
+      - name: Get GitHub App user info
+        id: user-info
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          slug: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          name="$slug"
+          name_regex="$slug"'\[bot\]'
+          id=$(gh api "/users/$name" --jq .id)
+          {
+            echo "id=$id"
+            echo "name=$name"
+            echo "email=$id+$name@users.noreply.github.com"
+            echo 'author-regex=^'"$name_regex"' <'"$id+$name_regex"'@users\.noreply\.github\.com>$'
+          } >> "$GITHUB_OUTPUT"
+
       # Checkout the code from the base branch.
       # This is a security measure for `pull_request_target` to run trusted code.
       - name: Checkout code
