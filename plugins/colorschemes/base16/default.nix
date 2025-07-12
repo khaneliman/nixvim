@@ -13,7 +13,6 @@ lib.nixvim.plugins.mkNeovimPlugin {
   packPathName = "base16-nvim";
   setup = ".with_config";
   package = "base16-nvim";
-
   isColorscheme = true;
 
   maintainers = with lib.maintainers; [
