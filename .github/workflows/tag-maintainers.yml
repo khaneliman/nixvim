@@ -90,4 +90,5 @@ jobs:
             --pr-number "$PR_NUMBER" \
             --pr-author "$PR_AUTHOR" \
             --current-maintainers "$MAINTAINERS" \
-            --changed-files "$CHANGED_FILES"
+            --changed-files "$CHANGED_FILES" \
+            --bot-user-name "${{ steps.app-token.outputs.app-slug }}"

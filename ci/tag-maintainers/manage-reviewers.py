@@ -71,9 +71,9 @@ def run_gh_command(
 
 
 def get_manually_requested_reviewers(
-    owner: str, repo: str, pr_number: int
+    owner: str, repo: str, pr_number: int, bot_user_name: str
 ) -> set[str]:
-    """Fetches a set of reviewers who were manually requested by a human."""
+    """Fetches a set of reviewers who were manually requested by someone other than the bot."""
     try:
         result = run_gh_command([
             "api", "graphql",
@@ -88,7 +88,7 @@ def get_manually_requested_reviewers(
         manually_requested = {
             node["requestedReviewer"]["login"]
             for node in nodes
-            if node and node.get("actor", {}).get("__typename") == "User" and node.get("requestedReviewer")
+            if node and node.get("requestedReviewer") and node.get("actor", {}).get("login") != bot_user_name
         }
         return manually_requested
     except (GHError, json.JSONDecodeError, KeyError) as e:
@@ -193,6 +193,7 @@ def main() -> None:
     parser.add_argument("--pr-author", required=True, help="PR author's username.")
     parser.add_argument("--current-maintainers", default="", help="Space-separated list of current maintainers.")
     parser.add_argument("--changed-files", default="", help="Newline-separated list of changed files.")
+    parser.add_argument("--bot-user-name", default="", help="Bot user name to distinguish manual vs automated review requests.")
     args = parser.parse_args()
 
     no_plugin_files = not args.changed_files.strip()
@@ -201,7 +202,7 @@ def main() -> None:
     maintainers: set[str] = set(args.current_maintainers.split())
     pending_reviewers = get_pending_reviewers(args.pr_number)
     past_reviewers = get_past_reviewers(args.owner, args.repo, args.pr_number)
-    manually_requested = get_manually_requested_reviewers(args.owner, args.repo, args.pr_number)
+    manually_requested = get_manually_requested_reviewers(args.owner, args.repo, args.pr_number, args.bot_user_name)
 
     logging.info("Current Maintainers: %s", ' '.join(maintainers) or "None")
     logging.info("Pending Reviewers: %s", ' '.join(pending_reviewers) or "None")
