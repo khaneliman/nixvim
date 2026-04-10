@@ -1,4 +1,8 @@
-{ lib, ... }:
+{
+  lib,
+  config,
+  ...
+}:
 let
   inherit (lib) mkOption types;
   inherit (lib.nixvim) defaultNullOpts literalLua toLuaObject;
@@ -289,6 +293,8 @@ lib.nixvim.plugins.mkNeovimPlugin {
   };
 
   extraOptions = {
+    enableFriendlySnippetsIntegration = lib.mkEnableOption "friendly-snippets integration";
+
     fromVscode = mkOption {
       type = types.listOf loaderSubmodule;
       default = [ ];
@@ -369,10 +375,15 @@ lib.nixvim.plugins.mkNeovimPlugin {
   extraConfig =
     cfg:
     let
+      friendlySnippetsLoader = lib.optional cfg.enableFriendlySnippetsIntegration {
+        lazyLoad = true;
+        paths = config.plugins.friendly-snippets.package;
+      };
+
       loaderConfig =
         lib.pipe
           {
-            vscode = cfg.fromVscode;
+            vscode = friendlySnippetsLoader ++ cfg.fromVscode;
             snipmate = cfg.fromSnipmate;
             lua = cfg.fromLua;
           }
@@ -383,11 +394,14 @@ lib.nixvim.plugins.mkNeovimPlugin {
               pair:
               let
                 inherit (pair) name loader;
-                options = lib.getAttrs [
-                  "paths"
-                  "exclude"
-                  "include"
-                ] loader;
+                options = lib.filterAttrs (
+                  name: _:
+                  builtins.elem name [
+                    "paths"
+                    "exclude"
+                    "include"
+                  ]
+                ) loader;
               in
               ''
                 require("luasnip.loaders.from_${name}").${lib.optionalString loader.lazyLoad "lazy_"}load(${toLuaObject options})
@@ -400,6 +414,13 @@ lib.nixvim.plugins.mkNeovimPlugin {
       '') cfg.filetypeExtend;
     in
     {
+      assertions = lib.nixvim.mkAssertions "plugins.luasnip" {
+        assertion = !cfg.enableFriendlySnippetsIntegration || config.plugins.friendly-snippets.enable;
+        message = ''
+          `enableFriendlySnippetsIntegration` requires `plugins.friendly-snippets.enable` to be true.
+        '';
+      };
+
       plugins.luasnip.luaConfig.content = lib.concatLines (loaderConfig ++ filetypeExtendConfig);
     };
 }

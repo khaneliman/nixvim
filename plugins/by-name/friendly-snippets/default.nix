@@ -39,7 +39,5 @@ lib.nixvim.plugins.mkVimPlugin {
         '';
       }
     );
-    # Simply add an element to the `fromVscode` list to trigger the import of friendly-snippets
-    plugins.luasnip.fromVscode = [ { } ];
   };
 }

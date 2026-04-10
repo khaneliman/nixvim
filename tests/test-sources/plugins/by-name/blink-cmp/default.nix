@@ -416,4 +416,41 @@
     };
     plugins.lsp.enable = true;
   };
+
+  friendly-snippets =
+    { config, ... }:
+    {
+      test.runNvim = false;
+
+      plugins = {
+        friendly-snippets.enable = true;
+        blink-cmp = {
+          enable = true;
+          enableFriendlySnippetsIntegration = true;
+        };
+      };
+
+      assertions = [
+        {
+          assertion =
+            config.plugins.blink-cmp.settings.sources.providers.snippets.opts.friendly_snippets == true;
+          message = "Expected blink-cmp snippets provider to enable friendly_snippets.";
+        }
+      ];
+    };
+
+  friendly-snippets-missing-dependency = {
+    test = {
+      runNvim = false;
+      assertions = expect: [
+        (expect "count" 1)
+        (expect "any" "`enableFriendlySnippetsIntegration` requires `plugins.friendly-snippets.enable`")
+      ];
+    };
+
+    plugins.blink-cmp = {
+      enable = true;
+      enableFriendlySnippetsIntegration = true;
+    };
+  };
 }

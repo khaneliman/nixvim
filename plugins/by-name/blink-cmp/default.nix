@@ -1,5 +1,6 @@
 {
   lib,
+  config,
   ...
 }:
 lib.nixvim.plugins.mkNeovimPlugin {
@@ -44,9 +45,18 @@ lib.nixvim.plugins.mkNeovimPlugin {
 
   extraOptions = {
     setupLspCapabilities = lib.nixvim.options.mkEnabledOption "LSP capabilities for blink-cmp";
+
+    enableFriendlySnippetsIntegration = lib.mkEnableOption "friendly-snippets integration";
   };
 
   extraConfig = cfg: {
+    assertions = lib.nixvim.mkAssertions "plugins.blink-cmp" {
+      assertion = !cfg.enableFriendlySnippetsIntegration || config.plugins.friendly-snippets.enable;
+      message = ''
+        `enableFriendlySnippetsIntegration` requires `plugins.friendly-snippets.enable` to be true.
+      '';
+    };
+
     # TODO: On Neovim 0.11+ and Blink.cmp 0.10+ with vim.lsp.config, you may skip this step.
     # This is still required when using nvim-lspconfig, until this issue is completed:
     # https://github.com/neovim/nvim-lspconfig/issues/3494
@@ -59,5 +69,11 @@ lib.nixvim.plugins.mkNeovimPlugin {
 
     # blink_cmp_fuzzy lib
     performance.combinePlugins.pathsToLink = [ "/target/release" ];
+
+    plugins.blink-cmp.settings.sources.providers.snippets.opts =
+      lib.mkIf cfg.enableFriendlySnippetsIntegration
+        {
+          friendly_snippets = lib.mkDefault true;
+        };
   };
 }
