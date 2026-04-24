@@ -208,6 +208,25 @@ in
 
       You should use `plugins.none-ls.sources.*.enable` instead.
 
+      This is still the escape hatch for custom or third-party sources.
+      For example, `tex-fmt` currently lives in `none-ls-extras.nvim`, not in
+      upstream `none-ls` builtins, so it should be configured here instead of as
+      a first-class Nixvim source option:
+
+      ```nix
+      {
+        extraPlugins = [ myNoneLsExtrasPlugin ];
+        extraPackages = [ pkgs.tex-fmt ];
+
+        plugins.none-ls = {
+          enable = true;
+          settings.sources = [
+            "require('none-ls.formatting.tex_fmt')"
+          ];
+        };
+      }
+      ```
+
       **Upstream's description:**
 
       Defines a list of sources for null-ls to register.
