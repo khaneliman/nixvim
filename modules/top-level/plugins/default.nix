@@ -28,33 +28,35 @@ in
     };
   };
 
-  config = {
-    build.plugins =
-      let
-        shouldCompilePlugins = byteCompileCfg.enable && byteCompileCfg.plugins;
-        byteCompilePlugins = pkgs.callPackage ./byte-compile-plugins.nix {
-          inherit lib;
-          inherit (config.performance.byteCompileLua) excludedPlugins;
-        };
+  config =
+    let
+      shouldCompilePlugins = byteCompileCfg.enable && byteCompileCfg.plugins;
+      byteCompilePlugins = pkgs.callPackage ./byte-compile-plugins.nix {
+        inherit lib;
+        inherit (config.performance.byteCompileLua) excludedPlugins;
+      };
 
-        shouldCompileLuaLib = byteCompileCfg.enable && byteCompileCfg.luaLib;
-        inherit (pkgs.callPackage ./byte-compile-lua-lib.nix { inherit lib; }) byteCompilePluginDeps;
+      shouldCompileLuaLib = byteCompileCfg.enable && byteCompileCfg.luaLib;
+      inherit (pkgs.callPackage ./byte-compile-lua-lib.nix { inherit lib; }) byteCompilePluginDeps;
 
-        shouldCombinePlugins = config.performance.combinePlugins.enable;
-        combinePlugins = pkgs.callPackage ./combine-plugins.nix {
-          inherit lib;
-          inherit (config.performance.combinePlugins)
-            standalonePlugins
-            pathsToLink
-            ;
-        };
-      in
+      shouldCombinePlugins = config.performance.combinePlugins.enable;
+      combinePlugins = pkgs.callPackage ./combine-plugins.nix {
+        inherit lib;
+        inherit (config.performance.combinePlugins)
+          standalonePlugins
+          pathsToLink
+          ;
+      };
 
-      lib.pipe config.extraPlugins (
+      plugins = lib.pipe config.extraPlugins (
         [ normalizePlugins ]
         ++ lib.optionals shouldCompilePlugins [ byteCompilePlugins ]
         ++ lib.optionals shouldCompileLuaLib [ byteCompilePluginDeps ]
-        ++ lib.optionals shouldCombinePlugins [ combinePlugins ]
       );
-  };
+      combinedPlugins = combinePlugins plugins;
+    in
+    {
+      build.plugins = if shouldCombinePlugins then combinedPlugins.plugins else plugins;
+      assertions = lib.optionals shouldCombinePlugins combinedPlugins.assertions;
+    };
 }
