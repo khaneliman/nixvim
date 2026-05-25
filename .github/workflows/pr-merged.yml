@@ -6,6 +6,8 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: read
 
 defaults:
   run:
@@ -79,6 +81,7 @@ jobs:
         with:
           sparse-checkout: |
             flake/dev/diff-plugins.py
+            flake/dev/plugin-announcements.py
             flake.lock
           sparse-checkout-cone-mode: false
 
@@ -179,3 +182,45 @@ jobs:
             echo '```'
             echo
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Generate plugin announcements
+        id: announcements
+        env:
+          diff: ${{ steps.diff2.outputs.json }}
+          head: ${{ github.event.pull_request.merge_commit_sha }}
+          pr_number: ${{ github.event.pull_request.number }}
+          pr_url: ${{ github.event.pull_request.html_url }}
+          pr_author_name: ${{ github.event.pull_request.user.login }}
+          pr_author_url: ${{ github.event.pull_request.user.html_url }}
+        run: |
+          out=$(mktemp)
+          ./flake/dev/plugin-announcements.py \
+            --compact \
+            --diff-json "$diff" \
+            --flake-ref "github:${{ github.repository }}/$head" \
+            --pr-number "$pr_number" \
+            --pr-url "$pr_url" \
+            --pr-author-name "$pr_author_name" \
+            --pr-author-url "$pr_author_url" \
+            > "$out"
+
+          {
+            echo -n 'json='
+            jq -c . < "$out"
+          } >> "$GITHUB_OUTPUT"
+
+          jq -r .summary_markdown < "$out" >> "$GITHUB_STEP_SUMMARY"
+          jq . < "$out"
+
+      - name: Comment when announcements need manual review
+        if: ${{ fromJSON(steps.announcements.outputs.json).blocked }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          pr_number: ${{ github.event.pull_request.number }}
+          json: ${{ steps.announcements.outputs.json }}
+        run: |
+          body=$(mktemp)
+          jq -r .comment_markdown <<< "$json" > "$body"
+          gh pr comment "$pr_number" \
+            --repo "${{ github.repository }}" \
+            --body-file "$body"
