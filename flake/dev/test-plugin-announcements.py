@@ -67,7 +67,9 @@ class PluginAnnouncementsTest(unittest.TestCase):
         result = plugin_announcements.build_announcements(diff, [], None)
 
         self.assertTrue(result["blocked"])
-        self.assertIn("Automatic announcements were not prepared", result["summary_markdown"])
+        self.assertIn(
+            "Automatic announcements were not prepared", result["summary_markdown"]
+        )
         self.assertIn("plugins.bar", result["comment_markdown"])
 
     def test_empty_diff_reports_no_announcements(self):

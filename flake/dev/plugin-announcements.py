@@ -113,7 +113,7 @@ def read_metadata(flake_ref, entries):
             pkg = package entry.namespace entry.name;
           in
           entry // {{
-            displayName = info.originalName or entry.name;
+            displayName = if pkg == null then entry.name else pkg.pname or entry.name;
             url = info.url or (if pkg == null then null else pkg.meta.homepage or null);
             description = info.description or (if pkg == null then null else pkg.meta.description or null);
           }}
@@ -134,9 +134,7 @@ def read_metadata(flake_ref, entries):
 
 def build_announcements(diff, metadata, pr):
     removed = removed_entries(diff)
-    metadata_by_key = {
-        (entry["namespace"], entry["name"]): entry for entry in metadata
-    }
+    metadata_by_key = {(entry["namespace"], entry["name"]): entry for entry in metadata}
     added = []
 
     for entry in added_entries(diff):
